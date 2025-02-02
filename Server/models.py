@@ -5,7 +5,7 @@ from config import db, bcrypt, association_proxy
 from datetime import datetime
 
 class User(db.Model, SerializerMixin):
-    _tablename_ = "users"
+    __tablename__ = "users"
 
     serialize_rules = ("-bookshelves.user", "-bookclubs.users")  
 
@@ -24,7 +24,7 @@ class User(db.Model, SerializerMixin):
 
 # One to Many
 class BookShelf(db.Model, SerializerMixin):
-    _tablename_ = "bookshelves"
+    __tablename__ = "bookshelves"
 
     serialize_rules = ('-user.bookshelves',) 
 
@@ -47,7 +47,7 @@ bookshelf_books = db.Table('bookshelf_books',
 )
 
 class Book(db.Model, SerializerMixin):
-    _tablename_ = "books"
+    __tablename__ = "books"
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
@@ -71,7 +71,7 @@ bookclub_books = db.Table('bookclub_books',
 )
 
 class Bookclub(db.Model, SerializerMixin):
-    _tablename_ = "bookclubs"
+    __tablename__= "bookclubs"
 
     serialize_rules = ("-chatlogs.bookclub", "-users.bookclubs")  
 
@@ -87,7 +87,7 @@ class Bookclub(db.Model, SerializerMixin):
 
 
 class Chatlog(db.Model, SerializerMixin):
-    _tablename_ = "chatlogs"
+    __tablename__ = "chatlogs"
 
     serialize_rules = ("-bookclub.chatlogs",)  
 
