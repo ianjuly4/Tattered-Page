@@ -1,4 +1,3 @@
-#/server/models.py
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_serializer import SerializerMixin
@@ -7,6 +6,8 @@ from datetime import datetime
 
 class User(db.Model, SerializerMixin):
     _tablename_ = "users"
+
+    serialize_rules = ("-bookshelves.user", "-bookclubs.users")  
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False, unique=True)
@@ -18,10 +19,14 @@ class User(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     bookshelves = db.relationship('BookShelf', back_populates='user', cascade='all, delete-orphan')
+    bookclubs = db.relationship('Bookclub', secondary='bookclub_users', back_populates='users')
 
-#One to Many
+
+# One to Many
 class BookShelf(db.Model, SerializerMixin):
     _tablename_ = "bookshelves"
+
+    serialize_rules = ('-user.bookshelves',) 
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -31,14 +36,14 @@ class BookShelf(db.Model, SerializerMixin):
     updated_at = db.Column(db.DateTime, default=datetime, onupdate=datetime, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
     user = db.relationship('User', back_populates='bookshelves')
     books = db.relationship('Book', secondary='bookshelf_books', back_populates='bookshelves')
 
+
 # Bookshelf-Book (many-to-many relationship between bookshelf and book through the 'bookshelf_books' table)
 bookshelf_books = db.Table('bookshelf_books',
-    db.Column('bookshelf_id', db.Integer, db.ForeignKey('bookshelf.id'), primary_key=True),
-    db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True)
+    db.Column('bookshelf_id', db.Integer, db.ForeignKey('bookshelves.id'), primary_key=True),
+    db.Column('book_id', db.Integer, db.ForeignKey('books.id'), primary_key=True)
 )
 
 class Book(db.Model, SerializerMixin):
@@ -55,16 +60,20 @@ class Book(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, default=datetime, nullable=False)
     last_read_at = db.Column(db.DateTime, nullable=True)
 
-    bookshelves = db.relationship('Bookshelf', secondary='bookshelf_books', back_populates="books")
+    bookshelves = db.relationship('BookShelf', secondary='bookshelf_books', back_populates="books")
+    bookclubs = db.relationship('Bookclub', secondary='bookclub_books', back_populates='books')
+
 
 # BookClub-Book (many-to-many relationship between book and bookclub through the 'bookclub_books' table)
 bookclub_books = db.Table('bookclub_books',
-    db.Column('bookclub_id', db.Integer, db.ForeignKey('book_club.id'), primary_key=True),
-    db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True)
+    db.Column('bookclub_id', db.Integer, db.ForeignKey('bookclubs.id'), primary_key=True),
+    db.Column('book_id', db.Integer, db.ForeignKey('books.id'), primary_key=True)
 )
 
 class Bookclub(db.Model, SerializerMixin):
     _tablename_ = "bookclubs"
+
+    serialize_rules = ("-chatlogs.bookclub", "-users.bookclubs")  
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -73,20 +82,26 @@ class Bookclub(db.Model, SerializerMixin):
     updated_at = db.Column(db.DateTime, default=datetime, onupdate=datetime, nullable=False)
 
     books = db.relationship('Book', secondary='bookclub_books', back_populates='bookclubs')
-    chatlogs = db.relationship('Chatlog', back_populates='bookclubs', cascade='all, delete-orphan')
+    users = db.relationship('User', secondary='bookclub_users', back_populates='bookclubs')
+    chatlogs = db.relationship('Chatlog', back_populates='bookclub', cascade='all, delete-orphan')
+
 
 class Chatlog(db.Model, SerializerMixin):
     _tablename_ = "chatlogs"
+
+    serialize_rules = ("-bookclub.chatlogs",)  
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime, onupdate=datetime, nullable=False)
 
-    bookclubs = db.relationship('Bookclub', back_populates='chatlogs')
+    bookclub_id = db.Column(db.Integer, db.ForeignKey('bookclubs.id'))
+    bookclub = db.relationship('Bookclub', back_populates='chatlogs')
 
-# BookClub-Members (many-to-many relationship between user and bookclub through the 'bookclub_members' table)
-bookclub_books = db.Table('bookclub_members',
-    db.Column('bookclub_id', db.Integer, db.ForeignKey('book_club.id'), primary_key=True),
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+
+# BookClub-Users (many-to-many relationship between user and bookclub through the 'bookclub_users' table)
+bookclub_users = db.Table('bookclub_users',
+    db.Column('bookclub_id', db.Integer, db.ForeignKey('bookclubs.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
 )
