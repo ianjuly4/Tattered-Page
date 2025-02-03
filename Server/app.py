@@ -35,6 +35,5 @@ def handle_message(message):
     socketio.emit('message', {'data': message})  # Emit the message with a custom event
 
 
-# Run Flask with SocketIO
 if __name__ == '__main__':
     socketio.run(app, port=5555, debug=True) 

@@ -1,11 +1,11 @@
 // src/App.js
 import React from 'react';
-import LoFiBackground from './components/LoFiBackground'; // Import the background component
+import LandingPage from './components/LandingPage';
 
 function App() {
   return (
     <div className="App">
-      <LoFiBackground />
+      <LandingPage/>
     </div>
   );
 }
