@@ -1,5 +1,6 @@
 import React from 'react';
-import lofiBackground from '../assets/lofi-background.svg'; // Your SVG or JPG file
+import lofiBackground from '../assets/lofi-background.svg'; 
+import ChatComponent from './ChatComponent';
 
 const LoFiBackground = () => {
   return (
@@ -15,7 +16,7 @@ const LoFiBackground = () => {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      {/* Add any other content here */}
+      <ChatComponent/>
     </div>
   );
 };
