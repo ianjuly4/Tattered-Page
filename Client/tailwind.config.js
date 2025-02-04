@@ -21,11 +21,11 @@ module.exports = {
     themes: [
       {
         lofitheme: {
-          "primary": "#A3BFD9", // Soft Blue
-          "secondary": "#C3A0D9", // Soft Purple
-          "accent": "#7C4C97", // Rich Purple
-          "neutral": "#4A3C6C", // Dark Purple
-          "base-100": "#F2E4C4", // Creamy Neutral
+          "base-100": "#674ab3", 
+          "accent": "#a348a6", 
+          "secondary": "#9f63c4", 
+          "primary": "#9075d8", 
+          "nuetral": "#cea2d7", 
     },
   },
     "light", "dark", "aqua", "pastel", "sunset", "night", "valentine",
