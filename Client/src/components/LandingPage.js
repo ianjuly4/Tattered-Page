@@ -1,9 +1,10 @@
 // src/components/LandingPage.js
 import React from 'react';
-import Lottie from 'react-lottie'
-import ChatBubble from "../assests/chatbubble.json"
-import Books from "../assests/books.json"
-import Bookanimation from "../assests/Bookanimation.json"
+import Lottie from 'react-lottie';
+import ChatBubble from "../assets/chatbubble.json";
+import Books from "../assets/books.json";
+import Bookanimation from "../assets/Bookanimation.json";
+import { NavLink } from "react-router-dom";
 
 const LandingPage = () => {
   const chatbubble = {
@@ -14,7 +15,7 @@ const LandingPage = () => {
       preserveAspectRatio: 'xMidYMid slice',
     },
   };
-  const books= {
+  const books = {
     animationData: Books,
     loop: true,
     autoplay: true,
@@ -22,7 +23,7 @@ const LandingPage = () => {
       preserveAspectRatio: 'xMidYMid slice',
     },
   };
-  const bookanimation= {
+  const bookanimation = {
     animationData: Bookanimation,
     loop: true,
     autoplay: true,
@@ -30,44 +31,64 @@ const LandingPage = () => {
       preserveAspectRatio: 'xMidYMid slice',
     },
   };
+
   return (
     <div data-theme="lofitheme">
+      {/* Navbar */}
+      <div className="navbar bg-base-100 border-t-2 border-b-2 border-gray-300">
+        {/* Left section: The Tattered Page logo */}
+        <div className="flex-1">
+          <a className="btn btn-ghost text-xl">The Tattered Page</a>
+        </div>
 
-    {/* Header Section */}
-    <header className="sticky top-0 w-full bg-primary text-lofi-background p-6 shadow-lg">
-      <div className="container mx-auto flex items-center justify-between">
-        <h1 className="text-4xl font-bold">The Tattered Page</h1>
+        {/* Right section: Icons and links */}
+        <div className="flex-none gap-4">
+          {/* Links to Bookshelves and Bookclub */}
+          <div className="flex gap-4">
+            <NavLink to={'/'}>
+            <a className="btn btn-ghost">Home</a>
+            </NavLink>
 
-      {/* Navigation Menu */}
-        <ul className="menu menu-horizontal bg-base-200 rounded-box mt-6">
-          <li className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            <a href="#home" className="ml-2">Home</a>
-          </li>
-          <li className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <a href="#login" className="ml-2">Login</a>
-          </li>
-          <li className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <a href="#signup" className="ml-2">Signup</a>
-          </li>
-        </ul>
+          </div>
+          {/* Account Icon with dropdown */}
+          <div className="dropdown dropdown-end">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn btn-ghost btn-circle avatar"
+            >
+              <div className="w-10 rounded-full">
+                <img
+                  alt="Profile Avatar"
+                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                />
+              </div>
+            </div>
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+            >
+              <li>
+                <a className="justify-between">
+                  Profile
+                  <span className="badge">New</span>
+                </a>
+              </li>
+              <li><a>Logout</a></li>
+            </ul>
+          </div>
+
+        </div>
       </div>
-    </header>
 
-      {/*Intro Section*/}
+
+      {/* Intro Section */}
       <section className="bg-white text-center text-black py-12">
         <div className="container mx-auto ">
           <h2 className="text-3xl font-semibold">Welcome to The Tattered Page</h2>
-          <p className="mt-4 text-lg">Get lost in the world of books—discover new titles, connect with fellow readers, and share your thoughts on what you’ve read. Whether you’re looking for recommendations or just want to chat about your latest read, this is the place for you."
-          .</p>
+          <p className="mt-4 text-lg">
+            Get lost in the world of books—discover new titles, connect with fellow readers, and share your thoughts on what you’ve read. Whether you’re looking for recommendations or just want to chat about your latest read, this is the place for you.
+          </p>
           <button className="btn btn-accent mt-6">Let's Get Started</button>
         </div>
       </section>
@@ -76,23 +97,26 @@ const LandingPage = () => {
       <section className="bg-secondary text-lofi-background py-12">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-semibold">Discover New Books</h2>
-          <p className="mt-4 text-lg">Search through a vast collection of books fetched from the Open Library API. Whether you're into thrillers, classics, or contemporary reads, you can easily find your next book to read, add it to your bookshelf, and get inspired by recommendations tailored to your preferences.</p>
+          <p className="mt-4 text-lg">
+            Search through a vast collection of books fetched from the Open Library API. Whether you're into thrillers, classics, or contemporary reads, you can easily find your next book to read, add it to your bookshelf, and get inspired by recommendations tailored to your preferences.
+          </p>
           <div className="flex-shrink-0">
-          <Lottie options={bookanimation} height={200} width={200} />
-        </div>
+            <Lottie options={bookanimation} height={200} width={200} />
+          </div>
           <button className="btn btn-primary mt-6">Browse Books</button>
         </div>
       </section>
-
 
       {/* Section 2: Bookshelf Management */}
       <section className="bg-lofi-background py-12">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-semibold">Create Your Own Bookshelf</h2>
-          <p className="mt-4 text-lg">Curate your personal bookshelf, track your reading progress, and organize your books into categories like "Reading," "Completed," and "Wishlist." Keep all your favorite books in one place, and revisit them whenever you want to get nostalgic.</p>
+          <p className="mt-4 text-lg">
+            Curate your personal bookshelf, track your reading progress, and organize your books into categories like "Reading," "Completed," and "Wishlist." Keep all your favorite books in one place, and revisit them whenever you want to get nostalgic.
+          </p>
           <div className="flex-shrink-0">
-          <Lottie options={books} height={150} width={150} />
-        </div>
+            <Lottie options={books} height={150} width={150} />
+          </div>
           <button className="btn btn-secondary mt-6">Go to Bookshelf</button>
         </div>
       </section>
@@ -101,26 +125,28 @@ const LandingPage = () => {
       <section className="bg-accent text-black py-12">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-semibold">Join the Discussion</h2>
-          <p className="mt-4 text-lg">Engage in live, real-time conversations with your fellow readers. Whether it’s for a group discussion or a one-on-one chat, the app keeps your conversations flowing smoothly. So, grab your coffee and chat about your favorite chapters!</p>
+          <p className="mt-4 text-lg">
+            Engage in live, real-time conversations with your fellow readers. Whether it’s for a group discussion or a one-on-one chat, the app keeps your conversations flowing smoothly. So, grab your coffee and chat about your favorite chapters!
+          </p>
           <div className="flex-shrink-0">
-          <Lottie options={chatbubble} height={150} width={150} />
-            </div>
+            <Lottie options={chatbubble} height={150} width={150} />
+          </div>
           <button className="btn btn-secondary mt-6">Join Now</button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-white py-6 border-t-4 text-black ">
+      <footer className="bg-white py-6 border-t-4 text-black">
         <div className="container mx-auto text-center">
           <p>&copy; 2025 Your Book Club. All rights reserved. | Made with ❤️ for book lovers</p>
         </div>
       </footer>
-
     </div>
   );
 };
 
 export default LandingPage;
+
 
 
 
