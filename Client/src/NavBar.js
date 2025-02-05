@@ -43,10 +43,11 @@ function Navbar() {
             role="button"
             className="btn btn-ghost btn-circle avatar"
           >
-            <div className="w-10 rounded-full">
+             <div className="w-10 rounded-full">
+              {/* Conditional rendering based on login status */}
               <img
                 alt="Profile Avatar"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                //src={user?.profilePic || "https://via.placeholder.com/150"} 
               />
             </div>
           </div>
