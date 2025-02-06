@@ -1,15 +1,18 @@
+// MyContext.js
 import React, { createContext, useState, useEffect } from 'react';
 
 const MyContext = createContext();
 
 function MyContextProvider({ children }) {
-  const [query, setQuery] = useState(""); 
-  const [filter, setFilter] = useState("");
-  const [books, setBooks] = useState([]); 
-  const [loading, setLoading] = useState(false); 
-  const [error, setError] = useState(null); 
+  const [query, setQuery] = useState([]);
+  const [filter, setFilter] = useState('');
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const fetchBooks = (searchQuery, filterType) => {
+  const fetchBooks = (searchQuery, filterType, values) => {
+    setQuery(values.searchTerm);
+    setFilter(values.filter);
     setLoading(true);
     setError(null);
 
@@ -23,17 +26,12 @@ function MyContextProvider({ children }) {
       url += `&subject=${searchQuery}`;
     }
 
-    fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    fetch(url)
       .then((response) => response.json())
       .then((data) => {
         setLoading(false);
         if (data.docs && data.docs.length > 0) {
-          setBooks(data.docs); 
+          setBooks(data.docs);
         } else {
           throw new Error(data.error || 'No books found');
         }
@@ -46,12 +44,13 @@ function MyContextProvider({ children }) {
 
   useEffect(() => {
     if (query && filter) {
-      fetchBooks(query, filter); 
+      fetchBooks(query, filter);
     }
   }, [query, filter]);
 
   return (
-    <MyContext.Provider value={{books, loading, error, query, setQuery, filter, setFilter}}>
+    <MyContext.Provider value={{ books, loading, error, query, setQuery, filter, setFilter}}>
+      
       {children}
     </MyContext.Provider>
   );

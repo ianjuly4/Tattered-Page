@@ -1,21 +1,20 @@
-// src/App.js
+// App.js
 import React from 'react';
-import LandingPage from './LandingPage';
-import { MyContextProvider } from '../MyContext';
+import { Routes, Route } from 'react-router-dom';
+import { MyContextProvider } from './MyContext'; 
+import Navbar from './Navbar';  
+import SearchResults from './SearchResults';  
 
 function App() {
   return (
-    <MyContextProvider>
-    <Route>
-      <NavBar/>
+    <MyContextProvider>  
+      <Navbar />
       <Routes>
-        <Route path="/" element={<Home/>}/>
-        <Route path="/landingpage" element={<LandingPage/>}/>
+        <Route path="/" element={<Home />} />
+        <Route path="/books" element={<SearchResults />} />
       </Routes>
-    </Route>
     </MyContextProvider>
   );
 }
 
 export default App;
-

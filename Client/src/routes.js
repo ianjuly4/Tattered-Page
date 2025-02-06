@@ -1,5 +1,6 @@
 import LandingPage from "./components/LandingPage";
 import Home from "./components/Home"
+import SearchResults from "./components/SearchResults";
 
 
 const routes = [
@@ -10,6 +11,10 @@ const routes = [
   {
     path: "/landingPage",
     element: <LandingPage />,
+  },
+  {
+    path:"/books",
+    elements: <SearchResults/>
   },
   
 ];
