@@ -6,8 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 function Navbar() {
   const { fetchBooks } = useContext(MyContext); 
-  
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   
   const formSchema = yup.object().shape({
     searchTerm: yup.string().required("Must enter a search term").max(100),
@@ -27,7 +26,7 @@ function Navbar() {
   });
 
   return (
-    <div className="navbar bg-base-100 border-t-2 border-b-2 border-gray-300">
+    <div className="navbar bg-base-100  sticky top-0 z-10">
       <div className="flex-1">
         <a className="btn btn-ghost text-xl">The Tattered Page</a>
       </div>
@@ -65,7 +64,7 @@ function Navbar() {
               onBlur={formik.handleBlur}
             />
             {formik.touched.searchTerm && formik.errors.searchTerm && (
-              <div className="text-white text-xs">{formik.errors.searchTerm}</div>
+              <div className="text-red-500 text-xs">{formik.errors.searchTerm}</div>  
             )}
 
             {/* Search button */}

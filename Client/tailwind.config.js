@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: { 
       colors: {
-        
+        // You can add custom colors here if needed
       },
       fontFamily: {
         sans: ['Poppins', 'sans-serif'], // Use clean, soft fonts
@@ -14,7 +14,6 @@ module.exports = {
     },
   },
   plugins: [
-    
     require('daisyui'),
   ],
   daisyui: {
@@ -25,11 +24,11 @@ module.exports = {
           "accent": "#a348a6", 
           "secondary": "#9f63c4", 
           "primary": "#9075d8", 
-          "nuetral": "#cea2d7", 
-    },
-  },
-    "light", "dark", "aqua", "pastel", "sunset", "night", "valentine",
-    ],  // Add available DaisyUI themes
+          "neutral": "#cea2d7", 
+        },
+      },
+      "light", "dark", "aqua", "pastel", "sunset", "night", "valentine", // Other built-in DaisyUI themes
+    ],  
     darkTheme: "night", // Optional: Set a default dark mode theme
     base: true, // Apply base background and foreground colors to root element
     styled: true, // Use DaisyUI's default styles

@@ -5,24 +5,23 @@ import Navbar from "../NavBar";
 function Header() {
   return (
     <div>
-    <div
-      style={{
-        backgroundImage: `url(${headerBackground})`,
-        backgroundSize: "cover", 
-        backgroundPosition: "center", 
-        height: "200px", 
-      }}
-    >
-    </div>
-        <div>
+      {/* Background image section */}
+      <div
+        style={{
+          backgroundImage: `url(${headerBackground})`,
+          backgroundSize: "cover", 
+          backgroundPosition: "center", 
+          height: "200px", 
+        }}
+      >
+      </div>
+      
+      {/* Sticky Navbar */}
+      <div className="navbar bg-base-100 border-t-2 border-b-2 border-gray-300 sticky top-0 z-10">
         <Navbar />
-        </div>
+      </div>
     </div>
   );
 }
 
 export default Header;
-
-
-
-  
