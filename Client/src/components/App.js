@@ -3,7 +3,8 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { MyContextProvider } from './MyContext'; 
 import Navbar from './Navbar';  
-import SearchResults from './SearchResults';  
+import SearchResults from './SearchResults'; 
+import BookDetails from './BookDetails'; 
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/books" element={<SearchResults />} />
+        <Route path="/books/:bookKey" element={<BookDetails/>}/>
       </Routes>
     </MyContextProvider>
   );

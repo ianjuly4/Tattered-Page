@@ -3,6 +3,7 @@ import { MyContext } from "./MyContext";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Navbar() {
   const { fetchBooks } = useContext(MyContext); 
@@ -28,7 +29,9 @@ function Navbar() {
   return (
     <div className="navbar bg-base-100  sticky top-0 z-10">
       <div className="flex-1">
-        <a className="btn btn-ghost text-xl">The Tattered Page</a>
+        <NavLink to={"/"}>
+          <a className="btn btn-ghost text-xl">The Tattered Page</a>
+        </NavLink>
       </div>
       <div className="flex-none gap-2">
         <ul className="flex space-x-5">
