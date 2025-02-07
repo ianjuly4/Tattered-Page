@@ -28,6 +28,7 @@ function MyContextProvider({ children }) {
         setLoading(false);
         if (data.docs && data.docs.length > 0) {
           setBooks(data.docs); 
+          console.log(url)
         } else {
           setError("No books found.");
         }
@@ -37,6 +38,7 @@ function MyContextProvider({ children }) {
         setError(error.message || "Something went wrong");
       });
   };
+
 
   return (
     <MyContext.Provider value={{ books, loading, error, query, setQuery, filter, setFilter, fetchBooks }}>

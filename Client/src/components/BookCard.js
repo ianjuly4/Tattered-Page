@@ -1,5 +1,5 @@
 import React from "react";
-import defaultbookimage from "../assets/defaultbookimage.jpg"
+import defaultbookimage from "../assets/defaultbookimage.jpg";
 
 function BookCard({ book }) {
   const { title, author_name, cover_i, subject } = book;
@@ -10,10 +10,11 @@ function BookCard({ book }) {
 
   return (
     <div className="card bg-base-100 w-96 shadow-xl">
-      <figure>
+      <figure className="flex justify-center items-center p-6">
         <img
           src={coverImageUrl}
-          alt={title} 
+          alt={title}
+          className="max-w-full max-h-96 object-contain"
         />
       </figure>
       <div className="card-body">
@@ -31,8 +32,7 @@ function BookCard({ book }) {
           </p>
         )}
         <div className="card-actions justify-end">
-          <div className="badge badge-outline">Fashion</div>
-          <div className="badge badge-outline">Products</div>
+          
         </div>
       </div>
     </div>

@@ -67,7 +67,7 @@ function Navbar() {
               onBlur={formik.handleBlur}
             />
             {formik.touched.searchTerm && formik.errors.searchTerm && (
-              <div className="text-red-500 text-xs">{formik.errors.searchTerm}</div>  
+              <div className="text-white text-xs">{formik.errors.searchTerm}</div>  
             )}
 
             {/* Search button */}

@@ -10,12 +10,17 @@ function SearchResults() {
   console.log(books);
   return (
     <div>
-      <Header />
-      <div className="w-full px-0 py-4">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-10">
+        <Header />
+      </div>
+
+      {/* Search Results Section */}
+      <div className="w-full px-4 py-6">
         <div className="bg-primary grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {books && books.length > 0 ? (
             books.map((book) => (
-                <NavLink 
+              <NavLink 
                 key={book.key} 
                 to={`/books/${book.key.replace('/works/', '')}`} 
                 className="block"
@@ -24,7 +29,6 @@ function SearchResults() {
                   <BookCard book={book} />
                 </div>
               </NavLink>
-              
             ))
           ) : (
             <p>No books found</p>

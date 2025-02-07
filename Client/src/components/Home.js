@@ -1,17 +1,17 @@
 import React from "react";
 import Header from "./Header";
-
+import bookNook from "../assets/bookNook.jpg"
 function Home(){
 
     return(
         <div>
-            <div>
+            <div className="sticky top-0 z-10">
                 <Header/>
             </div>
             <div className="hero bg-primary min-h-screen">
             <div className="hero-content flex-col lg:flex-row">
                 <img
-                src="https://img.daisyui.com/images/stock/photo-1635805737707-575885ab0820.webp"
+                src={bookNook}
                 className="max-w-sm rounded-lg shadow-2xl" />
                 <div>
                 <h1 className="text-5xl font-bold">Welcome to The Tattered Page</h1>
@@ -21,10 +21,11 @@ function Home(){
 
                     Join our community of passionate readers—explore new books, share your thoughts, or simply unwind in a relaxing, lofi-inspired space designed for book lovers. Here, every chapter sparks a new connection. Let's create our own reading adventure. Ready to turn the page? 📖
                 </p>
-                <button className="btn btn-primary">Get Started</button>
                 </div>
             </div>
             </div>
+            <div>bookshelf section</div>
+            <div>bookclub section</div>
         </div>
     )
 }

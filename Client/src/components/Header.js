@@ -11,7 +11,7 @@ function Header() {
           backgroundImage: `url(${headerBackground})`,
           backgroundSize: "cover", 
           backgroundPosition: "center", 
-          height: "200px", 
+          height: "140px", 
         }}
       >
       </div>
