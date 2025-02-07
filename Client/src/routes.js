@@ -1,7 +1,6 @@
 import LandingPage from "./components/LandingPage";
-import Home from "./components/Home"
+import Home from "./components/Home";
 import SearchResults from "./components/SearchResults";
-
 
 const routes = [
   {
@@ -13,10 +12,9 @@ const routes = [
     element: <LandingPage />,
   },
   {
-    path:"/books",
-    elements: <SearchResults/>
+    path: "/books",
+    element: <SearchResults />,
   },
-  
 ];
 
 export default routes;
