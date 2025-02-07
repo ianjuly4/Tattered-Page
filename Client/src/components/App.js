@@ -14,6 +14,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/books" element={<SearchResults />} />
         <Route path="/books/:bookKey" element={<BookDetails/>}/>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </MyContextProvider>
   );

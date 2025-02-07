@@ -2,12 +2,11 @@ import React from "react";
 import defaultbookimage from "../assets/defaultbookimage.jpg"
 
 function BookCard({ book }) {
-
   const { title, author_name, cover_i, subject } = book;
 
   const coverImageUrl = cover_i
     ? `https://covers.openlibrary.org/b/id/${cover_i}-L.jpg`
-    : defaultbookimage; // Fallback image
+    : defaultbookimage;
 
   return (
     <div className="card bg-base-100 w-96 shadow-xl">
