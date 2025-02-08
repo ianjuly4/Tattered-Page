@@ -17,6 +17,7 @@ function App() {
         <Route path="/books/:bookKey" element={<BookDetails/>}/>
         <Route path="/bookshelves" element={<BookShelves/>}/>
         <Route path="/account" element={<Account/>}/>
+        <Route path="/login" element={<LoginCreate/>}/>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </MyContextProvider>

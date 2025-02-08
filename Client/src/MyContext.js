@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext } from "react";
 
-// API key and context setup
-const API_KEY = "YOUR_GOOGLE_BOOKS_API_KEY";
+
+const API_KEY = "AIzaSyBf_grAHTnhr09zZ0oZI_NQ8AlSyBeXS_s";
 const MyContext = createContext();
 
 function MyContextProvider({ children }) {
@@ -10,8 +10,8 @@ function MyContextProvider({ children }) {
   const [error, setError] = useState(null);
   const [loginError, setLoginError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null)
 
-  // Fetch books based on search query and filter type
   const fetchBooks = (searchQuery, filterType) => {
     setLoading(true);
     setError(null);
@@ -40,7 +40,7 @@ function MyContextProvider({ children }) {
       });
   };
 
-  // Handle login action
+ 
   const login = (username, password) => {
     setLoginError(null);
     setLoading(true);
@@ -56,6 +56,7 @@ function MyContextProvider({ children }) {
       .then((data) => {
         if (data.user) {
           setIsLoggedIn(true);
+          setUser(data.user)
         } else {
           setLoginError(data.error || "Login failed");
         }
@@ -69,6 +70,12 @@ function MyContextProvider({ children }) {
       });
   };
 
+  const handleLogout = () => {
+    setIsLoggedIn(false); 
+    setUser(null); 
+  };
+  
+
   return (
     <MyContext.Provider value={{
       books,
@@ -77,7 +84,9 @@ function MyContextProvider({ children }) {
       loginError,
       isLoggedIn,
       fetchBooks,
-      login
+      login,
+      user,
+      handleLogout
     }}>
       {children}
     </MyContext.Provider>

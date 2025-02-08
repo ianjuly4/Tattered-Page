@@ -5,6 +5,7 @@ import BookDetails from "./components/BookDetails"
 import NotFound from "./components/NotFound";
 import BookShelves from "./components/BookShelves";
 import Account from "./components/Account";
+import LoginCreate from "./components/LoginCreate";
 
 const routes = [
   {
@@ -30,6 +31,10 @@ const routes = [
   {
     path: "/account",
     element: <Account/>
+  },
+  {
+    path: "/login",
+    element: <LoginCreate/>
   },
   {
    path:"*", 

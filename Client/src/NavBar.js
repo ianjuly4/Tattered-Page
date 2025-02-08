@@ -6,18 +6,16 @@ import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
 function Navbar() {
-  const {
-    fetchBooks,
-    login,
-    loading,
-    error: booksError,
-    loginError,
+  const { fetchBooks,  
+    loading, 
+    error: booksError, 
+    loginError, 
     isLoggedIn,
-  } = useContext(MyContext); 
+    handleLogout, 
+    user } = useContext(MyContext); 
 
   const navigate = useNavigate();
 
-  // Search form schema
   const formSchema = yup.object().shape({
     searchTerm: yup.string().required("Must enter a search term").max(100),
     filter: yup.string().required("Must filter search term").oneOf(["title", "author", "genre"]),
@@ -32,23 +30,6 @@ function Navbar() {
     onSubmit: (values) => {
       fetchBooks(values.searchTerm, values.filter);
       navigate('/books');  
-    },
-  });
-
-  // Login form schema
-  const formSchema2 = yup.object().shape({
-    username: yup.string().required("Must enter a username.").max(25),
-    password: yup.string().required("Must enter a password").max(25),
-  });
-
-  const loginFormik = useFormik({
-    initialValues: {
-      username: "",
-      password: ""
-    },
-    validationSchema: formSchema2,
-    onSubmit: (values) => {
-      login(values.username, values.password);
     },
   });
 
@@ -75,7 +56,6 @@ function Navbar() {
               name="filter"
               value={formik.values.filter}
               onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
             >
               <option value="title">Title</option>
               <option value="author">Author</option>
@@ -89,10 +69,10 @@ function Navbar() {
               value={formik.values.searchTerm}
               onChange={formik.handleChange}
               name="searchTerm"
-              onBlur={formik.handleBlur}
             />
-            {formik.touched.searchTerm && formik.errors.searchTerm && (
-              <div className="text-red-500 text-xs">{formik.errors.searchTerm}</div>  
+            {/* Show errors only after submit */}
+            {formik.submitCount > 0 && formik.errors.searchTerm && (
+              <div className="text-white text-xs">{formik.errors.searchTerm}</div>
             )}
 
             <button type="submit" className="btn btn-ghost ml-2 absolute right-1">
@@ -103,20 +83,30 @@ function Navbar() {
 
         {/* Display error or loading */}
         {loading && <div>Loading...</div>}
-        {booksError && <div className="text-red-500 text-xs">{booksError}</div>}
-
+        {booksError && <div className="text-white text-xs">{booksError}</div>}
       </div>
 
       {/* Avatar and Dropdown */}
       <div className="dropdown dropdown-end">
         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
           <div className="w-10 rounded-full">
-            <img
-              alt="User Avatar"
-              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-            />
+            {/* Conditionally render the avatar */}
+            {user?.avatar ? (
+              <img
+                alt="User Avatar"
+                src={user.avatar}
+              />
+            ) : (
+              <div className="avatar placeholder">
+                <div className="bg-secondary text-neutral-content w-12 rounded-full">
+                  {/* If there's no avatar, display initials */}
+                  <span>{user?.name ? user.name.split(' ').map((n) => n[0]).join('') : "UN"}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
         <ul
           tabIndex={0}
           className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
@@ -124,7 +114,17 @@ function Navbar() {
           <li>
             <NavLink to={"/account"}>Profile</NavLink>
           </li>
-          <li><a>Logout</a></li>
+          
+          {/* Conditionally render Login/Logout */}
+          {isLoggedIn ? (
+            <li>
+              <a onClick={handleLogout}>Logout</a>
+            </li>
+          ) : (
+            <li>
+              <NavLink to={"/login"}>Login</NavLink>
+            </li>
+          )}
         </ul>
       </div>
     </div>
