@@ -8,7 +8,7 @@ function Home(){
             <div className="sticky top-0 z-10">
                 <Header/>
             </div>
-            <div className="hero bg-primary min-h-screen">
+            <div className="hero bg-secondary min-h-screen">
             <div className="hero-content flex-col lg:flex-row">
                 <img
                 src={bookNook}

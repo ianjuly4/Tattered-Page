@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 
+const API_KEY = "AIzaSyBf_grAHTnhr09zZ0oZI_NQ8AlSyBeXS_s";
 
 const MyContext = createContext();
 
@@ -17,18 +18,24 @@ function MyContextProvider({ children }) {
     setLoading(true);
     setError(null);
 
-    let url = `https://openlibrary.org/search.json?q=${searchQuery}`;
-    if (filterType === "title") url += `&title=${searchQuery}`;
-    if (filterType === "author") url += `&author=${searchQuery}`;
-    if (filterType === "genre") url += `&subject=${searchQuery}`;
+    let url = `https://www.googleapis.com/books/v1/volumes?q=`;
+
+    // Add the appropriate search filter
+    if (filterType === "title") url += `intitle:${searchQuery}`;
+    if (filterType === "author") url += `inauthor:${searchQuery}`;
+    if (filterType === "genre") url += `subject:${searchQuery}`;
+
+    // Add the API key for authorization
+    url += `&key=${API_KEY}`;
 
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
         setLoading(false);
-        if (data.docs && data.docs.length > 0) {
-          setBooks(data.docs); 
+        if (data.items && data.items.length > 0) {
+          setBooks(data.items); 
           console.log(url)
+          console.log(data.items)
         } else {
           setError("No books found.");
         }
@@ -48,3 +55,5 @@ function MyContextProvider({ children }) {
 }
 
 export { MyContext, MyContextProvider };
+
+//AIzaSyBf_grAHTnhr09zZ0oZI_NQ8AlSyBeXS_s

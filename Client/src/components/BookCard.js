@@ -2,11 +2,11 @@ import React from "react";
 import defaultbookimage from "../assets/defaultbookimage.jpg";
 
 function BookCard({ book }) {
-  const { title, author_name, cover_i, subject } = book;
+  const { volumeInfo } = book;
+  const { title, authors, description, imageLinks } = volumeInfo;
 
-  const coverImageUrl = cover_i
-    ? `https://covers.openlibrary.org/b/id/${cover_i}-L.jpg`
-    : defaultbookimage;
+  
+  const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
 
   return (
     <div className="card bg-base-100 w-96 shadow-xl">
@@ -22,17 +22,15 @@ function BookCard({ book }) {
           {title}
         </h2>
         <p className="text-sm">
-          {author_name && author_name.length > 0
-            ? `By ${author_name.join(", ")}`
+          {authors && authors.length > 0
+            ? `By ${authors.join(", ")}`
             : "Author unknown"}
         </p>
-        {subject && subject.length > 0 && (
-          <p className="text-sm">
-            <strong>Subjects:</strong> {subject.join(", ")}
-          </p>
-        )}
+        <p className="text-sm">
+          {description ? description.substring(0, 100) + "..." : "No description available."}
+        </p>
         <div className="card-actions justify-end">
-          
+          {/* Optional actions like "Add to Wishlist" can go here */}
         </div>
       </div>
     </div>

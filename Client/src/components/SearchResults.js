@@ -5,24 +5,24 @@ import BookCard from "./BookCard";
 import { NavLink } from "react-router-dom";
 
 function SearchResults() {
-  const { books } = useContext(MyContext);
+  const { books, loading, error } = useContext(MyContext);
+  console.log(books)
 
-  console.log(books);
   return (
     <div>
-      {/* Sticky Header */}
       <div className="sticky top-0 z-10">
         <Header />
       </div>
 
-      {/* Search Results Section */}
       <div className="w-full px-4 py-6">
         <div className="bg-primary grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {loading && <p>Loading...</p>}
+          {error && <p>{error}</p>}
           {books && books.length > 0 ? (
             books.map((book) => (
-              <NavLink 
-                key={book.key} 
-                to={`/books/${book.key.replace('/works/', '')}`} 
+              <NavLink
+                key={book.id}  
+                to={`/books/${book.id}`}  e
                 className="block"
               >
                 <div className="p-4">
@@ -31,7 +31,9 @@ function SearchResults() {
               </NavLink>
             ))
           ) : (
-            <p>No books found</p>
+            <div className="col-span-3 text-center">
+              <p>No books found. Please try a different search.</p>
+            </div>
           )}
         </div>
       </div>
