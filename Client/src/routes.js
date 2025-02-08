@@ -3,6 +3,8 @@ import Home from "./components/Home";
 import SearchResults from "./components/SearchResults";
 import BookDetails from "./components/BookDetails"
 import NotFound from "./components/NotFound";
+import BookShelves from "./components/BookShelves";
+import Account from "./components/Account";
 
 const routes = [
   {
@@ -20,6 +22,14 @@ const routes = [
   {
     path: "/books/:bookKey",
     element: <BookDetails/>
+  },
+  {
+    path: "/bookshelves",
+    element: <BookShelves/>
+  },
+  {
+    path: "/account",
+    element: <Account/>
   },
   {
    path:"*", 

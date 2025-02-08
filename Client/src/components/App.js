@@ -5,6 +5,7 @@ import { MyContextProvider } from './MyContext';
 import Navbar from './Navbar';  
 import SearchResults from './SearchResults'; 
 import BookDetails from './BookDetails'; 
+import BookShelves from './BookShelves';
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/books" element={<SearchResults />} />
         <Route path="/books/:bookKey" element={<BookDetails/>}/>
+        <Route path="/bookshelves" element={<BookShelves/>}/>
+        <Route path="/account" element={<Account/>}/>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </MyContextProvider>

@@ -6,9 +6,18 @@ import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
 function Navbar() {
-  const { fetchBooks } = useContext(MyContext); 
+  const {
+    fetchBooks,
+    login,
+    loading,
+    error: booksError,
+    loginError,
+    isLoggedIn,
+  } = useContext(MyContext); 
+
   const navigate = useNavigate();
-  
+
+  // Search form schema
   const formSchema = yup.object().shape({
     searchTerm: yup.string().required("Must enter a search term").max(100),
     filter: yup.string().required("Must filter search term").oneOf(["title", "author", "genre"]),
@@ -22,28 +31,45 @@ function Navbar() {
     validationSchema: formSchema,
     onSubmit: (values) => {
       fetchBooks(values.searchTerm, values.filter);
-      navigate('/books')  
+      navigate('/books');  
+    },
+  });
+
+  // Login form schema
+  const formSchema2 = yup.object().shape({
+    username: yup.string().required("Must enter a username.").max(25),
+    password: yup.string().required("Must enter a password").max(25),
+  });
+
+  const loginFormik = useFormik({
+    initialValues: {
+      username: "",
+      password: ""
+    },
+    validationSchema: formSchema2,
+    onSubmit: (values) => {
+      login(values.username, values.password);
     },
   });
 
   return (
-    <div className="navbar bg-base-100 border-t-2 sticky top-0 z-10">
+    <div className="navbar bg-base-100 sticky top-0 z-10">
       <div className="flex-1">
         <NavLink to={'/'}>
-        <a className="btn btn-ghost text-xl">The Tattered Page</a>
+          <span className="btn btn-ghost text-xl">The Tattered Page</span>
         </NavLink>
       </div>
       <div className="flex-none gap-2">
         <ul className="flex space-x-5">
           <li><a>Bookclubs</a></li>
-          <li><a>Bookshelves</a></li>
+          <NavLink to={"/bookshelves"}>
+            <li><a>Bookshelves</a></li>
+          </NavLink>
         </ul>
 
         {/* Search form with dropdown filter */}
         <form onSubmit={formik.handleSubmit} className="flex items-center space-x-0">
-          {/* Container for input and dropdown */}
           <div className="form-control relative flex items-center w-96">
-            {/* Dropdown for filter */}
             <select
               className="select select-bordered absolute right-20 pl-1"
               name="filter"
@@ -56,7 +82,6 @@ function Navbar() {
               <option value="genre">Genre</option>
             </select>
 
-            {/* Search Input */}
             <input
               type="text"
               placeholder="Search"
@@ -70,15 +95,16 @@ function Navbar() {
               <div className="text-red-500 text-xs">{formik.errors.searchTerm}</div>  
             )}
 
-            {/* Search button */}
-            <button
-              type="submit"  
-              className="btn btn-ghost ml-2 absolute right-1"
-            >
+            <button type="submit" className="btn btn-ghost ml-2 absolute right-1">
               Enter
             </button>
           </div>
         </form>
+
+        {/* Display error or loading */}
+        {loading && <div>Loading...</div>}
+        {booksError && <div className="text-red-500 text-xs">{booksError}</div>}
+
       </div>
 
       {/* Avatar and Dropdown */}
@@ -96,12 +122,8 @@ function Navbar() {
           className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
         >
           <li>
-            <a className="justify-between">
-              Profile
-              <span className="badge">New</span>
-            </a>
+            <NavLink to={"/account"}>Profile</NavLink>
           </li>
-          <li><a>Settings</a></li>
           <li><a>Logout</a></li>
         </ul>
       </div>

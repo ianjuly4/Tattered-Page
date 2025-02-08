@@ -1,31 +1,27 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useContext } from "react";
 
-const API_KEY = "AIzaSyBf_grAHTnhr09zZ0oZI_NQ8AlSyBeXS_s";
-
+// API key and context setup
+const API_KEY = "YOUR_GOOGLE_BOOKS_API_KEY";
 const MyContext = createContext();
 
 function MyContextProvider({ children }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [query, setQuery] = useState("");  
-  const [filter, setFilter] = useState("title");
+  const [loginError, setLoginError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-
+  // Fetch books based on search query and filter type
   const fetchBooks = (searchQuery, filterType) => {
-    setQuery(searchQuery);
-    setFilter(filterType);
     setLoading(true);
     setError(null);
-
+    
     let url = `https://www.googleapis.com/books/v1/volumes?q=`;
 
-    // Add the appropriate search filter
     if (filterType === "title") url += `intitle:${searchQuery}`;
     if (filterType === "author") url += `inauthor:${searchQuery}`;
     if (filterType === "genre") url += `subject:${searchQuery}`;
 
-    // Add the API key for authorization
     url += `&key=${API_KEY}`;
 
     fetch(url)
@@ -34,8 +30,6 @@ function MyContextProvider({ children }) {
         setLoading(false);
         if (data.items && data.items.length > 0) {
           setBooks(data.items); 
-          console.log(url)
-          console.log(data.items)
         } else {
           setError("No books found.");
         }
@@ -46,14 +40,48 @@ function MyContextProvider({ children }) {
       });
   };
 
+  // Handle login action
+  const login = (username, password) => {
+    setLoginError(null);
+    setLoading(true);
+
+    fetch("/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.user) {
+          setIsLoggedIn(true);
+        } else {
+          setLoginError(data.error || "Login failed");
+        }
+      })
+      .catch((error) => {
+        console.error("Login Error:", error);
+        setLoginError("An error occurred. Please try again later.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   return (
-    <MyContext.Provider value={{ books, loading, error, query, setQuery, filter, setFilter, fetchBooks }}>
+    <MyContext.Provider value={{
+      books,
+      loading,
+      error,
+      loginError,
+      isLoggedIn,
+      fetchBooks,
+      login
+    }}>
       {children}
     </MyContext.Provider>
   );
 }
 
 export { MyContext, MyContextProvider };
-
-//AIzaSyBf_grAHTnhr09zZ0oZI_NQ8AlSyBeXS_s

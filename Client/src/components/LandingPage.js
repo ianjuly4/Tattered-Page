@@ -75,7 +75,7 @@ const LandingPage = () => {
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-semibold">Discover New Books</h2>
           <p className="mt-4 text-lg">
-            Search through a vast collection of books fetched from the Open Library API. Whether you're into thrillers, classics, or contemporary reads, you can easily find your next book to read, add it to your bookshelf, and get inspired by recommendations tailored to your preferences.
+            Search through a vast collection of books fetched from the Google Books API. Whether you're into thrillers, classics, or contemporary reads, you can easily find your next book to read, add it to your bookshelf, and get inspired by recommendations tailored to your preferences.
           </p>
           <div className="flex-shrink-0">
             <Lottie options={bookanimation} height={200} width={200} />
