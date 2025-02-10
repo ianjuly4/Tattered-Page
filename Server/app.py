@@ -83,7 +83,6 @@ class Login(Resource):
             print(f"User not found: {username}")
         
         return make_response({'error': 'Invalid username or password'}, 401)
-
     
 api.add_resource(Login, '/login')   
 

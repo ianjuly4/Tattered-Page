@@ -22,8 +22,6 @@ app = Flask(
 )
 
 
-
-
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'sqlite:///instance/app.db')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', b'9\x8c_\xc8\x16$OE\xbe5\x98d\x19\xc1\xd8(')
 app.json.compact = False
