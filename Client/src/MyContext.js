@@ -8,6 +8,7 @@ function MyContextProvider({ children }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [signUpError, setSignUpError] = useState(null)
   const [loginError, setLoginError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null)
@@ -45,7 +46,7 @@ function MyContextProvider({ children }) {
     setLoginError(null);
     setLoading(true);
 
-    fetch("/login", {
+    fetch("http://127.0.0.1:5555/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,6 +71,40 @@ function MyContextProvider({ children }) {
       });
   };
 
+  const signup=(username,password)=>{
+    setSignUpError(null);
+    setLoading(true);
+
+    fetch("http://127.0.0.1:5555/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.id) {  
+          setIsLoggedIn(true);
+          setUser(data);  
+          console.log("User created");
+        } else {
+          setSignUpError(data.message || "Signup failed");  
+        }
+      })
+      
+      .catch((error) => {
+        console.error("Login Error:", error);
+        setLoginError("An error occurred. Please try again later.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  
+
+  
+
   const handleLogout = () => {
     setIsLoggedIn(false); 
     setUser(null); 
@@ -81,12 +116,13 @@ function MyContextProvider({ children }) {
       books,
       loading,
       error,
-      loginError,
+      loginError, 
       isLoggedIn,
       fetchBooks,
       login,
       user,
-      handleLogout
+      handleLogout,
+      signup
     }}>
       {children}
     </MyContext.Provider>

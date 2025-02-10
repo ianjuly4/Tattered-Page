@@ -5,7 +5,8 @@ import BookDetails from "./components/BookDetails"
 import NotFound from "./components/NotFound";
 import BookShelves from "./components/BookShelves";
 import Account from "./components/Account";
-import LoginCreate from "./components/LoginCreate";
+import Login from "./components/Login";
+import CreateAccount from "./components/CreateAccount";
 
 const routes = [
   {
@@ -33,8 +34,12 @@ const routes = [
     element: <Account/>
   },
   {
+    path: "/signup",
+    element: <CreateAccount/>
+  },
+  {
     path: "/login",
-    element: <LoginCreate/>
+    element: <Login/>
   },
   {
    path:"*", 

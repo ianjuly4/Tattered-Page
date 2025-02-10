@@ -6,18 +6,22 @@ import Navbar from './Navbar';
 import SearchResults from './SearchResults'; 
 import BookDetails from './BookDetails'; 
 import BookShelves from './BookShelves';
+import Login from './Login';
+import CreateAccount from './CreateAccount';
 
 function App() {
   return (
     <MyContextProvider>  
       <Navbar />
       <Routes>
+        <Route path= "/landingpage" element={<LandingPage/>}/>
         <Route path="/" element={<Home />} />
         <Route path="/books" element={<SearchResults />} />
         <Route path="/books/:bookKey" element={<BookDetails/>}/>
         <Route path="/bookshelves" element={<BookShelves/>}/>
         <Route path="/account" element={<Account/>}/>
-        <Route path="/login" element={<LoginCreate/>}/>
+        <Route path="/login" element={<Login/>}/>
+        <Route path="/signup" element={<CreateAccount/>}/>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </MyContextProvider>
