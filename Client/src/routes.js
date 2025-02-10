@@ -6,7 +6,8 @@ import NotFound from "./components/NotFound";
 import BookShelves from "./components/BookShelves";
 import Account from "./components/Account";
 import Login from "./components/Login";
-import CreateAccount from "./components/CreateAccount";
+import Signup from "./components/Signup";
+import Avatars from "./components/Avatars";
 
 const routes = [
   {
@@ -35,11 +36,15 @@ const routes = [
   },
   {
     path: "/signup",
-    element: <CreateAccount/>
+    element: <Signup/>
   },
   {
-    path: "/login",
+    path: "/auth/login",
     element: <Login/>
+  },
+  {
+    path:"/avatar",
+    element: <Avatars/>
   },
   {
    path:"*", 

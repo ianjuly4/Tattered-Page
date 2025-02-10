@@ -5,7 +5,7 @@ import * as yup from "yup";
 import { MyContext } from "../MyContext";
 import { NavLink, useNavigate } from "react-router-dom";
 
-function CreateAccount() {
+function Signup() {
   const { signup } = useContext(MyContext);
 
   const navigate= useNavigate()
@@ -35,7 +35,7 @@ function CreateAccount() {
         <Header />
       </div>
 
-      <div className="hero bg-base-200 min-h-screen">
+      <div className="hero bg-secondary min-h-screen">
         <div className="hero-content flex-col lg:flex-row-reverse">
           <div className="text-center lg:text-left">
             <h1 className="text-5xl font-bold">Create Account</h1>
@@ -103,4 +103,4 @@ function CreateAccount() {
   );
 }
 
-export default CreateAccount;
+export default Signup;

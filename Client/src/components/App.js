@@ -7,7 +7,7 @@ import SearchResults from './SearchResults';
 import BookDetails from './BookDetails'; 
 import BookShelves from './BookShelves';
 import Login from './Login';
-import CreateAccount from './CreateAccount';
+import Signup from './Signup';
 
 function App() {
   return (
@@ -20,8 +20,8 @@ function App() {
         <Route path="/books/:bookKey" element={<BookDetails/>}/>
         <Route path="/bookshelves" element={<BookShelves/>}/>
         <Route path="/account" element={<Account/>}/>
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/signup" element={<CreateAccount/>}/>
+        <Route path="/auth/login" element={<Login/>}/>
+        <Route path="/signup" element={<Signup/>}/>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </MyContextProvider>

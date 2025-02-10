@@ -15,7 +15,7 @@ function SearchResults() {
       </div>
 
       <div className="w-full px-4 py-6">
-        <div className="bg-primary grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="bg-secondary grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {loading && <p>Loading...</p>}
           {error && <p>{error}</p>}
           {books && books.length > 0 ? (

@@ -122,7 +122,7 @@ function Navbar() {
             </li>
           ) : (
             <li>
-              <NavLink to={"/login"}>Login</NavLink>
+              <NavLink to={"/auth/login"}>Login</NavLink>
             </li>
           )}
         </ul>

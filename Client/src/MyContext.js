@@ -45,8 +45,8 @@ function MyContextProvider({ children }) {
   const login = (username, password) => {
     setLoginError(null);
     setLoading(true);
-
-    fetch("http://127.0.0.1:5555/login", {
+  
+    return fetch("http://127.0.0.1:8000/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,19 +57,23 @@ function MyContextProvider({ children }) {
       .then((data) => {
         if (data.user) {
           setIsLoggedIn(true);
-          setUser(data.user)
+          setUser(data.user);
+          return true; 
         } else {
           setLoginError(data.error || "Login failed");
+          return false; 
         }
       })
       .catch((error) => {
         console.error("Login Error:", error);
         setLoginError("An error occurred. Please try again later.");
+        return false; 
       })
       .finally(() => {
         setLoading(false);
       });
   };
+  
 
   const signup=(username,password)=>{
     setSignUpError(null);

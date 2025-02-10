@@ -1,28 +1,37 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Header from "./Header";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { MyContext } from "../MyContext";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 function Login() {
   const { login } = useContext(MyContext);
+  const [errorMessage, setErrorMessage] = useState(null); // State to hold error message if login fails
+  const navigate = useNavigate();
 
-  // Form validation schema with Yup
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
     password: yup.string().required("Must enter a password").max(25),
   });
 
-  // Formik form setup
   const loginFormik = useFormik({
     initialValues: {
       username: "",
       password: "",
     },
     validationSchema: formSchema,
-    onSubmit: (values) => {
-      login(values.username, values.password); 
+    onSubmit: async (values) => {
+      // Try logging in, await the login function's result
+      const success = await login(values.username, values.password);
+
+      if (success) {
+        // If login is successful, navigate to the account page
+        navigate("/account");
+      } else {
+        // If login fails, display error message
+        setErrorMessage("Invalid username or password.");
+      }
     },
   });
 
@@ -32,7 +41,7 @@ function Login() {
         <Header />
       </div>
 
-      <div className="hero bg-base-200 min-h-screen">
+      <div className="hero bg-secondary min-h-screen">
         <div className="hero-content flex-col lg:flex-row-reverse">
           <div className="text-center lg:text-left">
             <h1 className="text-5xl font-bold">Login now!</h1>
@@ -86,6 +95,11 @@ function Login() {
                   <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
                 </label>
               </div>
+
+              {/* Error Message (if login fails) */}
+              {errorMessage && (
+                <div className="text-red-500 text-sm mt-2">{errorMessage}</div>
+              )}
 
               {/* Submit Button */}
               <div className="form-control mt-6">
