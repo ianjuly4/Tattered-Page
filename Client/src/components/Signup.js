@@ -91,9 +91,11 @@ function Signup() {
 
               {/* Submit Button */}
               <div className="form-control mt-6">
+                <NavLink to={'/account'}>
                 <button type="submit" className="btn btn-primary">
                   Create Account
                 </button>
+                </NavLink>
               </div>
             </form>
           </div>

@@ -46,7 +46,7 @@ function MyContextProvider({ children }) {
     setLoginError(null);
     setLoading(true);
   
-    return fetch("http://127.0.0.1:8000/login", {
+    return fetch("http://127.0.0.1:5555/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -105,14 +105,27 @@ function MyContextProvider({ children }) {
         setLoading(false);
       });
   };
-  
 
-  
-
-  const handleLogout = () => {
-    setIsLoggedIn(false); 
-    setUser(null); 
+  const logout = () => {
+    fetch("http://127.0.0.1:5555/logout", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(() => {
+        console.log("logout")
+        setUser(null);
+        setIsLoggedIn(false)
+      })
+      .catch((error) => {
+        console.error("Logout Error:", error);
+      });
   };
+
+  
+
+  
   
 
   return (
@@ -125,8 +138,8 @@ function MyContextProvider({ children }) {
       fetchBooks,
       login,
       user,
-      handleLogout,
-      signup
+      signup,
+      logout
     }}>
       {children}
     </MyContext.Provider>

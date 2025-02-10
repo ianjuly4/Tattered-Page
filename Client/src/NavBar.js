@@ -11,7 +11,8 @@ function Navbar() {
     error: booksError, 
     loginError, 
     isLoggedIn,
-    handleLogout, 
+    handleLogout,
+    logout, 
     user } = useContext(MyContext); 
 
   const navigate = useNavigate();
@@ -98,9 +99,9 @@ function Navbar() {
               />
             ) : (
               <div className="avatar placeholder">
-                <div className="bg-secondary text-neutral-content w-12 rounded-full">
+                <div className="bg-secondary text-neutral-content w-53 rounded-full">
                   {/* If there's no avatar, display initials */}
-                  <span>{user?.name ? user.name.split(' ').map((n) => n[0]).join('') : "UN"}</span>
+                  <span>{user?.username ? user.username: "UN"}</span>
                 </div>
               </div>
             )}
@@ -118,7 +119,7 @@ function Navbar() {
           {/* Conditionally render Login/Logout */}
           {isLoggedIn ? (
             <li>
-              <a onClick={handleLogout}>Logout</a>
+              <a onClick={logout}>Logout</a>
             </li>
           ) : (
             <li>

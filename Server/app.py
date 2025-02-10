@@ -86,6 +86,14 @@ class Login(Resource):
     
 api.add_resource(Login, '/login')   
 
+class Logout(Resource):
+    def delete(self):
+        session['user_id'] = None
+        return make_response({'message': 'Logged out successfully'}, 200)
+
+api.add_resource(Logout, '/logout')
+
+
 
 if __name__ == '__main__':
     socketio.run(app, port=5555, debug=True) 
