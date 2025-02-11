@@ -7,10 +7,10 @@ import Header from "./Header";
 
 function Login() {
   const { login } = useContext(MyContext);
-  const [errorMessage, setErrorMessage] = useState(null); // State to hold error message if login fails
+  const [errorMessage, setErrorMessage] = useState(null); 
   const navigate = useNavigate();
-  const location = useLocation(); // Get the current location
-  const from = location.state?.from || "/"; // Get the redirect path (default to home)
+  const location = useLocation(); 
+  const from = location.state?.from || "/"; 
 
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),

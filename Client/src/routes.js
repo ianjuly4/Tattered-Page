@@ -48,8 +48,8 @@ const routes = [
     element: <Avatars/>
   },
   {
-    path: "/bookclubs",
-    element: <Bookclubs/>
+    path: "/users/:userId/bookclubs",
+    element: <Bookclubs /> 
   },
   {
    path:"*", 

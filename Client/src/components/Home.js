@@ -1,7 +1,8 @@
 import React from "react";
 import Header from "./Header";
 import bookNook from "../assets/bookNook.jpg";
-import animecoffeeshop from "../assets/animecoffeeshop.jpg"; // Import animecoffeeshop image
+import animecoffeeshop from "../assets/animecoffeeshop.jpg";
+import { NavLink } from "react-router-dom";
 
 function Home() {
 
@@ -36,6 +37,13 @@ function Home() {
         </div>
       </div>
 
+       {/* Bookshelf section */}
+       <div className="bg-primary py-12 text-center">
+        <h2 className="text-3xl text-white">Explore our Bookshelf</h2>
+        <p className="text-white mt-4">Dive into a collection of books that will spark your imagination!</p>
+      </div>
+
+
       {/* Bookshelf Section (Bookclub Section) */}
       <div className="hero bg-base-100 min-h-screen">
         <div className="hero-content flex-col lg:flex-row">
@@ -56,6 +64,13 @@ function Home() {
             <p className="mt-4">
               Start your reading journey today – your next favorite book is just a click away!
             </p>
+
+            {/* Wrap the button with NavLink */}
+            <NavLink to="/users/:userId/bookclubs">
+              <button className="btn btn-primary mt-4">
+                Get Started with Bookclubs
+              </button>
+            </NavLink>
           </div>
 
           {/* Right side image */}
@@ -68,8 +83,8 @@ function Home() {
           </div>
         </div>
       </div>
-        <div className="bg-primary">Bookshelf section</div>
 
+     
       {/* Footer */}
       <footer className="bg-white py-6 border-t-4 text-black">
         <div className="container mx-auto text-center">

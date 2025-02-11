@@ -11,7 +11,7 @@ function Account() {
 
     useEffect(() => {
         if (!user) {
-            navigate("/auth/login");
+            navigate("/auth/login", { state: { from: "/account" } });
         }
     });
 
@@ -65,7 +65,9 @@ function Account() {
                         {/* Bookshelves Section */}
                         <div className="flex justify-between items-center w-full">
                             <h1 className="text-3xl font-bold">Bookshelves</h1>
-                            <button className="btn btn-primary btn-sm">Add Shelf</button>
+                            <NavLink to={"/bookshelves"}>
+                            <button className="btn btn-primary btn-sm">Go To Your Bookshelves</button>
+                            </NavLink>
                         </div>
 
                         {/* Bookshelves Carousel */}
@@ -90,7 +92,9 @@ function Account() {
                         {/* Bookclubs Section */}
                         <div className="flex justify-between items-center w-full">
                             <h1 className="text-3xl font-bold">Bookclubs</h1>
-                            <button className="btn btn-primary btn-sm">Create Club</button>
+                            <NavLink to={"/users/:userId/bookclubs"}>
+                            <button className="btn btn-primary btn-sm">Go To Your Bookclubs</button>
+                            </NavLink>
                         </div>
 
                         {/* Bookclubs Carousel */}
