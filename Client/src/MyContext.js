@@ -123,10 +123,6 @@ function MyContextProvider({ children }) {
       });
   };
 
-  
-
-  
-  
 
   return (
     <MyContext.Provider value={{

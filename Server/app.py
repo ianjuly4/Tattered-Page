@@ -11,7 +11,7 @@ def index(path=None):
     return send_from_directory(os.path.join(app.static_folder), 'index.html')
 
 # Handle socket connection
-"""@socketio.on('connect')
+@socketio.on('connect')
 def handle_connect():
     print("A client has connected.")
     socketio.emit('response', {'data': 'Connected successfully!'})
@@ -32,7 +32,19 @@ def handle_disconnect():
 @socketio.on('message')
 def handle_message(message):
     print(f"Received message: {message}")
-    socketio.emit('message', {'data': message})  # Emit the message with a custom event"""
+    socketio.emit('message', {'data': message})  # Emit the message with a custom event
+
+class Users(Resource):
+    def get(self):
+        user_id = session.get('user_id')
+        if not user_id:
+            return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
+        
+        users = User.query.all()
+        return make_response([user.to_dict() for user in users], 200)
+    
+api.add_resource(Users, '/users') 
+
 
 class Signup(Resource):
     def post(self):

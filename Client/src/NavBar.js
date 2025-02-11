@@ -43,7 +43,9 @@ function Navbar() {
       </div>
       <div className="flex-none gap-2">
         <ul className="flex space-x-5">
+          <NavLink to ={"/bookclubs"}>
           <li><a>Bookclubs</a></li>
+          </NavLink>
           <NavLink to={"/bookshelves"}>
             <li><a>Bookshelves</a></li>
           </NavLink>
@@ -126,6 +128,9 @@ function Navbar() {
               <NavLink to={"/auth/login"}>Login</NavLink>
             </li>
           )}
+          <li>
+            <NavLink to={"/signup"}>Signup</NavLink>
+          </li>
         </ul>
       </div>
     </div>

@@ -8,6 +8,7 @@ import Account from "./components/Account";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Avatars from "./components/Avatars";
+import Bookclubs from "./components/Bookclubs";
 
 const routes = [
   {
@@ -45,6 +46,10 @@ const routes = [
   {
     path:"/avatar",
     element: <Avatars/>
+  },
+  {
+    path: "/bookclubs",
+    element: <Bookclubs/>
   },
   {
    path:"*", 

@@ -42,8 +42,8 @@ function Signup() {
             <p className="py-6">
               Please create an account to utilize all of the features of the Tattered Page.
             </p>
-            <NavLink to="/login">
-              <p>Already have an Account? Click here to login.</p>
+            <NavLink to="/auth/login">
+              <p>Already have an account? Click here to login.</p>
             </NavLink>
           </div>
           <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">

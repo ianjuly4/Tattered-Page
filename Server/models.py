@@ -117,5 +117,9 @@ class Chatlog(db.Model, SerializerMixin):
 # BookClub-Users (many-to-many relationship between user and bookclub through the 'bookclub_users' table)
 bookclub_users = db.Table('bookclub_users',
     db.Column('bookclub_id', db.Integer, db.ForeignKey('bookclubs.id'), primary_key=True),
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('status', db.String, default='invited', nullable=False),  
+    db.Column('invited_at', db.DateTime, default=datetime.utcnow, nullable=False),
+    db.Column('responded_at', db.DateTime, nullable=True)
 )
+

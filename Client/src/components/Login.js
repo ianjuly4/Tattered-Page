@@ -1,14 +1,16 @@
 import React, { useContext, useState } from "react";
-import Header from "./Header";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { MyContext } from "../MyContext";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import Header from "./Header";
 
 function Login() {
   const { login } = useContext(MyContext);
   const [errorMessage, setErrorMessage] = useState(null); // State to hold error message if login fails
   const navigate = useNavigate();
+  const location = useLocation(); // Get the current location
+  const from = location.state?.from || "/"; // Get the redirect path (default to home)
 
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
@@ -22,14 +24,13 @@ function Login() {
     },
     validationSchema: formSchema,
     onSubmit: async (values) => {
-      // Try logging in, await the login function's result
       const success = await login(values.username, values.password);
 
       if (success) {
-        // If login is successful, navigate to the account page
-        navigate("/account");
+       
+        navigate(from, { replace: true });
       } else {
-        // If login fails, display error message
+       
         setErrorMessage("Invalid username or password.");
       }
     },
