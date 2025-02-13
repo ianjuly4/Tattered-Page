@@ -1,30 +1,12 @@
-// App.js
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { MyContextProvider } from './MyContext'; 
-import Navbar from './Navbar';  
-import SearchResults from './SearchResults'; 
-import BookDetails from './BookDetails'; 
-import BookShelves from './BookShelves';
-import Login from './Login';
-import Signup from './Signup';
+import React from "react";
+import Navbar from "./Navbar"; // Assuming Navbar is a global component
 
 function App() {
   return (
-    <MyContextProvider>  
+    <div>
       <Navbar />
-      <Routes>
-        <Route path= "/landingpage" element={<LandingPage/>}/>
-        <Route path="/" element={<Home />} />
-        <Route path="/books" element={<SearchResults />} />
-        <Route path="/books/:bookKey" element={<BookDetails/>}/>
-        <Route path="/bookshelves" element={<BookShelves/>}/>
-        <Route path="/account" element={<Account/>}/>
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/signup" element={<Signup/>}/>
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </MyContextProvider>
+      {/* Your content will render based on the current route */}
+    </div>
   );
 }
 

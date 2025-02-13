@@ -29,13 +29,26 @@ function Login() {
     onSubmit: async (values) => {
       const success = await login(values.username, values.password);  
       if (success) {
-        navigate("/")
+        console.log('Login successful');
+  
+        console.log('Redirecting from:', from);
+        
+        if (from === "/bookclubs" && user && user.id) {
+         
+          navigate(`/users/${user.id}/bookclubs`);
+        } else if (from) {
+          navigate(from); 
+        } else {
+          navigate("/"); 
+        }
       } else {
         setErrorMessage("Invalid username or password.");
       }
     },
   });
-
+  
+  
+  
   return (
     <div>
       <div className="sticky top-0 z-10">

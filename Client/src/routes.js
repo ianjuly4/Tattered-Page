@@ -1,7 +1,7 @@
 import LandingPage from "./components/LandingPage";
 import Home from "./components/Home";
 import SearchResults from "./components/SearchResults";
-import BookDetails from "./components/BookDetails"
+import BookDetails from "./components/BookDetails";
 import NotFound from "./components/NotFound";
 import BookShelves from "./components/BookShelves";
 import Account from "./components/Account";
@@ -9,12 +9,13 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Avatars from "./components/Avatars";
 import Bookclubs from "./components/Bookclubs";
-import UsersBookclubs from "./components/UsersBookclubs"
+import UsersBookclubs from "./components/UsersBookclubs";
 
+// Define the routes using createBrowserRouter
 const routes = [
   {
     path: "/",
-    element: <Home />,
+    element: <Home />,  // Main homepage route
   },
   {
     path: "/landingPage",
@@ -25,42 +26,41 @@ const routes = [
     element: <SearchResults />,
   },
   {
-    path: "/books/:bookKey",
-    element: <BookDetails/>
+    path: "/books/:bookKey",  // Dynamic route for a specific book
+    element: <BookDetails />,
   },
   {
     path: "/bookshelves",
-    element: <BookShelves/>
+    element: <BookShelves />,
   },
   {
     path: "/account",
-    element: <Account/>
+    element: <Account />,
   },
   {
     path: "/signup",
-    element: <Signup/>
+    element: <Signup />,
   },
   {
     path: "/login",
-    element: <Login/>
+    element: <Login />,
   },
   {
-    path:"/avatar",
-    element: <Avatars/>
+    path: "/avatar",
+    element: <Avatars />,
   },
   {
     path: "/bookclubs",
-    element: <Bookclubs /> 
+    element: <Bookclubs />,
   },
   {
-    path: "/users/:userId/bookclubs",
-    element: <UsersBookclubs/>
+    path: "/users/:userId/bookclubs",  // Dynamic route for specific user's bookclubs
+    element: <UsersBookclubs />,
   },
   {
-   path:"*", 
-   element:<NotFound />
-  }
-
+    path: "*",  // Catch-all route for undefined paths
+    element: <NotFound />,
+  },
 ];
 
 export default routes;
