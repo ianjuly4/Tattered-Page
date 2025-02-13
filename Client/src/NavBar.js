@@ -56,9 +56,9 @@ function Navbar() {
       </div>
       <div className="flex-none gap-2">
         <ul className="flex space-x-5">
-          {/*<NavLink to ={`/users/${user.id}/bookclubs`}>
+          <NavLink to ={'/bookclubs'}>
           <li>Bookclubs</li>
-          </NavLink>*/}
+          </NavLink>
           <NavLink to={"/bookshelves"}>
             <li>Bookshelves</li>
           </NavLink>

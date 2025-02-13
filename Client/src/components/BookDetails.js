@@ -30,7 +30,7 @@ function BookDetails() {
 
             {/* Book Details Section */}
             <div className="p-4">
-                <div className="card bg-primary shadow-xl p-6 rounded-lg">
+                <div className="card bg-secondary shadow-xl p-6 rounded-lg">
 
                     {/* Book Title */}
                     <h2 className="text-3xl font-bold text-center mb-4">{title}</h2>

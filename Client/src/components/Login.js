@@ -5,16 +5,16 @@ import { MyContext } from "../MyContext";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 
+
 function Login() {
-  const { login } = useContext(MyContext);
+  const { login, user } = useContext(MyContext);
   const [errorMessage, setErrorMessage] = useState(null); 
   const navigate = useNavigate();
   const location = useLocation(); 
-  const from = location.state?.from || '/'; 
+  const from = location.state?.from; 
 
+  console.log(from)
 
- 
-  
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
     password: yup.string().required("Must enter a password").max(25),
@@ -29,13 +29,13 @@ function Login() {
     onSubmit: async (values) => {
       const success = await login(values.username, values.password);  
       if (success) {
-        navigate(from);  
+        navigate("/")
       } else {
         setErrorMessage("Invalid username or password.");
       }
     },
   });
-  
+
   return (
     <div>
       <div className="sticky top-0 z-10">

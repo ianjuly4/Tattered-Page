@@ -9,6 +9,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Avatars from "./components/Avatars";
 import Bookclubs from "./components/Bookclubs";
+import UsersBookclubs from "./components/UsersBookclubs"
 
 const routes = [
   {
@@ -48,8 +49,12 @@ const routes = [
     element: <Avatars/>
   },
   {
-    path: "/users/:userId/bookclubs",
+    path: "/bookclubs",
     element: <Bookclubs /> 
+  },
+  {
+    path: "/users/:userId/bookclubs",
+    element: <UsersBookclubs/>
   },
   {
    path:"*", 
