@@ -11,7 +11,7 @@ function Account() {
 
     useEffect(() => {
         if (!user) {
-            navigate("/auth/login", { state: { from: "/account" } });
+            navigate("/login", { state: { from: "/account" } });
         }
     });
 
@@ -121,7 +121,13 @@ function Account() {
                     </div>
                 </div>
             </div>
+        {/* Footer */}
+      <footer className="bg-white py-6 border-t-4 text-black">
+        <div className="container mx-auto text-center">
+          <p>&copy; 2025 The Tattered Page. All rights reserved. | Made with ❤️ for book lovers</p>
         </div>
+      </footer>
+    </div>
     );
 }
 

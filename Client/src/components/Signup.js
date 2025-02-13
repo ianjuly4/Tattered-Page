@@ -42,7 +42,7 @@ function Signup() {
             <p className="py-6">
               Please create an account to utilize all of the features of the Tattered Page.
             </p>
-            <NavLink to="/auth/login">
+            <NavLink to="/login">
               <p>Already have an account? Click here to login.</p>
             </NavLink>
           </div>
@@ -101,6 +101,12 @@ function Signup() {
           </div>
         </div>
       </div>
+    {/* Footer */}
+    <footer className="bg-white py-6 border-t-4 text-black">
+        <div className="container mx-auto text-center">
+          <p>&copy; 2025 The Tattered Page. All rights reserved. | Made with ❤️ for book lovers</p>
+        </div>
+      </footer>
     </div>
   );
 }

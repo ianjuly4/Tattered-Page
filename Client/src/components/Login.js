@@ -10,8 +10,11 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState(null); 
   const navigate = useNavigate();
   const location = useLocation(); 
-  const from = location.state?.from || "/"; 
+  const from = location.state?.from || '/'; 
 
+
+ 
+  
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
     password: yup.string().required("Must enter a password").max(25),
@@ -24,18 +27,15 @@ function Login() {
     },
     validationSchema: formSchema,
     onSubmit: async (values) => {
-      const success = await login(values.username, values.password);
-
+      const success = await login(values.username, values.password);  
       if (success) {
-       
-        navigate(from, { replace: true });
+        navigate(from);  
       } else {
-       
         setErrorMessage("Invalid username or password.");
       }
     },
   });
-
+  
   return (
     <div>
       <div className="sticky top-0 z-10">
@@ -112,6 +112,12 @@ function Login() {
           </div>
         </div>
       </div>
+      {/* Footer */}
+      <footer className="bg-white py-6 border-t-4 text-black">
+        <div className="container mx-auto text-center">
+          <p>&copy; 2025 The Tattered Page. All rights reserved. | Made with ❤️ for book lovers</p>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -73,6 +73,16 @@ class Signup(Resource):
         return make_response(new_user.to_dict(), 201)
 api.add_resource(Signup, "/signup")
 
+class CheckSession(Resource):
+    def get(self):
+        print(session)
+        user = User.query.filter(User.id == session.get('user_id')).first()
+        if user:
+            return make_response(user.to_dict(rules=('-_password_hash',)), 200)
+        return make_response({"message": "No user currently logged in"}, 401)
+
+api.add_resource(CheckSession, '/check_session')
+
 
 class Login(Resource):
     def post(self):
@@ -83,7 +93,7 @@ class Login(Resource):
         print(f"Login attempt for username: {username}")
 
         user = User.query.filter(User.username == username).first()
-
+        
         if user:
             print(f"User found: {user.username}")
             if user.authenticate(password):

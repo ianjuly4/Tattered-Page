@@ -20,7 +20,7 @@ function App() {
         <Route path="/books/:bookKey" element={<BookDetails/>}/>
         <Route path="/bookshelves" element={<BookShelves/>}/>
         <Route path="/account" element={<Account/>}/>
-        <Route path="/auth/login" element={<Login/>}/>
+        <Route path="/login" element={<Login/>}/>
         <Route path="/signup" element={<Signup/>}/>
         <Route path="*" element={<NotFound />} />
       </Routes>

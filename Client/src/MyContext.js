@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 
 const API_KEY = "AIzaSyBf_grAHTnhr09zZ0oZI_NQ8AlSyBeXS_s";
@@ -12,6 +12,61 @@ function MyContextProvider({ children }) {
   const [loginError, setLoginError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null)
+  const [bookclubs, setBookclubs] = useState([]);
+  const [createClubError, setCreateClubError] = useState(null);
+
+  console.log(user)
+
+  {/*useEffect(() => {
+    fetch("http://127.0.0.1:5555/check_session", {
+      method: 'GET',
+      credentials: 'include', 
+    })
+    .then((response) => {
+      console.log(response);
+      if (!response.ok) {
+        throw new Error('Session not valid');  
+      }
+      return response.json();  
+    })
+    .then((userData) => {
+      console.log(userData); 
+      setUser(userData);
+    })
+    .catch((error) => {
+      console.error("Error checking session:", error);
+      setUser(null);  
+    });
+  }, []);*/}
+
+
+  const createBookclub = (name, description) => {
+    setCreateClubError(null);
+    setLoading(true);
+
+    fetch("http://127.0.0.1:5555/bookclubs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, description }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.id) {
+          
+          setBookclubs((prevBookclubs) => [...prevBookclubs, data]);
+        } else {
+          setCreateClubError("Failed to create bookclub");
+        }
+      })
+      .catch((error) => {
+        setCreateClubError("An error occurred. Please try again later.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   const fetchBooks = (searchQuery, filterType) => {
     setLoading(true);
@@ -42,39 +97,40 @@ function MyContextProvider({ children }) {
   };
 
  
-  const login = (username, password) => {
+  const login = async (username, password) => {
     setLoginError(null);
     setLoading(true);
   
-    return fetch("http://127.0.0.1:5555/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.user) {
-          setIsLoggedIn(true);
-          setUser(data.user);
-          return true; 
-        } else {
-          setLoginError(data.error || "Login failed");
-          return false; 
-        }
-      })
-      .catch((error) => {
-        console.error("Login Error:", error);
-        setLoginError("An error occurred. Please try again later.");
-        return false; 
-      })
-      .finally(() => {
-        setLoading(false);
+    try {
+      const response = await fetch("http://127.0.0.1:5555/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
       });
+  
+      const data = await response.json();
+  
+      if (data.user) {
+        setIsLoggedIn(true);
+        setUser(data.user);
+        console.log(`${data.user.username} logged in`);
+        return true;  
+      } else {
+        setLoginError(data.error || "Login failed");
+        return false; 
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      setLoginError("An error occurred. Please try again later.");
+      return false;  
+    } finally {
+      setLoading(false);  
+    }
   };
   
-
+  
   const signup=(username,password)=>{
     setSignUpError(null);
     setLoading(true);
@@ -123,6 +179,9 @@ function MyContextProvider({ children }) {
       });
   };
 
+  
+
+
 
   return (
     <MyContext.Provider value={{
@@ -135,7 +194,8 @@ function MyContextProvider({ children }) {
       login,
       user,
       signup,
-      logout
+      logout,
+      createBookclub
     }}>
       {children}
     </MyContext.Provider>

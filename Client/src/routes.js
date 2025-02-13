@@ -40,7 +40,7 @@ const routes = [
     element: <Signup/>
   },
   {
-    path: "/auth/login",
+    path: "/login",
     element: <Login/>
   },
   {

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MyContext } from "./MyContext"; 
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -13,9 +13,22 @@ function Navbar() {
     isLoggedIn,
     handleLogout,
     logout, 
-    user } = useContext(MyContext); 
+    user } = useContext(MyContext);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+   
+    console.log(user)
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+      if (user && isLoggedIn) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+      setIsLoading(false);
+    }, [user, isLoggedIn]);
 
   const formSchema = yup.object().shape({
     searchTerm: yup.string().required("Must enter a search term").max(100),
@@ -43,11 +56,11 @@ function Navbar() {
       </div>
       <div className="flex-none gap-2">
         <ul className="flex space-x-5">
-          <NavLink to ={"/users/:userId/bookclubs"}>
-          <li><a>Bookclubs</a></li>
-          </NavLink>
+          {/*<NavLink to ={`/users/${user.id}/bookclubs`}>
+          <li>Bookclubs</li>
+          </NavLink>*/}
           <NavLink to={"/bookshelves"}>
-            <li><a>Bookshelves</a></li>
+            <li>Bookshelves</li>
           </NavLink>
         </ul>
 
@@ -125,7 +138,7 @@ function Navbar() {
             </li>
           ) : (
             <li>
-              <NavLink to={"/auth/login"}>Login</NavLink>
+              <NavLink to={"/login"}>Login</NavLink>
             </li>
           )}
           <li>
