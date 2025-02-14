@@ -49,7 +49,7 @@ function Navbar() {
   return (
     <div className="navbar bg-base-100 sticky top-0 z-10">
       <div className="flex-1">
-        <NavLink to={'/'}>
+        <NavLink to={'/dashboard'}>
           <span className="btn btn-ghost text-xl">The Tattered Page</span>
         </NavLink>
       </div>

@@ -66,7 +66,9 @@ const LandingPage = () => {
           <p className="mt-4 text-lg">
             Get lost in the world of books—discover new titles, connect with fellow readers, and share your thoughts on what you’ve read. Whether you’re looking for recommendations or just want to chat about your latest read, this is the place for you.
           </p>
+          <NavLink to={"/dashboard"}>
           <button className="btn btn-accent mt-6">Let's Get Started</button>
+          </NavLink>
         </div>
       </section>
 
@@ -94,7 +96,9 @@ const LandingPage = () => {
           <div className="flex-shrink-0">
             <Lottie options={books} height={150} width={150} />
           </div>
+          <NavLink to={"/bookshelves"}>
           <button className="btn btn-secondary mt-6">Go to Bookshelf</button>
+          </NavLink>
         </div>
       </section>
 

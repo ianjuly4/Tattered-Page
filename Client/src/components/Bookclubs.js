@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import Header from "./Header";
 import { MyContext } from "../MyContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import animecoffeeshop from "../assets/animecoffeeshop.jpg";
 
 
@@ -9,17 +9,14 @@ function Bookclubs() {
   const { user, isLoggedIn } = useContext(MyContext);
   const {bookclubs} = user || {}
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const navigate= useNavigate()
+ 
+  const navigate= useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (user && isLoggedIn) {
-      setIsAuthenticated(true);
       navigate(`/users/${user.id}/bookclubs`);
     } else {
-      setIsAuthenticated(false);
-    
     }
     setIsLoading(false);
   }, [user, isLoggedIn]);
@@ -63,7 +60,7 @@ function Bookclubs() {
 
                 <div className="text-center mt-4">
                   <button
-                    onClick={(()=> navigate("/login"))}
+                    onClick={(()=> navigate("/login", { state: { from: location.pathname } }))}
                     className="btn btn-primary mt-4"
                   >
                     Login To Get Started

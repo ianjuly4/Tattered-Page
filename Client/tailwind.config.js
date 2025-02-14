@@ -6,10 +6,10 @@ module.exports = {
   theme: {
     extend: { 
       colors: {
-        // You can add custom colors here if needed
+        
       },
       fontFamily: {
-        sans: ['Poppins', 'sans-serif'], // Use clean, soft fonts
+        sans: ['Poppins', 'sans-serif'], 
       },
     },
   },
@@ -27,14 +27,14 @@ module.exports = {
           "neutral": "#cea2d7", 
         },
       },
-      "light", "dark", "aqua", "pastel", "sunset", "night", "valentine", // Other built-in DaisyUI themes
+      "light", "dark", "aqua", "pastel", "sunset", "night", "valentine", 
     ],  
-    darkTheme: "night", // Optional: Set a default dark mode theme
-    base: true, // Apply base background and foreground colors to root element
-    styled: true, // Use DaisyUI's default styles
-    utils: true, // Enable utility classes for responsive and other modifiers
-    prefix: "", // Optional: Define a class prefix (default is '')
-    logs: true, // Show logs for DaisyUI's version and config when building
-    themeRoot: ":root", // Define where theme variables will be applied
+    darkTheme: "night", 
+    base: true, 
+    styled: true,
+    utils: true, 
+    prefix: "",
+    logs: true, 
+    themeRoot: ":root", 
   },
 };

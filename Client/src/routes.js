@@ -10,15 +10,15 @@ import Signup from "./components/Signup";
 import Avatars from "./components/Avatars";
 import Bookclubs from "./components/Bookclubs";
 import UsersBookclubs from "./components/UsersBookclubs";
+import UserBookshelves from "./components/UserBookshelves";
 
-// Define the routes using createBrowserRouter
 const routes = [
   {
-    path: "/",
-    element: <Home />,  // Main homepage route
+    path: "/dashboard",
+    element: <Home />,  
   },
   {
-    path: "/landingPage",
+    path: "/",
     element: <LandingPage />,
   },
   {
@@ -26,12 +26,16 @@ const routes = [
     element: <SearchResults />,
   },
   {
-    path: "/books/:bookKey",  // Dynamic route for a specific book
+    path: "/books/:bookKey", 
     element: <BookDetails />,
   },
   {
     path: "/bookshelves",
     element: <BookShelves />,
+  },
+  {
+    path: "/users/:userId/bookshelves",
+    element: <UserBookshelves/>
   },
   {
     path: "/account",
@@ -54,11 +58,11 @@ const routes = [
     element: <Bookclubs />,
   },
   {
-    path: "/users/:userId/bookclubs",  // Dynamic route for specific user's bookclubs
+    path: "/users/:userId/bookclubs",  
     element: <UsersBookclubs />,
   },
   {
-    path: "*",  // Catch-all route for undefined paths
+    path: "*", 
     element: <NotFound />,
   },
 ];

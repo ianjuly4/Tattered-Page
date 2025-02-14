@@ -1,19 +1,16 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { MyContext } from "../MyContext";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 
-
 function Login() {
   const { login, user } = useContext(MyContext);
-  const [errorMessage, setErrorMessage] = useState(null); 
+  const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
-  const location = useLocation(); 
-  const from = location.state?.from; 
-
-  
+  const location = useLocation();
+  const from = location.state?.from || "/"; 
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
     password: yup.string().required("Must enter a password").max(25),
@@ -26,28 +23,39 @@ function Login() {
     },
     validationSchema: formSchema,
     onSubmit: async (values) => {
-      const success = await login(values.username, values.password);  
+      const success = await login(values.username, values.password);
       if (success) {
-        console.log('Login successful');
-  
-        console.log('Redirecting from:', from);
-        
-        if (from === "/bookclubs" && user && user.id) {
-         
-          navigate(`/users/${user.id}/bookclubs`);
-        } else if (from) {
-          navigate(from); 
-        } else {
-          navigate("/"); 
-        }
+        console.log("Login successful");
       } else {
         setErrorMessage("Invalid username or password.");
       }
     },
   });
+
   
-  
-  
+  useEffect(() => {
+    if (user) {
+      console.log("User logged in:", user);
+
+    
+      if (from && from !== "/") {
+   
+        navigate(from);
+      } else if (user.id) {
+      
+        if (user.bookclubs && user.bookclubs.length > 0) {
+          navigate(`/users/${user.id}/bookclubs`);
+        } else if (user.bookshelves && user.bookshelves.length > 0) {
+          navigate(`/users/${user.id}/bookshelves`);
+        } else {
+          navigate('/acount'); 
+        }
+      } else {
+        navigate("/dashboard"); 
+      }
+    }
+  }, [user, from, navigate]); 
+
   return (
     <div>
       <div className="sticky top-0 z-10">
@@ -124,6 +132,7 @@ function Login() {
           </div>
         </div>
       </div>
+
       {/* Footer */}
       <footer className="bg-white py-6 border-t-4 text-black">
         <div className="container mx-auto text-center">
