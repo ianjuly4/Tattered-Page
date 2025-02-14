@@ -16,8 +16,7 @@ function Navbar() {
     user } = useContext(MyContext);
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-   
-    console.log(user)
+  
 
   const navigate = useNavigate();
 

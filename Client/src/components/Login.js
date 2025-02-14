@@ -13,8 +13,7 @@ function Login() {
   const location = useLocation(); 
   const from = location.state?.from; 
 
-
-
+  
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
     password: yup.string().required("Must enter a password").max(25),
@@ -62,7 +61,7 @@ function Login() {
             <p className="py-6">
               Please login to utilize all of the features of the Tattered Page.
             </p>
-            <NavLink to="/signup">
+            <NavLink to={"/signup"}>
               <p>Don't have an account? Click here to create one.</p>
             </NavLink>
           </div>
