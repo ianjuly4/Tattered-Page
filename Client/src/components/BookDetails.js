@@ -6,89 +6,91 @@ import defaultbookimage from "../assets/defaultbookimage.jpg";
 import { NavLink } from "react-router-dom";
 
 function BookDetails() {
-    const { bookKey } = useParams();
-    const { books } = useContext(MyContext);
+  const { bookKey } = useParams();
+  const { books } = useContext(MyContext);
 
-    const bookId = bookKey.replace('/works/', '');
-    const book = books.find((book) => book.id === bookId);  
+  const bookId = bookKey.replace('/works/', '');
+  const book = books.find((book) => book.id === bookId);  
 
-    if (!book) {
-        return <div>Book not found.</div>;
-    }
+  if (!book) {
+    return <div>Book not found.</div>;
+  }
 
-    const { volumeInfo } = book;
-    const { title, authors, description, imageLinks, categories, pageCount, publishedDate } = volumeInfo;
+  const { volumeInfo } = book;
+  const { title, authors, description, imageLinks, categories, pageCount, publishedDate } = volumeInfo;
 
-    const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
+  const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
 
-    return (
-        <div>
-            {/* Sticky Header */}
-            <div className="sticky top-0 z-10">
-                <Header />
+  return (
+    <div>
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-10">
+        <Header />
+      </div>
+
+      {/* Book Details Section */}
+      <div className="p-4">
+        <div className="card bg-secondary shadow-xl p-6 rounded-lg">
+
+          {/* Book Title */}
+          <h2 className="text-3xl font-bold text-center mb-4">{title}</h2>
+
+          {/* Image Section */}
+          <figure className="flex justify-center mb-6">
+            <img
+              src={coverImageUrl}
+              alt={title}
+              className="w-full sm:w-48 md:w-64 lg:w-80 h-auto object-cover rounded shadow-lg"
+            />
+          </figure>
+
+          {/* Description Section */}
+          <div className="text-center mb-4">
+            <div
+              className="text-sm max-h-48 overflow-y-auto"
+              style={{ maxHeight: '12rem' }} // You can adjust the height as needed
+            >
+              {description || "No description available."}
             </div>
+          </div>
 
-            {/* Book Details Section */}
-            <div className="p-4">
-                <div className="card bg-secondary shadow-xl p-6 rounded-lg">
+          {/* Author Section */}
+          {authors && authors.length > 0 && (
+            <p className="text-center mb-4 text-lg">By {authors.join(", ")}</p>
+          )}
 
-                    {/* Book Title */}
-                    <h2 className="text-3xl font-bold text-center mb-4">{title}</h2>
+          {/* Category Section */}
+          {categories && (
+            <p className="text-center mb-4 text-lg">Categories: {categories.join(", ")}</p>
+          )}
 
-                    {/* Image Section */}
-                    <figure className="flex justify-center mb-6">
-                        <img
-                            src={coverImageUrl}
-                            alt={title}
-                            className="w-full sm:w-48 md:w-64 lg:w-80 h-auto object-cover rounded shadow-lg"
-                        />
-                    </figure>
+          {/* Page Count Section */}
+          {pageCount && (
+            <p className="text-center mb-4 text-lg">Page Count: {pageCount}</p>
+          )}
 
-                    {/* Description Section */}
-                    <div className="text-center mb-4">
-                        <p>{description || "No description available."}</p>
-                    </div>
+          {/* Published Date Section */}
+          {publishedDate && (
+            <p className="text-center mb-4 text-lg">Published Date: {publishedDate}</p>
+          )}
 
-                    {/* Author Section */}
-                    {authors && authors.length > 0 && (
-                        <p className="text-center mb-4 text-lg">By {authors.join(", ")}</p>
-                    )}
+          {/* Action Section with Buttons next to each other */}
+          <div className="flex justify-center gap-4 mt-4">
+            <NavLink to={"/bookshelves"}>
+              <button className="btn btn-primary">View Your Bookshelves</button>
+            </NavLink>
+          </div>
 
-                    {/* Category Section */}
-                    {categories && (
-                        <p className="text-center mb-4 text-lg">Categories: {categories.join(", ")}</p>
-                    )}
-
-                    {/* Page Count Section */}
-                    {pageCount && (
-                        <p className="text-center mb-4 text-lg">Page Count: {pageCount}</p>
-                    )}
-
-                    {/* Published Date Section */}
-                    {publishedDate && (
-                        <p className="text-center mb-4 text-lg">Published Date: {publishedDate}</p>
-                    )}
-
-                    {/* Action Section with Buttons next to each other */}
-                    <div className="flex justify-center gap-4 mt-4">
-                        <NavLink to={"/bookshelves"}>
-                            <button className="btn btn-primary">View Your Bookshelves</button>
-                        </NavLink>
-
-                        {/* Add to Bookshelf Button */}
-                        <button className="btn btn-primary">Add Book To Bookshelf</button>
-                    </div>
-
-                </div>
-            </div>
-        {/* Footer */}
+        </div>
+      </div>
+      {/* Footer */}
       <footer className="bg-white py-6 border-t-4 text-black">
         <div className="container mx-auto text-center">
           <p>&copy; 2025 The Tattered Page. All rights reserved. | Made with ❤️ for book lovers</p>
         </div>
       </footer>
     </div>
-    );
+  );
 }
 
 export default BookDetails;

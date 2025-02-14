@@ -34,6 +34,28 @@ def handle_message(message):
     print(f"Received message: {message}")
     socketio.emit('message', {'data': message})  # Emit the message with a custom event
 
+class Bookclub(Resource):
+    def post(self):
+        data = request.get_json()
+        print(data)
+
+        user_id = session.get('user_id')
+        if not user_id:
+            return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
+
+        new_bookclub = Bookclub(
+            name=data.get('name'),
+            description=data.get('description')
+        )
+
+        db.session.add(new_bookclub)
+        db.session.commit()
+
+        return make_response(new_bookclub.to_dict(), 201)
+    
+api.add_resource(Bookclub, "/bookclub")
+
+
 class Users(Resource):
     def get(self):
         user_id = session.get('user_id')

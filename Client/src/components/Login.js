@@ -13,7 +13,7 @@ function Login() {
   const location = useLocation(); 
   const from = location.state?.from; 
 
-  console.log(from)
+
 
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),

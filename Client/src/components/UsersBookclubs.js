@@ -6,27 +6,14 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 
 function UsersBookclubs() {
-  const { user, isLoggedIn } = useContext(MyContext);
+  const { user, isLoggedIn, createbookclub } = useContext(MyContext);
   const { bookclubs } = user || {};
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-
-  
-  useEffect(() => {
-    if (isLoggedIn && user) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-      navigate("/bookclubs")
-    }
-    setIsLoading(false);
-  }, [isLoggedIn, user]);
-
 
   const formSchema = yup.object().shape({
     ame: yup.string().required("Must Enter A BookClub Name.").max(25),
-    description: yup.string().required("Must Enter A Bookclub Description ").max(200),
+    description: yup.string().required("Must Enter A Bookclub Description ").max(500),
   });
 
   const formik = useFormik({
@@ -36,21 +23,10 @@ function UsersBookclubs() {
     },
     validationSchema: formSchema,
     onSubmit: (values) => {
-      console.log(values.username, values.password);
-     
+      console.log(values.name, values.description);
+      createbookclub(values.name, values.description)
     },
   });
-
-  if (isLoading) {
-    return (
-      <div>
-        <Header />
-        <div className="hero bg-secondary min-h-screen flex justify-center items-center">
-          <div>Loading...</div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -60,7 +36,7 @@ function UsersBookclubs() {
       
       <div className="hero bg-secondary min-h-screen">
         <div className="hero-content flex-col lg:flex-row">
-          {isAuthenticated ? (
+          
             <div className="text-center lg:text-left">
               <h1 className="text-5xl font-bold">{`${user.username}'s Bookclub Dashboard`}</h1>
 
@@ -96,7 +72,7 @@ function UsersBookclubs() {
                     type="text"
                     className="grow"
                     placeholder="Bookclub Name"
-                    {...formik.getFieldProps("Bookclub Name")}
+                    {...formik.getFieldProps("name")}
                   />
                 </label>
                 {formik.touched.name && formik.errors.name && (
@@ -115,19 +91,15 @@ function UsersBookclubs() {
                   <div className="text-red-500">{formik.errors.description}</div>
                 )}
 
-                <button type="submit" className="btn btn-primary mt-4">
+                {/* Submit Button */}
+                <div className="form-control mt-6">
+                <button type="submit" className="btn btn-primary">
                   Create Bookclub
                 </button>
+              </div>
               </form>
             </div>
-          ) : (
-            <div className="text-center">
-              <p>You need to log in to access this page.</p>
-              <button onClick={() => navigate("/login")} className="btn btn-primary mt-4">
-                Login
-              </button>
-            </div>
-          )}
+          
         </div>
       </div>
 

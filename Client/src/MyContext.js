@@ -44,7 +44,7 @@ function MyContextProvider({ children }) {
     setCreateClubError(null);
     setLoading(true);
 
-    fetch("http://127.0.0.1:5555/bookclubs", {
+    fetch("http://127.0.0.1:5555/bookclub", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +54,6 @@ function MyContextProvider({ children }) {
       .then((response) => response.json())
       .then((data) => {
         if (data.id) {
-          
           setBookclubs((prevBookclubs) => [...prevBookclubs, data]);
         } else {
           setCreateClubError("Failed to create bookclub");
@@ -102,7 +101,7 @@ function MyContextProvider({ children }) {
     setLoading(true);
   
     try {
-      const response = await fetch("http://127.0.0.1:5555/login", {
+      const response = await fetch("/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
