@@ -11,12 +11,12 @@ function Bookclubs() {
 
   const navigate = useNavigate();
   const location = useLocation();
-
+  
   useEffect(() => {
     if (user && isLoggedIn) {
       navigate(`/users/${user.id}/bookclubs`);
     } else {
-      // Handle non-logged-in users here (maybe show a message or redirect)
+      
     }
     setIsLoading(false);
   }, [user, isLoggedIn]);

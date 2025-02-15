@@ -17,8 +17,8 @@ function MyContextProvider({ children }) {
 
   console.log(user)
 
-  {/*useEffect(() => {
-    fetch("http://127.0.0.1:5555/check_session", {
+  useEffect(() => {
+    fetch("/check_session", {
       method: 'GET',
       credentials: 'include', 
     })
@@ -30,14 +30,16 @@ function MyContextProvider({ children }) {
       return response.json();  
     })
     .then((userData) => {
-      console.log(userData); 
+      console.log(userData.id); 
       setUser(userData);
+      setIsLoggedIn(true)
     })
     .catch((error) => {
       console.error("Error checking session:", error);
-      setUser(null);  
+      setUser(null);
+      setIsLoggedIn(false)  
     });
-  }, []);*/}
+  }, []);
 
 
   const createBookclub = (name, description) => {
@@ -107,6 +109,7 @@ function MyContextProvider({ children }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
+        credentials: 'include'
       });
   
       const data = await response.json();

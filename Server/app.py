@@ -58,7 +58,7 @@ api.add_resource(Bookclub, "/bookclub")
 
 class Users(Resource):
     def get(self):
-        print(session)
+        
         user_id = session.get("user_id")
         if not user_id:
             return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
@@ -100,7 +100,7 @@ api.add_resource(Signup, "/signup")
 
 class CheckSession(Resource):
     def get(self):
-        print("/check_session",session)
+        #print("/check_session",session["user_id"])
         user = User.query.filter(User.id == session.get('user_id')).first()
         if user:
             return make_response(user.to_dict(rules=('-_password_hash',)), 200)
