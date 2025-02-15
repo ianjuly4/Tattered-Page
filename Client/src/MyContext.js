@@ -44,7 +44,7 @@ function MyContextProvider({ children }) {
     setCreateClubError(null);
     setLoading(true);
 
-    fetch("http://127.0.0.1:5555/bookclub", {
+    fetch("/bookclub", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -101,7 +101,7 @@ function MyContextProvider({ children }) {
     setLoading(true);
   
     try {
-      const response = await fetch("http://127.0.0.1:5555/login", {
+      const response = await fetch("/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -162,7 +162,7 @@ function MyContextProvider({ children }) {
   };
 
   const logout = () => {
-    fetch("http://127.0.0.1:5555/logout", {
+    fetch("/logout", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

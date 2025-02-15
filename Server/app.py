@@ -1,15 +1,15 @@
 # app.py
 from flask import Flask, render_template, request, make_response, session, send_from_directory
 from flask_restful import Api, Resource
-from models import User, BookShelf, Bookclub
 from config import app, db, bcrypt, migrate, api, os, socketio
+from models import User, BookShelf, Bookclub
 
 
 @app.route('/')
 @app.route('/<path:path>')
 def index(path=None):
     return send_from_directory(os.path.join(app.static_folder), 'index.html')
-
+""""
 # Handle socket connection
 @socketio.on('connect')
 def handle_connect():
@@ -33,7 +33,7 @@ def handle_disconnect():
 def handle_message(message):
     print(f"Received message: {message}")
     socketio.emit('message', {'data': message})  # Emit the message with a custom event
-
+"""
 class Bookclub(Resource):
     def post(self):
         data = request.get_json()
@@ -58,7 +58,8 @@ api.add_resource(Bookclub, "/bookclub")
 
 class Users(Resource):
     def get(self):
-        user_id = session.get('user_id')
+        print(session)
+        user_id = session.get("user_id")
         if not user_id:
             return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
         
@@ -66,6 +67,8 @@ class Users(Resource):
         return make_response([user.to_dict() for user in users], 200)
     
 api.add_resource(Users, '/users') 
+
+
 
 
 class Signup(Resource):
@@ -97,7 +100,7 @@ api.add_resource(Signup, "/signup")
 
 class CheckSession(Resource):
     def get(self):
-        print(session)
+        print("/check_session",session)
         user = User.query.filter(User.id == session.get('user_id')).first()
         if user:
             return make_response(user.to_dict(rules=('-_password_hash',)), 200)
@@ -120,7 +123,8 @@ class Login(Resource):
             print(f"User found: {user.username}")
             if user.authenticate(password):
                 session['user_id'] = user.id
-                return make_response({'message': 'Login successful', 'user': user.to_dict(rules=('-_password_hash',))}, 200)
+                print("/login",session)
+                return make_response({'message': 'Login successful', 'user': user.to_dict()}, 200)
             else:
                 print(f"Password mismatch for user {username}")
         else:
@@ -132,6 +136,7 @@ api.add_resource(Login, '/login')
 
 class Logout(Resource):
     def delete(self):
+        print("/logout", session)
         session['user_id'] = None
         return make_response({'message': 'Logged out successfully'}, 200)
 

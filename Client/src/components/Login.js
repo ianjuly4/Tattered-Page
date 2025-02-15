@@ -37,7 +37,6 @@ function Login() {
     if (user) {
       console.log("User logged in:", user);
 
-    
       if (from && from !== "/") {
    
         navigate(from);
@@ -48,7 +47,7 @@ function Login() {
         } else if (user.bookshelves && user.bookshelves.length > 0) {
           navigate(`/users/${user.id}/bookshelves`);
         } else {
-          navigate('/acount'); 
+          navigate('/account'); 
         }
       } else {
         navigate("/dashboard"); 

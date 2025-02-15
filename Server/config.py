@@ -22,11 +22,9 @@ app = Flask(
 )
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'sqlite:///instance/app.db')
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', b'9\x8c_\xc8\x16$OE\xbe5\x98d\x19\xc1\xd8(')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.json.compact = False
-
-
 
 
 metadata = MetaData(naming_convention={
@@ -38,10 +36,10 @@ db = SQLAlchemy(metadata=metadata)
 
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
-CORS(app, origins=['http://localhost:3000'], supports_credentials=True)
+CORS(app, cors_allowed_origins=['http://localhost:3000'], supports_credentials=True)
+socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000"])
 api = Api(app)
 
-socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000"])
 
 db.init_app(app)
 

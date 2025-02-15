@@ -6,46 +6,47 @@ import library from "../assets/library.jpg";
 
 function UserBookshelves() {
   const { user, isLoggedIn } = useContext(MyContext);
-  const { bookclubs } = user || {};  
+  const { bookshelves } = user || {};  
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user && !isLoggedIn) {
-      navigate("/bookshelves");
-    } else if (user) {
-      navigate(`/users/${user.id}/bookshelves`);
-    }
-    setIsLoading(false);
-  }, [user, isLoggedIn, navigate]);
+    console.log(user)
+    console.log(isLoggedIn)
+      if (!user && !isLoggedIn) {
+        navigate("/login");
+      } else if (user) {
+        navigate(`/users/${user.id}/bookshelves`);
+      }
+      setIsLoading(false);
+    }, [user, isLoggedIn, navigate]);
+
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
   if (!user) {
     return <div>You need to log in to view this page.</div>;
   }
-
-  // Style for the background image with a distant effect (blurred)
+  
   const backgroundStyle = {
     backgroundImage: `url(${library})`,
-    backgroundSize: "140%",  // Slightly reduce size to create the distant effect
+    backgroundSize: "150%",  
     backgroundPosition: "center",
     minHeight: "100vh",
-    filter: "blur(6px)",  // Blurring the background
+    filter: "blur(6px)", 
     opacity: 0.6,
     backgroundRepeat: "no-repeat",
-    position: "absolute",  // Make sure the background is positioned absolutely
+    position: "absolute",  
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: -1,  // Push the background behind the content
+    zIndex: -1, 
   };
 
   return (
-    <div className="relative">
+    <div>
       <div className="sticky top-0 z-10">
         <Header />
       </div>
@@ -65,11 +66,11 @@ function UserBookshelves() {
               {/* Bookshelves Carousel */}
               <div className="border p-4 rounded-lg bg-white shadow-lg">
                 <div className="flex overflow-x-auto space-x-4">
-                  {bookclubs && bookclubs.length > 0 ? (
-                    bookclubs.map((club, index) => (
+                  {bookshelves&& bookshelves.length > 0 ? (
+                    bookshelves.map((shelf, index) => (
                       <div key={index} className="w-60 p-4 bg-white rounded-xl shadow-lg flex-none">
-                        <h2 className="text-xl font-semibold">{club.name}</h2>
-                        <p>{club.description}</p>
+                        <h2 className="text-xl font-semibold">{shelf.name}</h2>
+                        <p>{shelf.description}</p>
                         <button className="btn btn-primary btn-sm mt-4">View Shelf</button>
                       </div>
                     ))
