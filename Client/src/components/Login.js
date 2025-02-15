@@ -1,3 +1,4 @@
+// Login Component
 import React, { useContext, useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -6,11 +7,12 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 
 function Login() {
-  const { login, user } = useContext(MyContext);
+  const { login, user, books } = useContext(MyContext);
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || "/"; 
+  const from = location.state?.from || "/";  
+
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
     password: yup.string().required("Must enter a password").max(25),
@@ -32,28 +34,26 @@ function Login() {
     },
   });
 
-  
   useEffect(() => {
     if (user) {
       console.log("User logged in:", user);
-
-      if (from && from !== "/") {
-   
-        navigate(from);
+      if (from && from !== "/dashboard") {
+        navigate(from);  
       } else if (user.id) {
-      
         if (user.bookclubs && user.bookclubs.length > 0) {
           navigate(`/users/${user.id}/bookclubs`);
         } else if (user.bookshelves && user.bookshelves.length > 0) {
           navigate(`/users/${user.id}/bookshelves`);
-        } else {
-          navigate('/account'); 
+        } else if (books.length>0){
+          navigate("/") 
+        }else {
+          navigate("/account");
         }
       } else {
-        navigate("/dashboard"); 
+        navigate("/dashboard");
       }
     }
-  }, [user, from, navigate]); 
+  }, [user, from, navigate]);
 
   return (
     <div>
@@ -65,9 +65,7 @@ function Login() {
         <div className="hero-content flex-col lg:flex-row-reverse">
           <div className="text-center lg:text-left">
             <h1 className="text-5xl font-bold">Login now!</h1>
-            <p className="py-6">
-              Please login to utilize all of the features of the Tattered Page.
-            </p>
+            <p className="py-6">Please login to utilize all of the features of the Tattered Page.</p>
             <NavLink to={"/signup"}>
               <p>Don't have an account? Click here to create one.</p>
             </NavLink>
@@ -111,9 +109,6 @@ function Login() {
                 {loginFormik.touched.password && loginFormik.errors.password && (
                   <div className="text-red-500 text-sm">{loginFormik.errors.password}</div>
                 )}
-                <label className="label">
-                  <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
-                </label>
               </div>
 
               {/* Error Message (if login fails) */}

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { MyContext } from "./MyContext"; 
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -16,7 +16,7 @@ function Navbar() {
     user } = useContext(MyContext);
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
+    const [dropdownOpen, setDropdownOpen] = useState(false); 
 
   const navigate = useNavigate();
 
@@ -47,6 +47,12 @@ function Navbar() {
     },
   });
 
+ 
+  const handleDropdownToggle = () => {
+    console.log("navbar is dropped down")
+    setDropdownOpen(!dropdownOpen);
+  };
+
   return (
     <div className="navbar bg-base-100 sticky top-0 z-10">
       <div className="flex-1">
@@ -57,7 +63,7 @@ function Navbar() {
       <div className="flex-none gap-2">
         <ul className="flex space-x-5">
           <NavLink to ={'/bookclubs'}>
-          <li>Bookclubs</li>
+            <li>Bookclubs</li>
           </NavLink>
           <NavLink to={"/bookshelves"}>
             <li>Bookshelves</li>
@@ -104,7 +110,12 @@ function Navbar() {
 
       {/* Avatar and Dropdown */}
       <div className="dropdown dropdown-end">
-        <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+        <div 
+          tabIndex={0} 
+          role="button" 
+          className="btn btn-ghost btn-circle avatar" 
+          onClick={handleDropdownToggle} 
+        >
           <div className="w-10 rounded-full">
             {/* Conditionally render the avatar */}
             {user?.avatar ? (
@@ -123,28 +134,32 @@ function Navbar() {
           </div>
         </div>
 
-        <ul
-          tabIndex={0}
-          className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
-        >
-          <li>
-            <NavLink to={"/account"}>Profile</NavLink>
-          </li>
-          
-          {/* Conditionally render Login/Logout */}
-          {isLoggedIn ? (
+        {/* Dropdown menu - Show it conditionally based on dropdownOpen */}
+        {dropdownOpen && (
+          <ul
+            tabIndex={0}
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+            style={{ display: dropdownOpen ? "block" : "none" }} 
+          >
             <li>
-              <a onClick={logout}>Logout</a>
+              <NavLink to={"/account"}>Profile</NavLink>
             </li>
-          ) : (
+            
+            {/* Conditionally render Login/Logout */}
+            {isLoggedIn ? (
+              <li>
+                <a onClick={logout}>Logout</a>
+              </li>
+            ) : (
+              <li>
+                <NavLink to={"/login"}>Login</NavLink>
+              </li>
+            )}
             <li>
-              <NavLink to={"/login"}>Login</NavLink>
+              <NavLink to={"/signup"}>Signup</NavLink>
             </li>
+          </ul>
           )}
-          <li>
-            <NavLink to={"/signup"}>Signup</NavLink>
-          </li>
-        </ul>
       </div>
     </div>
   );

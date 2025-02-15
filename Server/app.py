@@ -100,7 +100,7 @@ api.add_resource(Signup, "/signup")
 
 class CheckSession(Resource):
     def get(self):
-        #print("/check_session",session["user_id"])
+  
         user = User.query.filter(User.id == session.get('user_id')).first()
         if user:
             return make_response(user.to_dict(rules=('-_password_hash',)), 200)

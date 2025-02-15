@@ -6,17 +6,17 @@ import animecoffeeshop from "../assets/animecoffeeshop.jpg";
 
 function Bookclubs() {
   const { user, isLoggedIn } = useContext(MyContext);
-  const { bookclubs } = user || {};
+ 
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   useEffect(() => {
     if (user && isLoggedIn) {
       navigate(`/users/${user.id}/bookclubs`);
     } else {
-      
+      navigate('/bookclubs')
     }
     setIsLoading(false);
   }, [user, isLoggedIn]);

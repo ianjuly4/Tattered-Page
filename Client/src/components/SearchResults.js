@@ -2,25 +2,43 @@ import React, { useContext, useEffect, useState } from "react";
 import { MyContext } from "../MyContext";
 import Header from "./Header";
 import BookCard from "./BookCard";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 function SearchResults() {
   const { books, loading, error } = useContext(MyContext);
-  const [isLoading, setIsLoading] = useState(true); // Set initial loading state to true
+  const [isLoading, setIsLoading] = useState(true);
+  const [fromLanding, setFromLanding] = useState(false);
+  const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
+
+  const location = useLocation();
+  const from = location.state?.from || "/";  
+
+  console.log(from);
 
   useEffect(() => {
-    // When the books data or loading status changes, set isLoading accordingly
     if (!loading && books) {
-      setIsLoading(false); // Set loading to false when books are fetched
+      setIsLoading(false);
     }
-  }, [loading, books]); // Dependency array ensures that it runs when loading or books change
+  }, [loading, books]);
+
+  useEffect(() => {
+    if (from === '/') {
+      setFromLanding(true);
+      setShowWelcomeMessage(true);  
+    } else {
+      setFromLanding(false);
+      setShowWelcomeMessage(false); 
+    }
+  }, [from]);
+
+  const noBooksFound = !loading && books && books.length === 0;
 
   if (isLoading) {
     return (
       <div>
         <Header />
         <div className="hero bg-secondary min-h-screen flex justify-center items-center">
-          <div>Loading...</div> {/* You can replace this with a spinner or any loading UI */}
+          <div>Loading...</div>
         </div>
       </div>
     );
@@ -33,28 +51,37 @@ function SearchResults() {
       </div>
 
       <div className="w-full px-4 py-6">
-        <div className="bg-secondary grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {loading && <p>Loading...</p>} {/* Show loading message if still loading */}
-          {error && <p>{error}</p>} {/* Show error if there is one */}
+        <div className="bg-secondary">
           
-          {/* Display books when loaded */}
-          {books && books.length > 0 ? (
-            books.map((book) => (
-              <NavLink
-                key={book.id}
-                to={`/books/${book.id}`}
-                className="block"
-              >
-                <div className="p-4">
-                  <BookCard book={book} />
-                </div>
-              </NavLink>
-            ))
-          ) : (
-            <div className="col-span-3 text-center">
-              <p>No books found. Please try a different search.</p>
+          {/* Conditional rendering for the landing page welcome message */}
+          {showWelcomeMessage && (
+            <div className="py-8 text-center">
+              <h2 className="text-2xl font-semibold">Welcome, please use the search bar to find books.</h2>
+              <p className="mt-4">Start exploring our collection of books by searching for titles, authors, or genres.</p>
             </div>
           )}
+
+          {/* Render books if available */}
+          {books && books.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {books.map((book) => (
+                <NavLink key={book.id} to={`/books/${book.id}`} className="block">
+                  <div className="p-4">
+                    <BookCard book={book} />
+                  </div>
+                </NavLink>
+              ))}
+            </div>
+          ) : (
+            // Show "No books found" message if no books are found and not from landing
+            !showWelcomeMessage && noBooksFound && (
+              <div className="col-span-3 text-center py-8">
+                <h3 className="text-xl">No books found.</h3>
+                <p>Please try a different search or explore other categories.</p>
+              </div>
+            )
+          )}
+
         </div>
       </div>
 

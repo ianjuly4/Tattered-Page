@@ -4,6 +4,8 @@ import { MyContext } from "../MyContext";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { useFormik } from "formik";
+import animecoffeeshop from "../assets/animecoffeeshop.jpg";
+
 
 function UsersBookclubs() {
   const { user, isLoggedIn, createbookclub } = useContext(MyContext);
@@ -32,7 +34,7 @@ function UsersBookclubs() {
   useEffect(() => {
    
     if (!user && !isLoggedIn) {
-      navigate("/login");
+      navigate("/bookclubs");
     } else if (user) {
   
       navigate(`/users/${user.id}/bookclubs`);
@@ -49,14 +51,29 @@ function UsersBookclubs() {
   if (!user) {
     return <div>You need to log in to view this page.</div>;
   }
+  const backgroundStyle = {
+      backgroundImage: `url(${animecoffeeshop})`,
+      backgroundSize: "150%",  
+      backgroundPosition: "center",
+      minHeight: "100vh",
+      filter: "blur(6px)", 
+      opacity: 0.6,
+      backgroundRepeat: "no-repeat",
+      position: "absolute",  
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: -1, 
+    };
 
   return (
     <div>
       <div className="sticky top-0 z-10">
         <Header />
       </div>
-      
-      <div className="hero bg-secondary min-h-screen">
+      <div style={backgroundStyle}></div>
+      <div className="hero  min-h-screen">
         <div className="hero-content flex-col lg:flex-row">
           <div className="text-center lg:text-left">
             <h1 className="text-5xl font-bold">{"Bookclub Dashboard"}</h1>

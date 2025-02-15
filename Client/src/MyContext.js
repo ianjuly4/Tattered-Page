@@ -30,7 +30,7 @@ function MyContextProvider({ children }) {
       return response.json();  
     })
     .then((userData) => {
-      console.log(userData.id); 
+      //console.log(userData.id); 
       setUser(userData);
       setIsLoggedIn(true)
     })

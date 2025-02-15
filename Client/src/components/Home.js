@@ -2,6 +2,7 @@ import React from "react";
 import Header from "./Header";
 import bookNook from "../assets/bookNook.jpg";
 import animecoffeeshop from "../assets/animecoffeeshop.jpg";
+import library from "../assets/library.jpg"
 import { NavLink } from "react-router-dom";
 
 function Home() {
@@ -37,15 +38,44 @@ function Home() {
         </div>
       </div>
 
-       {/* Bookshelf section */}
-       <div className="bg-primary py-12 text-center">
-        <h2 className="text-3xl text-white">Explore our Bookshelf</h2>
-        <p className="text-white mt-4">Dive into a collection of books that will spark your imagination!</p>
+      {/* Bookshelves Hero Section */}
+      <div className="hero bg-base-100 min-h-screen">
+        <div className="hero-content flex-col lg:flex-row">
+          {/* Left side image */}
+          <div className="flex justify-center lg:justify-start lg:w-1/2 mt-6 lg:mt-0">
+            <img
+              src={library} // New image for Bookshelves section
+              alt="Bookshelves"
+              className="max-w-lg rounded-lg shadow-2xl"
+            />
+          </div>
+
+          {/* Right side text */}
+          <div className="text-center lg:text-left lg:w-1/2 px-4 py-8">
+            <h1 className="text-5xl font-bold mb-6">Bookshelves</h1>
+            <p className="py-6">
+              Whether you're a casual reader or a passionate bibliophile, your bookshelf is your personal space to explore, organize, and cherish every story. With Bookshelves, you can keep track of your favorite reads, discover new gems, and build the ultimate collection of books you've always wanted.
+            </p>
+            <p className="mt-4">Here’s what you can do:</p>
+            <ul className="mt-4 list-disc pl-6">
+              <li>Organize Your Collection: Create shelves for your current reads, wish list, or books you’ve already devoured.</li>
+              <li>Get Personalized Recommendations: Based on your shelves and preferences, we’ll help you discover your next great read.</li>
+              <li>Share Your Reading Journey: Track your progress, add ratings, and share your thoughts with fellow readers.</li>
+            </ul>
+            <p className="mt-4">Ready to start building your perfect bookshelf? Dive in and make your library truly yours!</p>
+            <div className="text-center mt-4">
+              <NavLink to="/bookshelves">
+                <button className="btn btn-primary mt-4">
+                  Explore Bookshelves
+                </button>
+              </NavLink>
+            </div>
+          </div>
+        </div>
       </div>
 
-
-      {/* Bookshelf Section (Bookclub Section) */}
-      <div className="hero bg-base-100 min-h-screen">
+      {/* Bookclub Section*/}
+      <div className="hero bg-primary min-h-screen">
         <div className="hero-content flex-col lg:flex-row">
           {/* Left side text */}
           <div className="text-center lg:text-left lg:w-1/2 px-4 py-8">
@@ -66,8 +96,8 @@ function Home() {
             </p>
 
             {/* Wrap the button with NavLink */}
-            <NavLink to="/users/:userId/bookclubs">
-              <button className="btn btn-primary mt-4">
+            <NavLink to="/bookclubs">
+              <button className="btn btn-secondary mt-4">
                 Get Started with Bookclubs
               </button>
             </NavLink>

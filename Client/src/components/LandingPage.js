@@ -4,7 +4,7 @@ import Lottie from 'react-lottie';
 import ChatBubble from "../assets/chatbubble.json";
 import Books from "../assets/books.json";
 import Bookanimation from "../assets/Bookanimation.json";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 
 const LandingPage = () => {
   const chatbubble = {
@@ -32,6 +32,9 @@ const LandingPage = () => {
     },
   };
 
+  const navigate = useNavigate()
+  const location = useLocation();
+
   return (
     <div data-theme="lofitheme">
       {/* Navbar */}
@@ -45,12 +48,12 @@ const LandingPage = () => {
         <div className="flex-none gap-4">
           {/* Links to Bookshelves and Bookclub */}
           <div className="flex gap-4">
-            <NavLink to={'/'}>
+            <NavLink to={'/dashboard'}>
             <a className="btn btn-ghost">Home</a>
             </NavLink>
           </div>
           <div className="flex gap-4">
-            <NavLink to={'/User'}>
+            <NavLink to={'/account'}>
             <a className="btn btn-ghost">Account</a>
             </NavLink>
           </div>
@@ -82,7 +85,10 @@ const LandingPage = () => {
           <div className="flex-shrink-0">
             <Lottie options={bookanimation} height={200} width={200} />
           </div>
-          <button className="btn btn-primary mt-6">Browse Books</button>
+         
+          <button onClick={(() => navigate("/books", { state: { from: location.pathname } }))}
+          className="btn btn-primary mt-6">Browse Books</button>
+
         </div>
       </section>
 
