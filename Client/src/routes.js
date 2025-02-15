@@ -11,6 +11,7 @@ import Avatars from "./components/Avatars";
 import Bookclubs from "./components/Bookclubs";
 import UsersBookclubs from "./components/UsersBookclubs";
 import UserBookshelves from "./components/UserBookshelves";
+import BookshelfDetails from "./components/BookshelfDetail"
 
 const routes = [
   {
@@ -36,6 +37,10 @@ const routes = [
   {
     path: "/users/:userId/bookshelves",
     element: <UserBookshelves/>
+  },
+  {
+    path: "/users/:userId/bookshelves/:bookshelfId",
+    element: <BookshelfDetails/>
   },
   {
     path: "/account",

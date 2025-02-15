@@ -11,7 +11,7 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || "/";  
+  const from = location.state?.from || "/dashboard";  
 
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
@@ -45,7 +45,7 @@ function Login() {
         } else if (user.bookshelves && user.bookshelves.length > 0) {
           navigate(`/users/${user.id}/bookshelves`);
         } else if (books.length>0){
-          navigate("/") 
+          navigate("/dashboard") 
         }else {
           navigate("/account");
         }
