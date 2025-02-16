@@ -15,32 +15,6 @@ function MyContextProvider({ children }) {
   const [bookclubs, setBookclubs] = useState([]);
   const [createClubError, setCreateClubError] = useState(null);
 
-  console.log(user)
-
-  useEffect(() => {
-    fetch("/check_session", {
-      method: 'GET',
-      credentials: 'include', 
-    })
-    .then((response) => {
-      //console.log(response);
-      if (!response.ok) {
-        throw new Error('Session not valid');  
-      }
-      return response.json();  
-    })
-    .then((userData) => {
-      //console.log(userData.id); 
-      setUser(userData);
-      setIsLoggedIn(true)
-    })
-    .catch((error) => {
-      console.error("Error checking session:", error);
-      setUser(null);
-      setIsLoggedIn(false)  
-    });
-  }, []);
-
 
   const createBookclub = (name, description) => {
     setCreateClubError(null);
@@ -68,6 +42,42 @@ function MyContextProvider({ children }) {
         setLoading(false);
       });
   };
+
+  const AddBook = (name, description, author, category, publishedDate, coverImage) => {
+    setCreateClubError(null);
+    setLoading(true);
+  
+    fetch("/add_book", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        //userId: user.id,
+        title: name,
+        description: description,
+        author: author,
+        categories: category, 
+        release_date: publishedDate,       
+        cover_image: coverImage,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.message) {
+          console.log(data.message);  
+        } else {
+          setCreateClubError("Failed to add book to library");
+        }
+      })
+      .catch((error) => {
+        setCreateClubError("An error occurred. Please try again later.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  
 
   const createBookshelf = async (values) => {
     try {
@@ -203,7 +213,29 @@ function MyContextProvider({ children }) {
       });
   };
 
-  
+  useEffect(() => {
+    fetch("/check_session", {
+      method: 'GET',
+      credentials: 'include', 
+    })
+    .then((response) => {
+      //console.log(response);
+      if (!response.ok) {
+        throw new Error('Session not valid');  
+      }
+      return response.json();  
+    })
+    .then((userData) => {
+      //console.log(userData.id); 
+      setUser(userData);
+      setIsLoggedIn(true)
+    })
+    .catch((error) => {
+      console.error("Error checking session:", error);
+      setUser(null);
+      setIsLoggedIn(false)  
+    });
+  }, []);
 
 
 
@@ -220,7 +252,8 @@ function MyContextProvider({ children }) {
       signup,
       logout,
       createBookclub,
-      createBookshelf
+      createBookshelf,
+      AddBook
     }}>
       {children}
     </MyContext.Provider>

@@ -2,7 +2,8 @@
 from flask import Flask, render_template, request, make_response, session, send_from_directory
 from flask_restful import Api, Resource
 from config import app, db, bcrypt, migrate, api, os, socketio
-from models import User, BookShelf, Bookclub
+from models import User, BookShelf, Bookclub, Book
+from datetime import datetime
 
 
 @app.route('/')
@@ -34,6 +35,45 @@ def handle_message(message):
     print(f"Received message: {message}")
     socketio.emit('message', {'data': message})  # Emit the message with a custom event
 """
+
+from datetime import datetime
+
+class AddBook(Resource):
+    def post(self):
+        data = request.get_json()
+
+        user_id = session.get('user_id')
+        if not user_id:
+            return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
+
+        categories = ",".join(data['categories'])  # Join the categories list into a comma-separated string
+        
+        # Parse the release_date string into a datetime object
+        try:
+            release_date = datetime.strptime(data['release_date'], "%Y-%m-%d").date()
+        except ValueError:
+            return {"message": "Invalid release date format. Please use YYYY-MM-DD."}, 400
+
+        # Create a Book object with the data
+        book = Book(
+            title=data['title'],
+            author=data['author'][0],  # Assumes the author is a list, pick the first item
+            synopsis=data['description'],
+            category=categories,  
+            release_date=release_date,  # Use the parsed datetime object directly
+            cover_image=data['cover_image'],
+            progress=0,
+        )
+
+        # Add the book to the session and commit to the database
+        db.session.add(book)
+        db.session.commit()
+
+        return {"message": "Book added to library!"}, 201
+
+
+api.add_resource(AddBook, "/add_book")
+
 class Bookclub(Resource):
     def post(self):
         data = request.get_json()
@@ -67,8 +107,6 @@ class Users(Resource):
         return make_response([user.to_dict() for user in users], 200)
     
 api.add_resource(Users, '/users') 
-
-
 
 
 class Signup(Resource):

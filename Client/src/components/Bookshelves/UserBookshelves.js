@@ -1,19 +1,17 @@
 import React, { useState, useContext, useEffect } from "react";
 import Header from "../Header";
 import { MyContext } from "../../MyContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import library from "../../assets/library.jpg";
 import * as yup from "yup";
 import { useFormik } from "formik";
-import BookCard from "../Books/BookCard"; // Assuming BookCard is a component for displaying book details.
 
 function UserBookshelves() {
   const { user, isLoggedIn, createBookshelf } = useContext(MyContext);
-  const { bookshelves } = user || {};  
+  const { bookshelves } = user || {};
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const { bookId } = useParams();  // Getting bookId from the URL for Book Card
-  
+
   const formSchema = yup.object().shape({
     name: yup.string().required("Must Enter A Bookshelf Name.").max(25),
     description: yup.string().required("Must Enter A Bookshelf Description").max(500),
@@ -28,13 +26,13 @@ function UserBookshelves() {
     },
     validationSchema: formSchema,
     onSubmit: (values) => {
-      createBookshelf(values.name, values.description, values.genre);
+      createBookshelf(values.name, values, values.description, values.genre);
     },
   });
 
   useEffect(() => {
     if (!user && !isLoggedIn) {
-      navigate("/login");
+      navigate("/bookshelves");
     }
     setIsLoading(false);
   }, [user, isLoggedIn, navigate]);
@@ -46,117 +44,158 @@ function UserBookshelves() {
     return <div>You need to log in to view this page.</div>;
   }
 
+  const allBooks = bookshelves
+    ? bookshelves.flatMap((shelf) => shelf.books || [])
+    : [];
+
   const backgroundStyle = {
     backgroundImage: `url(${library})`,
-    backgroundSize: "150%",  
+    backgroundSize: "150%",
     backgroundPosition: "center",
     minHeight: "100vh",
-    filter: "blur(6px)", 
+    filter: "blur(6px)",
     opacity: 0.6,
     backgroundRepeat: "no-repeat",
-    position: "absolute",  
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: -1, 
+    zIndex: -1,
   };
 
   return (
     <div>
-      <div className="sticky top-0 z-10">
+      <div className="fixed top-0 left-0 w-full z-30">
         <Header />
       </div>
-      
+
       {/* Background div */}
       <div style={backgroundStyle}></div>
-      
+
       {/* Content Section */}
-      <div className="hero min-h-screen relative z-20">
+      <div className="hero min-h-screen relative z-20 pt-20"> {/* Added padding-top to offset the fixed header */}
         <div className="hero-content flex-col lg:flex-row">
-          <div className="flex space-x-4 w-full">
-            {/* Book Card - Left Section */}
-            {bookId && (
-              <div className="w-1/3">
-                <BookCard bookId={bookId} />
-              </div>
-            )}
-            
-            {/* Create Bookshelf Form - Center Section */}
-            <div className="w-1/3">
-              <h2 className="text-3xl justify-center flex items-center font-bold mt-24">Create A Bookshelf</h2>
-              <form onSubmit={formik.handleSubmit}>
-                <label className="input input-bordered flex items-center gap-2">
-                  <input
-                    type="text"
-                    className="grow"
-                    placeholder="Bookshelf Name"
-                    {...formik.getFieldProps("name")}
-                  />
-                </label>
-                {formik.touched.name && formik.errors.name && (
-                  <div className="text-red-500">{formik.errors.name}</div>
-                )}
+          <div className="text-center lg:text-left">
+            <h1 className="text-5xl font-bold">Your Bookshelves</h1>
 
-                <label className="input input-bordered flex items-center gap-2 mt-4">
-                  <input
-                    type="text"
-                    className="grow"
-                    placeholder="Bookshelf Description"
-                    {...formik.getFieldProps("description")}
-                  />
-                </label>
-                {formik.touched.description && formik.errors.description && (
-                  <div className="text-red-500">{formik.errors.description}</div>
-                )}
+            <div className="text-2xl mt-6">
+              {/* Books section - Stack Bookshelves Vertically */}
+              <div className="space-y-8">
+                {bookshelves && bookshelves.length > 0 ? (
+                  bookshelves.map((shelf, index) => (
+                    <div key={index} className="p-4 bg-white rounded-lg shadow-lg">
+                      <h2 className="text-xl font-semibold">{shelf.name}</h2>
+                      <p>{shelf.description}</p>
 
-                <label className="input input-bordered flex items-center gap-2 mt-4">
-                  <input
-                    type="text"
-                    className="grow"
-                    placeholder="Bookshelf Genre"
-                    {...formik.getFieldProps("genre")}
-                  />
-                </label>
-                {formik.touched.genre && formik.errors.genre && (
-                  <div className="text-red-500">{formik.errors.genre}</div>
-                )}
-
-                {/* Submit Button */}
-                <div className="form-control mt-6">
-                  <button type="submit" className="btn btn-primary">
-                    Create Bookshelf
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            {/* User's Library - Right Section */}
-            <div className="w-1/3">
-              <h2 className="text-3xl font-bold mt-24">Your Bookshelves</h2>
-              <div className="text-2xl mt-6">
-                <p className="mt-3">Here are your current bookshelves:</p>
-
-                {/* Bookshelves Carousel */}
-                <div className="border p-4 rounded-lg bg-white shadow-lg mt-4">
-                  <div className="flex overflow-x-auto space-x-4">
-                    {bookshelves && bookshelves.length > 0 ? (
-                      bookshelves.map((shelf, index) => (
-                        <div key={index} className="w-60 p-4 bg-white rounded-xl shadow-lg flex-none">
-                          <h2 className="text-xl font-semibold">{shelf.name}</h2>
-                          <p>{shelf.description}</p>
-                          <button className="btn btn-primary btn-sm mt-4">View Shelf</button>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="col-span-3 text-center">
-                        <p>No Bookshelves Found, Please Create One.</p>
+                      {/* Bookshelf Carousel: Display books inside a shelf */}
+                      <div className="carousel mt-4 w-full">
+                        {shelf.books && shelf.books.length > 0 ? (
+                          shelf.books.map((book, idx) => (
+                            <div key={idx} id={`book-carousel-item-${idx}`} className="carousel-item w-full">
+                              <div className="card w-64 bg-gray-200 rounded-lg shadow-lg">
+                                <img
+                                  src={book.coverImage} // Assuming each book has a coverImage property
+                                  alt={book.title}
+                                  className="w-full h-64 object-cover rounded-t-lg"
+                                />
+                                <div className="p-4">
+                                  <h3 className="font-semibold">{book.title}</h3>
+                                  <p className="text-sm text-gray-500">{book.author}</p>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div>No books available for this bookshelf.</div>
+                        )}
                       </div>
-                    )}
+
+                      {/* Button to view bookshelf details */}
+                      <button className="btn btn-primary btn-sm mt-4">View Shelf</button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-3 text-center">
+                    <p>No Bookshelves Found, Please Create One.</p>
                   </div>
-                </div>
+                )}
               </div>
             </div>
+
+            {/* New Section to Display All Books Added */}
+            <div className="py-8">
+              <h2 className="text-3xl font-semibold text-center mb-6">All Books You've Added</h2>
+              <div className="space-y-8">
+                {allBooks.length > 0 ? (
+                  allBooks.map((book, index) => (
+                    <div key={index} className="p-4 bg-white rounded-lg shadow-lg">
+                      <div className="flex gap-4">
+                        <img
+                          src={book.coverImage} // Assuming each book has a coverImage property
+                          alt={book.title}
+                          className="w-32 h-48 object-cover rounded-lg"
+                        />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{book.title}</h3>
+                          <p className="text-sm text-gray-500">{book.author}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>No books have been added yet. Please add some books to your bookshelves!</p>
+                )}
+              </div>
+            </div>
+
+            {/* Form to create a bookshelf */}
+            <h2 className="text-3xl justify-center flex items-center font-bold mt-24">Create A Bookshelf</h2>
+
+            <form onSubmit={formik.handleSubmit}>
+              <label className="input input-bordered flex items-center gap-2">
+                <input
+                  type="text"
+                  className="grow"
+                  placeholder="Bookshelf Name"
+                  {...formik.getFieldProps("name")}
+                />
+              </label>
+              {formik.touched.name && formik.errors.name && (
+                <div className="text-red-500">{formik.errors.name}</div>
+              )}
+
+              <label className="input input-bordered flex items-center gap-2 mt-4">
+                <input
+                  type="text"
+                  className="grow"
+                  placeholder="Bookshelf Description"
+                  {...formik.getFieldProps("description")}
+                />
+              </label>
+              {formik.touched.description && formik.errors.description && (
+                <div className="text-red-500">{formik.errors.description}</div>
+              )}
+
+              <label className="input input-bordered flex items-center gap-2 mt-4">
+                <input
+                  type="text"
+                  className="grow"
+                  placeholder="Bookshelf Genre"
+                  {...formik.getFieldProps("genre")}
+                />
+              </label>
+              {formik.touched.genre && formik.errors.genre && (
+                <div className="text-red-500">{formik.errors.genre}</div>
+              )}
+
+              {/* Submit Button */}
+              <div className="form-control mt-6">
+                <button type="submit" className="btn btn-primary">
+                  Create Bookshelf
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

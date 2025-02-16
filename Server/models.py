@@ -76,6 +76,13 @@ class Book(db.Model, SerializerMixin):
     bookshelves = db.relationship('BookShelf', secondary='bookshelf_books', back_populates="books")
     bookclubs = db.relationship('Bookclub', secondary='bookclub_books', back_populates='books')
 
+    def set_release_date(self, release_date_str):
+        # Convert the date string to a datetime.date object
+        if release_date_str:
+            try:
+                self.release_date = datetime.strptime(release_date_str, "%Y-%m-%d").date()
+            except ValueError:
+                raise ValueError("Invalid date format. Use YYYY-MM-DD.")
 
 # BookClub-Book (many-to-many relationship between book and bookclub through the 'bookclub_books' table)
 bookclub_books = db.Table('bookclub_books',
