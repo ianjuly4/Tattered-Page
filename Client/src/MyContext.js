@@ -12,7 +12,6 @@ function MyContextProvider({ children }) {
   const [loginError, setLoginError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null)
-  const [bookclubs, setBookclubs] = useState([]);
   const [createClubError, setCreateClubError] = useState(null);
 
 
@@ -30,7 +29,7 @@ function MyContextProvider({ children }) {
       .then((response) => response.json())
       .then((data) => {
         if (data.id) {
-          setBookclubs((prevBookclubs) => [...prevBookclubs, data]);
+          //setBookclubs((prevBookclubs) => [...prevBookclubs, data]);
         } else {
           setCreateClubError("Failed to create bookclub");
         }
@@ -43,62 +42,36 @@ function MyContextProvider({ children }) {
       });
   };
 
-  const AddBook = (name, description, author, category, publishedDate, coverImage) => {
-    setCreateClubError(null);
-    setLoading(true);
   
-    fetch("/add_book", {
+
+  const createBookshelf = (name, description, genre) => {
+    setLoading(true); 
+    fetch("/bookshelves", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        //userId: user.id,
-        title: name,
-        description: description,
-        author: author,
-        categories: category, 
-        release_date: publishedDate,       
-        cover_image: coverImage,
-      }),
+      body: JSON.stringify({ name, description, genre }),
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.message) {
-          console.log(data.message);  
+        if (data.id) {
+          setUser((prevUser) => ({
+            ...prevUser,
+            bookshelves: [...prevUser.bookshelves, data], 
+          }));
         } else {
-          setCreateClubError("Failed to add book to library");
+          setCreateClubError("Failed to create bookshelf");
         }
       })
       .catch((error) => {
         setCreateClubError("An error occurred. Please try again later.");
       })
       .finally(() => {
-        setLoading(false);
+        setLoading(false); 
       });
   };
   
-
-  const createBookshelf = async (values) => {
-    try {
-      const response = await fetch("/bookshelves", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Bookshelf created successfully:", data);
-        setUser()
-      } else {
-        console.error("Failed to create bookshelf:", data);
-      }
-    } catch (error) {
-      console.error("Error creating bookshelf:", error);
-    }
-  };
 
   const fetchBooks = (searchQuery, filterType) => {
     setLoading(true);
@@ -253,7 +226,6 @@ function MyContextProvider({ children }) {
       logout,
       createBookclub,
       createBookshelf,
-      AddBook
     }}>
       {children}
     </MyContext.Provider>

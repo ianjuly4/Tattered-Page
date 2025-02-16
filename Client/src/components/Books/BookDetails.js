@@ -7,7 +7,7 @@ import BookshelvesCard from "../Bookshelves/BookshelvesCard";
 
 function BookDetails() {
   const { bookKey } = useParams();
-  const { books, user, isLoggedIn, AddBook } = useContext(MyContext);
+  const { books, user, isLoggedIn } = useContext(MyContext);
   const { bookshelves } = user || {};
 
   const [isAdding, setIsAdding] = useState(false);
@@ -18,27 +18,14 @@ function BookDetails() {
     return <div>Book not found.</div>;
   }
 
-  
+  //console.log(book)
 
   const { volumeInfo } = book;
   const { title, authors, description, imageLinks, categories, pageCount, publishedDate } = volumeInfo;
 
   const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
 
-  const handleAddToLibrary = async () => {
-    setIsAdding(true);
   
-    try {
-      await AddBook(title, description, authors, categories, publishedDate, coverImageUrl);
-      //console.log("Book successfully added to your library!");
-    } catch (error) {
-      console.error("Error adding book to library:", error);
-      console.log("Failed to add the book to your library.");
-    } finally {
-      setIsAdding(false);
-    }
-  };
-
   return (
     <div>
       <div className="sticky top-0 z-10">
@@ -88,13 +75,7 @@ function BookDetails() {
                   <button className="btn btn-primary btn-sm">Go To Your Bookshelves</button>
                 </NavLink>
 
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={handleAddToLibrary}
-                  disabled={isAdding}
-                >
-                  {isAdding ? "Adding..." : "Add To Your Library"}
-                </button>
+                
               </div>
             </div>
           )}
@@ -106,8 +87,8 @@ function BookDetails() {
                   {bookshelves && bookshelves.length > 0 ? (
                     bookshelves.map((shelf) => (
                       <NavLink key={shelf.id} to={`/users/${user.id}/bookshelves/${shelf.id}`} className="block">
-                        <div className="w-60 p-4 bg-white rounded-xl shadow-lg flex-none">
-                          <BookshelvesCard />
+                        <div className="w-60 p-4 bg-black rounded-xl shadow-lg flex-none">
+                          <BookshelvesCard shelf={shelf} />
                         </div>
                       </NavLink>
                     ))

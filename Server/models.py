@@ -20,6 +20,8 @@ class User(db.Model, SerializerMixin):
 
     bookshelves = db.relationship('BookShelf', back_populates='user', cascade='all, delete-orphan')
     bookclubs = db.relationship('Bookclub', secondary='bookclub_users', back_populates='users')
+    
+    books = association_proxy('bookshelves', 'book', creator=lambda book_obj: Book(book=book_obj))
 
     @hybrid_property
     def password_hash(self):
@@ -44,13 +46,12 @@ class BookShelf(db.Model, SerializerMixin):
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=True)
     genre = db.Column(db.String, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime, onupdate=datetime, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', back_populates='bookshelves')
     books = db.relationship('Book', secondary='bookshelf_books', back_populates='bookshelves')
-
 
 # Bookshelf-Book (many-to-many relationship between bookshelf and book through the 'bookshelf_books' table)
 bookshelf_books = db.Table('bookshelf_books',
@@ -65,24 +66,17 @@ class Book(db.Model, SerializerMixin):
     title = db.Column(db.String, nullable=False)
     author = db.Column(db.String, nullable=False)
     synopsis = db.Column(db.String, nullable=False)
-    category = db.Column(db.String, nullable=False)
-    release_date = db.Column(db.Date, nullable=True)
-    spine_image = db.Column(db.String, nullable=True)
     cover_image = db.Column(db.String, nullable=False)
     progress = db.Column(db.Integer, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime, nullable=False)
-    last_read_at = db.Column(db.DateTime, nullable=True)
+    published_date=db.Column(db.Date, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False) 
+    last_read_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
 
     bookshelves = db.relationship('BookShelf', secondary='bookshelf_books', back_populates="books")
     bookclubs = db.relationship('Bookclub', secondary='bookclub_books', back_populates='books')
 
-    def set_release_date(self, release_date_str):
-        # Convert the date string to a datetime.date object
-        if release_date_str:
-            try:
-                self.release_date = datetime.strptime(release_date_str, "%Y-%m-%d").date()
-            except ValueError:
-                raise ValueError("Invalid date format. Use YYYY-MM-DD.")
+    users = association_proxy('bookshelves', 'user', creator=lambda user_obj: User(user=user_obj))
+   
 
 # BookClub-Book (many-to-many relationship between book and bookclub through the 'bookclub_books' table)
 bookclub_books = db.Table('bookclub_books',
@@ -98,8 +92,8 @@ class Bookclub(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime, onupdate=datetime, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     books = db.relationship('Book', secondary='bookclub_books', back_populates='bookclubs')
     users = db.relationship('User', secondary='bookclub_users', back_populates='bookclubs')
@@ -113,8 +107,8 @@ class Chatlog(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime, onupdate=datetime, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     bookclub_id = db.Column(db.Integer, db.ForeignKey('bookclubs.id'))
     bookclub = db.relationship('Bookclub', back_populates='chatlogs')

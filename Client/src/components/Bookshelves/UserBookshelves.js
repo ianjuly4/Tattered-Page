@@ -1,14 +1,15 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Header from "../Header";
 import { MyContext } from "../../MyContext";
 import { useNavigate } from "react-router-dom";
 import library from "../../assets/library.jpg";
 import * as yup from "yup";
 import { useFormik } from "formik";
+import BookshelvesCard from "../Bookshelves/BookshelvesCard";
 
 function UserBookshelves() {
   const { user, isLoggedIn, createBookshelf } = useContext(MyContext);
-  const { bookshelves } = user || {};
+  const { bookshelves, books } = user || {};
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -26,7 +27,8 @@ function UserBookshelves() {
     },
     validationSchema: formSchema,
     onSubmit: (values) => {
-      createBookshelf(values.name, values, values.description, values.genre);
+      createBookshelf(values.name, values.description, values.genre);
+      formik.resetForm();
     },
   });
 
@@ -43,10 +45,6 @@ function UserBookshelves() {
   if (!user) {
     return <div>You need to log in to view this page.</div>;
   }
-
-  const allBooks = bookshelves
-    ? bookshelves.flatMap((shelf) => shelf.books || [])
-    : [];
 
   const backgroundStyle = {
     backgroundImage: `url(${library})`,
@@ -74,7 +72,7 @@ function UserBookshelves() {
       <div style={backgroundStyle}></div>
 
       {/* Content Section */}
-      <div className="hero min-h-screen relative z-20 pt-20"> {/* Added padding-top to offset the fixed header */}
+      <div className="hero min-h-screen relative z-20 pt-20">
         <div className="hero-content flex-col lg:flex-row">
           <div className="text-center lg:text-left">
             <h1 className="text-5xl font-bold">Your Bookshelves</h1>
@@ -83,19 +81,26 @@ function UserBookshelves() {
               {/* Books section - Stack Bookshelves Vertically */}
               <div className="space-y-8">
                 {bookshelves && bookshelves.length > 0 ? (
-                  bookshelves.map((shelf, index) => (
-                    <div key={index} className="p-4 bg-white rounded-lg shadow-lg">
-                      <h2 className="text-xl font-semibold">{shelf.name}</h2>
+                  bookshelves.map((shelf) => (
+                    <div key={shelf.id} className="p-4 bg-white rounded-lg shadow-lg">
+                      <div className="flex justify-between items-center">
+                        <h2 className="text-xl font-semibold">{shelf.name}</h2>
+                        <p>{shelf.genre}</p>
+                      </div>
                       <p>{shelf.description}</p>
 
                       {/* Bookshelf Carousel: Display books inside a shelf */}
                       <div className="carousel mt-4 w-full">
                         {shelf.books && shelf.books.length > 0 ? (
                           shelf.books.map((book, idx) => (
-                            <div key={idx} id={`book-carousel-item-${idx}`} className="carousel-item w-full">
+                            <div
+                              key={idx}
+                              id={`book-carousel-item-${idx}`}
+                              className="carousel-item w-full"
+                            >
                               <div className="card w-64 bg-gray-200 rounded-lg shadow-lg">
                                 <img
-                                  src={book.coverImage} // Assuming each book has a coverImage property
+                                  src={book.coverImage}
                                   alt={book.title}
                                   className="w-full h-64 object-cover rounded-t-lg"
                                 />
@@ -119,32 +124,6 @@ function UserBookshelves() {
                   <div className="col-span-3 text-center">
                     <p>No Bookshelves Found, Please Create One.</p>
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* New Section to Display All Books Added */}
-            <div className="py-8">
-              <h2 className="text-3xl font-semibold text-center mb-6">All Books You've Added</h2>
-              <div className="space-y-8">
-                {allBooks.length > 0 ? (
-                  allBooks.map((book, index) => (
-                    <div key={index} className="p-4 bg-white rounded-lg shadow-lg">
-                      <div className="flex gap-4">
-                        <img
-                          src={book.coverImage} // Assuming each book has a coverImage property
-                          alt={book.title}
-                          className="w-32 h-48 object-cover rounded-lg"
-                        />
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg">{book.title}</h3>
-                          <p className="text-sm text-gray-500">{book.author}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p>No books have been added yet. Please add some books to your bookshelves!</p>
                 )}
               </div>
             </div>

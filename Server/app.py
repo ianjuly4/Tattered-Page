@@ -38,7 +38,26 @@ def handle_message(message):
 
 from datetime import datetime
 
-class AddBook(Resource):
+class Books(Resource):
+    def get(self):
+        book_dict_list = [book.to_dict() for book in Book.query.all()]
+        if book_dict_list:
+            return book_dict_list, 200
+        else:
+            return {"message": "No Books Found"}, 404
+
+api.add_resource(Books, "/books")
+
+class Bookshelves(Resource):
+    def get(self):
+       
+        bookshelves_dict_list = [bookshelf.to_dict() for bookshelf in BookShelf.query.all()]
+        
+        if bookshelves_dict_list:
+            return bookshelves_dict_list, 200
+        else:
+            return {"message": "No Bookshelves Found"}, 404
+
     def post(self):
         data = request.get_json()
 
@@ -46,33 +65,32 @@ class AddBook(Resource):
         if not user_id:
             return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
 
-        categories = ",".join(data['categories'])  # Join the categories list into a comma-separated string
-        
-        # Parse the release_date string into a datetime object
-        try:
-            release_date = datetime.strptime(data['release_date'], "%Y-%m-%d").date()
-        except ValueError:
-            return {"message": "Invalid release date format. Please use YYYY-MM-DD."}, 400
+        name = data.get("name")
+        description = data.get("description")
+        genre = data.get("genre")
 
-        # Create a Book object with the data
-        book = Book(
-            title=data['title'],
-            author=data['author'][0],  # Assumes the author is a list, pick the first item
-            synopsis=data['description'],
-            category=categories,  
-            release_date=release_date,  # Use the parsed datetime object directly
-            cover_image=data['cover_image'],
-            progress=0,
+        if not name:
+            return make_response({"message": "Bookshelf needs a name"}, 400)
+        if not description:
+            return make_response({"message": "Bookshelf needs a description"}, 400)
+        if not genre:
+            return make_response({"message": "Bookshelf needs a genre"}, 400)
+
+        new_bookshelf = BookShelf(
+            user_id=user_id,
+            name=name,
+            description=description,
+            genre=genre
         )
-
-        # Add the book to the session and commit to the database
-        db.session.add(book)
+      
+        db.session.add(new_bookshelf)
         db.session.commit()
 
-        return {"message": "Book added to library!"}, 201
+        
+        return make_response(new_bookshelf.to_dict(), 201)
 
+api.add_resource(Bookshelves, "/bookshelves")
 
-api.add_resource(AddBook, "/add_book")
 
 class Bookclub(Resource):
     def post(self):
