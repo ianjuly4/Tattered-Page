@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
-import Header from "./Header";
-import library from "../assets/library.jpg";
-import { MyContext } from "../MyContext";
+import Header from "../Header";
+import library from "../../assets/library.jpg";
+import { MyContext } from "../../MyContext";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function BookShelves() {

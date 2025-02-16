@@ -1,17 +1,17 @@
 import LandingPage from "./components/LandingPage";
 import Home from "./components/Home";
 import SearchResults from "./components/SearchResults";
-import BookDetails from "./components/BookDetails";
+import BookDetails from "./components/Books/BookDetails";
 import NotFound from "./components/NotFound";
-import BookShelves from "./components/BookShelves";
-import Account from "./components/Account";
-import Login from "./components/Login";
-import Signup from "./components/Signup";
-import Avatars from "./components/Avatars";
-import Bookclubs from "./components/Bookclubs";
-import UsersBookclubs from "./components/UsersBookclubs";
-import UserBookshelves from "./components/UserBookshelves";
-import BookshelfDetails from "./components/BookshelfDetail"
+import BookShelves from "./components/Bookshelves/BookShelves";
+import Account from "./components/Profile/Account";
+import Login from "./components/Profile/Login";
+import Signup from "./components/Profile/Signup";
+import Avatars from "./components/Profile/Avatars";
+import Bookclubs from "./components/Bookclubs/Bookclubs";
+import UsersBookclubs from "./components/Bookclubs/UsersBookclubs";
+import UserBookshelves from "./components/Bookshelves/UserBookshelves";
+import BookshelfDetails from "./components/Bookshelves/BookshelfDetail"
 
 const routes = [
   {
@@ -36,6 +36,10 @@ const routes = [
   },
   {
     path: "/users/:userId/bookshelves",
+    element: <UserBookshelves/>
+  },
+  {
+    path: "/users/:userId/bookshelves/:bookId",
     element: <UserBookshelves/>
   },
   {

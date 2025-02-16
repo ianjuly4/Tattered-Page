@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { connectSocket, sendMessage, listenForMessages, disconnectSocket } from "../services/SocketService"; // Fixed import
+import { connectSocket, sendMessage, listenForMessages, disconnectSocket } from "../../services/SocketService"; // Fixed import
 import "../ChatComponent.css";
-import Header from "./Header";
+import Header from "../Header";
 
 const BookclubChat = () => {
   const [message, setMessage] = useState("");

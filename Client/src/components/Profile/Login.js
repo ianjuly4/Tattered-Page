@@ -2,9 +2,9 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { MyContext } from "../MyContext";
+import { MyContext } from "../../MyContext";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import Header from "./Header";
+import Header from "../Header";
 
 function Login() {
   const { login, user, books } = useContext(MyContext);
@@ -13,6 +13,7 @@ function Login() {
   const location = useLocation();
   const from = location.state?.from || "/dashboard";  
 
+  //console.log(from)
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
     password: yup.string().required("Must enter a password").max(25),

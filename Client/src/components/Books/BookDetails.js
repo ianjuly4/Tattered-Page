@@ -1,10 +1,9 @@
 import React, { useContext } from "react";
-import { useParams } from "react-router-dom";
-import Header from "./Header";
-import { MyContext } from "../MyContext";
-import defaultbookimage from "../assets/defaultbookimage.jpg";
-import { NavLink } from "react-router-dom";
-import BookshelvesCard from "./BookshelvesCard"
+import Header from "../Header";
+import { MyContext } from "../../MyContext";
+import defaultbookimage from "../../assets/defaultbookimage.jpg";
+import { NavLink, useParams } from "react-router-dom";
+import BookshelvesCard from "../Bookshelves/BookshelvesCard"
 
 function BookDetails() {
   const { bookKey } = useParams();
@@ -13,6 +12,8 @@ function BookDetails() {
 
   const bookId = bookKey.replace('/works/', '');
   const book = books.find((book) => book.id === bookId);
+
+  console.log(book.id)
 
   if (!book) {
     return <div>Book not found.</div>;
@@ -86,7 +87,7 @@ function BookDetails() {
               <h1 className="text-3xl flex text-right font-bold"> Your Bookshelves</h1>
               
               {/* Button to Go To Your Bookshelves aligned to the right */}
-              <NavLink to={"/users/:userId/bookshelves"}>
+              <NavLink to={`/users/${user.id}/bookshelves/${book.id}`}>
                 <button className="btn btn-primary  btn-sm">Go To Your Bookshelves</button>
               </NavLink>
             </div>

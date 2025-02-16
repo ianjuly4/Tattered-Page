@@ -96,6 +96,7 @@ class Signup(Resource):
         db.session.commit()
 
         return make_response(new_user.to_dict(), 201)
+    
 api.add_resource(Signup, "/signup")
 
 class CheckSession(Resource):

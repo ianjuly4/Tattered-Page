@@ -1,8 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
-import Header from "./Header";
-import { MyContext } from "../MyContext";
+import Header from "../Header";
+import { MyContext } from "../../MyContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import animecoffeeshop from "../assets/animecoffeeshop.jpg";
+import animecoffeeshop from "../../assets/animecoffeeshop.jpg";
 
 function Bookclubs() {
   const { user, isLoggedIn } = useContext(MyContext);

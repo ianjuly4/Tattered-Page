@@ -1,12 +1,12 @@
 import React, { useContext } from "react";
-import Header from "./Header";
+import Header from "../Header";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { MyContext } from "../MyContext";
+import { MyContext } from "../../MyContext";
 import { NavLink, useNavigate } from "react-router-dom";
 
 function Signup() {
-  const { signup } = useContext(MyContext);
+  const { signup, setErrorMessage } = useContext(MyContext);
 
   const navigate= useNavigate()
 
@@ -22,11 +22,15 @@ function Signup() {
       password: "",
     },
     validationSchema: formSchema,
-    onSubmit: (values) => {
-      signup(values.username, values.password);
-      console.log(values.username, values.password)
-      navigate('/account')
-    },
+      onSubmit: async (values) => {
+        const success = await signup(values.username, values.password);
+        if (success) {
+          navigate('/account')
+          console.log("Login successful");
+        } else {
+          setErrorMessage("Invalid username or password.");
+        }
+      },
   });
 
   return (
@@ -91,11 +95,9 @@ function Signup() {
 
               {/* Submit Button */}
               <div className="form-control mt-6">
-                <NavLink to={'/account'}>
                 <button type="submit" className="btn btn-primary">
                   Create Account
                 </button>
-                </NavLink>
               </div>
             </form>
           </div>

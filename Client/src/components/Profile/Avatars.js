@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
-import { MyContext } from "../MyContext";
-import Header from "./Header";
+import { MyContext } from "../../MyContext";
+import Header from "../Header";
 import { useNavigate } from "react-router-dom";
 
 function Avatars() {

@@ -23,7 +23,7 @@ function MyContextProvider({ children }) {
       credentials: 'include', 
     })
     .then((response) => {
-      console.log(response);
+      //console.log(response);
       if (!response.ok) {
         throw new Error('Session not valid');  
       }
@@ -67,6 +67,27 @@ function MyContextProvider({ children }) {
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  const createBookshelf = async (values) => {
+    try {
+      const response = await fetch("/bookshelves", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Bookshelf created successfully:", data);
+        setUser()
+      } else {
+        console.error("Failed to create bookshelf:", data);
+      }
+    } catch (error) {
+      console.error("Error creating bookshelf:", error);
+    }
   };
 
   const fetchBooks = (searchQuery, filterType) => {
@@ -150,6 +171,7 @@ function MyContextProvider({ children }) {
           setIsLoggedIn(true);
           setUser(data);  
           console.log("User created");
+          console.log(data)
         } else {
           setSignUpError(data.message || "Signup failed");  
         }
@@ -197,7 +219,8 @@ function MyContextProvider({ children }) {
       user,
       signup,
       logout,
-      createBookclub
+      createBookclub,
+      createBookshelf
     }}>
       {children}
     </MyContext.Provider>

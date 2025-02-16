@@ -1,5 +1,6 @@
 import React from "react";
-import defaultbookimage from "../assets/defaultbookimage.jpg";
+import defaultbookimage from "../../assets/defaultbookimage.jpg";
+
 
 function BookCard({ book }) {
   const { volumeInfo } = book;

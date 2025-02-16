@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { MyContext } from "../MyContext";
 import Header from "./Header";
-import BookCard from "./BookCard";
+import BookCard from "./Books/BookCard";
 import { NavLink, useLocation } from "react-router-dom";
 
 function SearchResults() {
@@ -13,7 +13,6 @@ function SearchResults() {
   const location = useLocation();
   const from = location.state?.from || "/";  
 
-  console.log(from);
 
   useEffect(() => {
     if (!loading && books) {

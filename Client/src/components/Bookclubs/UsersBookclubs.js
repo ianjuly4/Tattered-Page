@@ -1,10 +1,10 @@
 import React, { useContext, useState, useEffect } from "react";
-import Header from "./Header";
-import { MyContext } from "../MyContext";
+import Header from "../Header";
+import { MyContext } from "../../MyContext";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { useFormik } from "formik";
-import animecoffeeshop from "../assets/animecoffeeshop.jpg";
+import animecoffeeshop from "../../assets/animecoffeeshop.jpg";
 
 
 function UsersBookclubs() {

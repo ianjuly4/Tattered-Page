@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
-import Header from "./Header.js";
-import { MyContext } from "../MyContext.js";
+import Header from "../Header.js";
+import { MyContext } from "../../MyContext.js";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 

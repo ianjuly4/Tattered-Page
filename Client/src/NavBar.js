@@ -21,7 +21,6 @@ function Navbar() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Navbar mounted")
       if (user && isLoggedIn) {
         setIsAuthenticated(true);
       } else {
