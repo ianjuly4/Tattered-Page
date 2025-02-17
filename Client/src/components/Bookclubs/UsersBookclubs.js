@@ -69,7 +69,7 @@ function UsersBookclubs() {
 
   return (
     <div>
-      <div className="sticky top-0 z-10">
+      <div className=" top-0 z-10">
         <Header />
       </div>
       <div style={backgroundStyle}></div>

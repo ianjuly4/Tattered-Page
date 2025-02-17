@@ -73,6 +73,34 @@ function MyContextProvider({ children }) {
   };
   
 
+  const addToBookshelf = (name, description, genre) => {
+    setLoading(true); 
+    fetch("/bookshelves", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, description, genre }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.id) {
+          setUser((prevUser) => ({
+            ...prevUser,
+            bookshelves: [...prevUser.bookshelves, data], 
+          }));
+        } else {
+          setCreateClubError("Failed to create bookshelf");
+        }
+      })
+      .catch((error) => {
+        setCreateClubError("An error occurred. Please try again later.");
+      })
+      .finally(() => {
+        setLoading(false); 
+      });
+  };
+
   const fetchBooks = (searchQuery, filterType) => {
     setLoading(true);
     setError(null);

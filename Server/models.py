@@ -40,7 +40,7 @@ class User(db.Model, SerializerMixin):
 class BookShelf(db.Model, SerializerMixin):
     __tablename__ = "bookshelves"
 
-    serialize_rules = ('-user.bookshelves',) 
+    serialize_rules = ('-user.bookshelves', '-books.bookshelves')
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -61,6 +61,8 @@ bookshelf_books = db.Table('bookshelf_books',
 
 class Book(db.Model, SerializerMixin):
     __tablename__ = "books"
+
+    erialize_rules = ('-bookshelves.books', '-bookclubs.books')
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)

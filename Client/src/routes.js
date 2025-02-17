@@ -13,6 +13,7 @@ import UsersBookclubs from "./components/Bookclubs/UsersBookclubs";
 import UserBookshelves from "./components/Bookshelves/UserBookshelves";
 import BookshelfDetails from "./components/Bookshelves/BookshelfDetail"
 
+
 const routes = [
   {
     path: "/dashboard",
@@ -29,6 +30,10 @@ const routes = [
   {
     path: "/books/:bookKey", 
     element: <BookDetails />,
+  },
+  {
+    path: "/books/:bookId",
+    element: <BookDetails/>
   },
   {
     path: "/bookshelves",

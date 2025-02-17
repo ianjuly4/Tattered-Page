@@ -9,7 +9,6 @@ function BookDetails() {
   const { bookKey } = useParams();
   const { books, user, isLoggedIn } = useContext(MyContext);
   const { bookshelves } = user || {};
-
   const [isAdding, setIsAdding] = useState(false);
   const bookId = bookKey.replace('/works/', '');
   const book = books.find((book) => book.id === bookId);
@@ -18,7 +17,7 @@ function BookDetails() {
     return <div>Book not found.</div>;
   }
 
-  //console.log(book)
+  console.log(book)
 
   const { volumeInfo } = book;
   const { title, authors, description, imageLinks, categories, pageCount, publishedDate } = volumeInfo;
@@ -87,8 +86,8 @@ function BookDetails() {
                   {bookshelves && bookshelves.length > 0 ? (
                     bookshelves.map((shelf) => (
                       <NavLink key={shelf.id} to={`/users/${user.id}/bookshelves/${shelf.id}`} className="block">
-                        <div className="w-60 p-4 bg-black rounded-xl shadow-lg flex-none">
-                          <BookshelvesCard shelf={shelf} />
+                        <div className="w-60 p-4 shadow-lg flex-none">
+                          <BookshelvesCard shelf={shelf} book={book} />
                         </div>
                       </NavLink>
                     ))

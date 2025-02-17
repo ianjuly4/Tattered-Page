@@ -45,7 +45,7 @@ function SearchResults() {
 
   return (
     <div>
-      <div className="sticky top-0 z-10">
+      <div className=" top-0 z-10">
         <Header />
       </div>
 
@@ -85,7 +85,7 @@ function SearchResults() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white py-6 border-t-4 text-black">
+      <footer className="bg-white  py-6 border-t-4 text-black">
         <div className="container mx-auto text-center">
           <p>&copy; 2025 The Tattered Page. All rights reserved. | Made with ❤️ for book lovers</p>
         </div>

@@ -36,17 +36,6 @@ def handle_message(message):
     socketio.emit('message', {'data': message})  # Emit the message with a custom event
 """
 
-from datetime import datetime
-
-class Books(Resource):
-    def get(self):
-        book_dict_list = [book.to_dict() for book in Book.query.all()]
-        if book_dict_list:
-            return book_dict_list, 200
-        else:
-            return {"message": "No Books Found"}, 404
-
-api.add_resource(Books, "/books")
 
 class Bookshelves(Resource):
     def get(self):
@@ -88,8 +77,75 @@ class Bookshelves(Resource):
 
         
         return make_response(new_bookshelf.to_dict(), 201)
+    
 
 api.add_resource(Bookshelves, "/bookshelves")
+
+class BookshelvesById(Resource):
+    def patch(self, id):
+        data = request.get_json()
+
+        bookshelf = BookShelf.query.filter(BookShelf.id == id).first()
+
+        book_id = data.get("book_id")
+        book = Book.query.filter(Book.id == book_id).first()
+
+        if not bookshelf or not book:
+            return make_response({"message": "Bookshelf or Book not found."}, 404)
+
+        if book in bookshelf.books:
+            return make_response({"message": "This book is already in the bookshelf."}, 400)
+
+   
+        bookshelf.books.append(book)
+
+       
+        db.session.commit()
+
+     
+        return make_response(bookshelf.to_dict(), 200)
+
+
+api.add_resource(BookshelvesById, "/bookshelves/<int:id>")
+
+
+
+class Books(Resource):
+    def get(self):
+        book_dict_list = [book.to_dict() for book in Book.query.all()]
+        if book_dict_list:
+            return book_dict_list, 200
+        else:
+            return {"message": "No Books Found"}, 404
+        
+    def post(self):
+        data = request.get_json()
+
+        title = data.get("title")
+        author = data.get("author")
+        synopsis = data.get("synopsis")
+        cover_image = data.get("cover_image")
+        progress = data.get("progress", 0)  
+        published_date = data.get("published_date")
+
+        if not title or not author or not synopsis or not cover_image:
+            return make_response({"message": "All book fields are required."}, 400)
+        
+        new_book = Book(
+            title=title,
+            author=author,
+            synopsis=synopsis,
+            cover_image=cover_image,
+            progress=progress,
+            published_date=published_date,
+        )
+
+        db.session.add(new_book)
+        db.session.commit()
+
+        return make_response(new_book.to_dict(), 201)
+
+api.add_resource(Books, "/books")
 
 
 class Bookclub(Resource):
