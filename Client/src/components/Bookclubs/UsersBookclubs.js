@@ -15,8 +15,8 @@ function UsersBookclubs() {
 
  
   const formSchema = yup.object().shape({
-    name: yup.string().required("Must Enter A BookClub Name.").max(25),
-    description: yup.string().required("Must Enter A Bookclub Description ").max(500),
+    name: yup.string().required("Must Enter A BookClub Name.").max(50),
+    description: yup.string().required("Must Enter A Bookclub Description ").max(1000),
   });
 
   const formik = useFormik({
@@ -114,7 +114,7 @@ function UsersBookclubs() {
                 />
               </label>
               {formik.touched.name && formik.errors.name && (
-                <div className="text-red-500">{formik.errors.name}</div>
+                <div className="text-white">{formik.errors.name}</div>
               )}
 
               <label className="input input-bordered flex items-center gap-2 mt-4">
@@ -126,7 +126,7 @@ function UsersBookclubs() {
                 />
               </label>
               {formik.touched.description && formik.errors.description && (
-                <div className="text-red-500">{formik.errors.description}</div>
+                <div className="text-white">{formik.errors.description}</div>
               )}
 
               {/* Submit Button */}

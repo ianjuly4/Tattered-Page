@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import { MyContext } from "../MyContext";
-import Header from "./Header";
-import BookCard from "./Books/BookCard";
+import { MyContext } from "../../MyContext";
+import Header from "../Header";
+import BookCard from "./BookCard";
 import { NavLink, useLocation } from "react-router-dom";
 
 function SearchResults() {
@@ -30,7 +30,7 @@ function SearchResults() {
     }
   }, [from]);
 
-  const noBooksFound = !loading && books && books.length === 0;
+
 
   if (isLoading) {
     return (
@@ -73,9 +73,9 @@ function SearchResults() {
             </div>
           ) : (
             // Show "No books found" message if no books are found and not from landing
-            !showWelcomeMessage && noBooksFound && (
+            !showWelcomeMessage && error && (
               <div className="col-span-3 text-center py-8">
-                <h3 className="text-xl">No books found.</h3>
+                <h3 className="text-xl">{error}</h3>
                 <p>Please try a different search or explore other categories.</p>
               </div>
             )

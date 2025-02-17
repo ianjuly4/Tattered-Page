@@ -1,6 +1,6 @@
 import LandingPage from "./components/LandingPage";
 import Home from "./components/Home";
-import SearchResults from "./components/SearchResults";
+import SearchResults from "./components/Books/SearchResults";
 import BookDetails from "./components/Books/BookDetails";
 import NotFound from "./components/NotFound";
 import BookShelves from "./components/Bookshelves/BookShelves";
@@ -43,10 +43,7 @@ const routes = [
     path: "/users/:userId/bookshelves",
     element: <UserBookshelves/>
   },
-  {
-    path: "/users/:userId/bookshelves/:bookId",
-    element: <UserBookshelves/>
-  },
+ 
   {
     path: "/users/:userId/bookshelves/:bookshelfId",
     element: <BookshelfDetails/>

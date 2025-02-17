@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import Header from "../Header";
 import { MyContext } from "../../MyContext";
 import defaultbookimage from "../../assets/defaultbookimage.jpg";
@@ -7,15 +7,14 @@ import BookshelvesCard from "../Bookshelves/BookshelvesCard";
 
 function BookDetails() {
   const { bookKey } = useParams();
-  const { books, user, isLoggedIn } = useContext(MyContext);
+  const { books, user, isLoggedIn, createBook } = useContext(MyContext);
   const { bookshelves } = user || {};
-  const [isAdding, setIsAdding] = useState(false);
   const bookId = bookKey.replace('/works/', '');
   const book = books.find((book) => book.id === bookId);
 
-  if (!book) {
-    return <div>Book not found.</div>;
-  }
+  //if (!book) {
+    //return <div>Book not found.</div>;
+  //}
 
   console.log(book)
 
@@ -24,10 +23,13 @@ function BookDetails() {
 
   const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
 
-  
+  const handleAddtoLibrary = () => {
+    createBook(title, authors, description, coverImageUrl, publishedDate)
+  }
+
   return (
     <div>
-      <div className="sticky top-0 z-10">
+      <div className=" top-0 z-10">
         <Header />
       </div>
 
@@ -70,30 +72,30 @@ function BookDetails() {
             <div className="flex justify-between items-center">
               <h1 className="text-3xl flex text-right font-bold">Your Bookshelves</h1>
               <div className="flex space-x-4">
-                <NavLink to={`/users/${user.id}/bookshelves/${book.id}`}>
+                <NavLink to={`/users/${user.id}/bookshelves`}>
                   <button className="btn btn-primary btn-sm">Go To Your Bookshelves</button>
                 </NavLink>
-
+                  <button onClick={handleAddtoLibrary} className="btn btn-primary btn-sm">Add to Your library</button>
                 
               </div>
             </div>
           )}
 
-          <div className="mt-6 bg-white p-4 rounded-lg shadow-lg">
+          <div className="mt-6 p-4 border border-black rounded-lg shadow-lg">
             {isLoggedIn ? (
               <>
                 <div className="flex overflow-x-auto space-x-4">
                   {bookshelves && bookshelves.length > 0 ? (
                     bookshelves.map((shelf) => (
-                      <NavLink key={shelf.id} to={`/users/${user.id}/bookshelves/${shelf.id}`} className="block">
-                        <div className="w-60 p-4 shadow-lg flex-none">
-                          <BookshelvesCard shelf={shelf} book={book} />
+                      
+                        <div className="w-60 p-4 flex-none">
+                          <BookshelvesCard key={shelf.id} shelf={shelf} book={book} />
                         </div>
-                      </NavLink>
+                      
                     ))
                   ) : (
                     <div className="col-span-3 text-center">
-                      <p>No Bookshelves Found, Please Create A Bookshelf.</p>
+                      <p>No Bookshelves Found, Please Go To Bookshelves To Create A Bookshelf.</p>
                     </div>
                   )}
                 </div>

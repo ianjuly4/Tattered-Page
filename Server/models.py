@@ -21,8 +21,6 @@ class User(db.Model, SerializerMixin):
     bookshelves = db.relationship('BookShelf', back_populates='user', cascade='all, delete-orphan')
     bookclubs = db.relationship('Bookclub', secondary='bookclub_users', back_populates='users')
     
-    books = association_proxy('bookshelves', 'book', creator=lambda book_obj: Book(book=book_obj))
-
     @hybrid_property
     def password_hash(self):
         return self._password_hash
@@ -35,6 +33,20 @@ class User(db.Model, SerializerMixin):
 
     def authenticate(self, password):
         return bcrypt.check_password_hash(self._password_hash, password.encode('utf-8'))
+    
+    @validates('username')
+    def validate_username(self, key, username):
+        if not username:
+            raise ValueError("Username cannot be empty")
+        if len(username) < 3:
+            raise ValueError("Username must be at least 3 characters")
+        return username
+
+    @validates('password_hash')
+    def validate_password_hash(self, key, password_hash):
+        if not password_hash:
+            raise ValueError("Password hash cannot be empty")
+        return password_hash
 
 # One to Many
 class BookShelf(db.Model, SerializerMixin):
@@ -52,6 +64,21 @@ class BookShelf(db.Model, SerializerMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', back_populates='bookshelves')
     books = db.relationship('Book', secondary='bookshelf_books', back_populates='bookshelves')
+
+    @validates('name')
+    def validate_name(self, key, name):
+        if not name:
+            raise ValueError("Bookshelf name cannot be empty")
+        if len(name) < 3:
+            raise ValueError("Bookshelf name must be at least 3 characters")
+        return name
+
+    @validates('genre')
+    def validate_genre(self, key, genre):
+        if not genre:
+            raise ValueError("Genre cannot be empty")
+        return genre
+
 
 # Bookshelf-Book (many-to-many relationship between bookshelf and book through the 'bookshelf_books' table)
 bookshelf_books = db.Table('bookshelf_books',
@@ -77,8 +104,26 @@ class Book(db.Model, SerializerMixin):
     bookshelves = db.relationship('BookShelf', secondary='bookshelf_books', back_populates="books")
     bookclubs = db.relationship('Bookclub', secondary='bookclub_books', back_populates='books')
 
-    users = association_proxy('bookshelves', 'user', creator=lambda user_obj: User(user=user_obj))
-   
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    @validates('title')
+    def validate_title(self, key, title):
+        if not title:
+            raise ValueError("Title cannot be empty")
+        return title
+
+    @validates('author')
+    def validate_author(self, key, author):
+        if not author:
+            raise ValueError("Author cannot be empty")
+        return author
+
+    @validates('cover_image')
+    def validate_cover_image(self, key, cover_image):
+        if not cover_image:
+            raise ValueError("Cover image URL cannot be empty")
+        return cover_image
+
 
 # BookClub-Book (many-to-many relationship between book and bookclub through the 'bookclub_books' table)
 bookclub_books = db.Table('bookclub_books',
@@ -101,6 +146,17 @@ class Bookclub(db.Model, SerializerMixin):
     users = db.relationship('User', secondary='bookclub_users', back_populates='bookclubs')
     chatlogs = db.relationship('Chatlog', back_populates='bookclub', cascade='all, delete-orphan')
 
+    @validates('name')
+    def validate_name(self, key, name):
+        if not name:
+            raise ValueError("Bookclub name cannot be empty")
+        return name
+
+    @validates('description')
+    def validate_description(self, key, description):
+        if not description:
+            raise ValueError("Description cannot be empty")
+        return description
 
 class Chatlog(db.Model, SerializerMixin):
     __tablename__ = "chatlogs"
@@ -114,6 +170,14 @@ class Chatlog(db.Model, SerializerMixin):
 
     bookclub_id = db.Column(db.Integer, db.ForeignKey('bookclubs.id'))
     bookclub = db.relationship('Bookclub', back_populates='chatlogs')
+
+    @validates('content')
+    def validate_content(self, key, content):
+        if not content:
+            raise ValueError("Content cannot be empty")
+        if len(content) < 1:
+            raise ValueError("Content must be at least 1 character long")
+        return content
 
 
 # BookClub-Users (many-to-many relationship between user and bookclub through the 'bookclub_users' table)

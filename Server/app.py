@@ -95,16 +95,11 @@ class BookshelvesById(Resource):
 
         if book in bookshelf.books:
             return make_response({"message": "This book is already in the bookshelf."}, 400)
-
-   
+        
         bookshelf.books.append(book)
-
-       
         db.session.commit()
 
-     
         return make_response(bookshelf.to_dict(), 200)
-
 
 api.add_resource(BookshelvesById, "/bookshelves/<int:id>")
 
@@ -121,12 +116,17 @@ class Books(Resource):
     def post(self):
         data = request.get_json()
 
+        user_id = session.get('user_id')
+        if not user_id:
+            return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
+
         title = data.get("title")
         author = data.get("author")
         synopsis = data.get("synopsis")
         cover_image = data.get("cover_image")
         progress = data.get("progress", 0)  
         published_date = data.get("published_date")
+
 
         if not title or not author or not synopsis or not cover_image:
             return make_response({"message": "All book fields are required."}, 400)
@@ -138,6 +138,7 @@ class Books(Resource):
             cover_image=cover_image,
             progress=progress,
             published_date=published_date,
+            user_id=user_id,
         )
 
         db.session.add(new_book)
@@ -151,15 +152,21 @@ api.add_resource(Books, "/books")
 class Bookclub(Resource):
     def post(self):
         data = request.get_json()
-        print(data)
+        
 
         user_id = session.get('user_id')
         if not user_id:
             return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
+        
+        name=data.get('name'),
+        description=data.get('description')
+
+        if not name and not description:
+            return make_response({"message": "All bookclub fields are required"}, 400)
 
         new_bookclub = Bookclub(
-            name=data.get('name'),
-            description=data.get('description')
+            name=name,
+            description=description
         )
 
         db.session.add(new_bookclub)

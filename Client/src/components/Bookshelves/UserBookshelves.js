@@ -12,11 +12,10 @@ function UserBookshelves() {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  console.log(books);
 
   const formSchema = yup.object().shape({
     name: yup.string().required("Must Enter A Bookshelf Name.").max(25),
-    description: yup.string().required("Must Enter A Bookshelf Description").max(500),
+    description: yup.string().required("Must Enter A Bookshelf Description").max(1000),
     genre: yup.string().required("Must Enter A Bookshelf Genre").max(25),
   });
 
@@ -71,7 +70,6 @@ function UserBookshelves() {
       }
       return shelf;
     });
-  
     updatedBookshelves(updatedBookshelves);
   };
   
@@ -101,7 +99,7 @@ function UserBookshelves() {
                       key={shelf.id}
                       className="p-4 bg-secondary rounded-lg shadow-lg max-w-4xl mx-auto"
                     >
-                      <h2 className="text-xl font-semibold">{shelf.name}</h2>
+                      <h2 className="text-3xl font-semibold">{shelf.name}</h2>
 
                       {/* Carousel for Books inside the Bookshelf */}
                       <div className="carousel mt-4 w-full overflow-x-auto flex gap-6 py-4">
@@ -125,9 +123,9 @@ function UserBookshelves() {
                                   />
                                   <button
                                     onClick={() => handleDeleteBook(book.id, shelf.id)}
-                                    className="btn btn-danger btn-sm mt-4"
+                                    className="btn btn-primary btn-sm "
                                   >
-                                    Delete Book
+                                    Remove Book
                                   </button>
                                 </div>
                               </div>
@@ -154,36 +152,32 @@ function UserBookshelves() {
               <div className="max-h-96 overflow-y-auto px-4 rounded-lg shadow-md">
                 {/* Consistent Grid for Books */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {allBooks.length > 0 ? (
-                  allBooks.map((book) => (
+                {books.length > 0 ? (
+                  books.map((book) => (
                     <NavLink key={book.id} to={`/books/${book.id}`} className="block">
                       <div className="p-4">
-                        <div className="card w-64 bg-gray-200 rounded-lg shadow-lg">
+                        <div className="card w-32 bg-gray-200 rounded-lg shadow-lg">
                           <img
                             src={book.cover_image}
                             alt={book.title}
-                            className="w-full h-64 object-cover rounded-t-lg"
+                            className="w-full h-32 object-cover rounded-t-lg"
                           />
                           <div className="p-4">
                             <h3 className="font-semibold">{book.title}</h3>
                             <p className="text-sm text-gray-500">
                               {(() => {
                                 let authors = book.author;
-                                // Check if author is a string and try parsing it if it's stringified
+                                
                                 if (typeof authors === 'string') {
                                   try {
-                                    // Check if the author string looks like JSON array
                                     if (authors.startsWith("{") && authors.endsWith("}")) {
-                                      // Remove the braces and split the authors
                                       authors = authors.slice(1, -1).split(",").map(item => item.replace(/"/g, '').trim());
                                     }
                                   } catch (error) {
-                                    // If parsing fails, log the error and return the raw string
                                     console.error('Error parsing author string:', error);
                                     return authors;
                                   }
                                 }
-                                // Return the authors as a comma-separated string
                                 return Array.isArray(authors) ? authors.join(", ") : authors;
                               })()}
                             </p>
@@ -205,7 +199,7 @@ function UserBookshelves() {
             <h2 className="text-3xl justify-center flex items-center font-bold mt-24 text-left">Create A Bookshelf</h2>
 
             <form onSubmit={formik.handleSubmit}>
-              <label className="input input-bordered flex items-center gap-2">
+              <label className="input bg-secondary input-bordered flex items-center gap-2">
                 <input
                   type="text"
                   className="grow"
@@ -217,7 +211,7 @@ function UserBookshelves() {
                 <div className="text-red-500">{formik.errors.name}</div>
               )}
 
-              <label className="input input-bordered flex items-center gap-2 mt-4">
+              <label className="input bg-secondary input-bordered flex items-center gap-2 mt-4">
                 <input
                   type="text"
                   className="grow"
@@ -229,7 +223,7 @@ function UserBookshelves() {
                 <div className="text-red-500">{formik.errors.description}</div>
               )}
 
-              <label className="input input-bordered flex items-center gap-2 mt-4">
+              <label className="input bg-secondary input-bordered flex items-center gap-2 mt-4">
                 <input
                   type="text"
                   className="grow"
@@ -242,7 +236,7 @@ function UserBookshelves() {
               )}
 
               <div className="form-control mt-6">
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" className="btn btn-secondary">
                   Create Bookshelf
                 </button>
               </div>

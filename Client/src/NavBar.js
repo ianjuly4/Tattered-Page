@@ -48,7 +48,7 @@ function Navbar() {
 
  
   const handleDropdownToggle = () => {
-    console.log("navbar is dropped down")
+    //console.log("navbar is dropped down")
     setDropdownOpen(!dropdownOpen);
   };
 

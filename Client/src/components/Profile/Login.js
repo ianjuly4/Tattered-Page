@@ -37,7 +37,7 @@ function Login() {
 
   useEffect(() => {
     if (user) {
-      console.log("User logged in:", user);
+      //console.log("User logged in:", user);
       if (from && from !== "/dashboard") {
         navigate(from);  
       } else if (user.id) {

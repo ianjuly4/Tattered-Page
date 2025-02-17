@@ -13,6 +13,9 @@ function MyContextProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null)
   const [createClubError, setCreateClubError] = useState(null);
+  const [createBookError, setCreateBookError] = useState(null)
+  const [bookclubs, setBookclubs] = useState([])
+  const [createShelfError, setCreateShelfError] = useState(null)
 
 
   const createBookclub = (name, description) => {
@@ -29,7 +32,10 @@ function MyContextProvider({ children }) {
       .then((response) => response.json())
       .then((data) => {
         if (data.id) {
-          //setBookclubs((prevBookclubs) => [...prevBookclubs, data]);
+          setUser((prevUser) => ({
+            ...prevUser,
+            bookshelves: [...prevUser.bookclubs, data], 
+          }));
         } else {
           setCreateClubError("Failed to create bookclub");
         }
@@ -43,7 +49,8 @@ function MyContextProvider({ children }) {
   };
 
   
-
+  
+  {/* CreateBookshelf/Post Function */}
   const createBookshelf = (name, description, genre) => {
     setLoading(true); 
     fetch("/bookshelves", {
@@ -61,46 +68,100 @@ function MyContextProvider({ children }) {
             bookshelves: [...prevUser.bookshelves, data], 
           }));
         } else {
-          setCreateClubError("Failed to create bookshelf");
+          setCreateShelfError("Failed to create bookshelf");
         }
       })
       .catch((error) => {
-        setCreateClubError("An error occurred. Please try again later.");
+        setCreateShelfError("An error occurred. Please try again later.");
       })
       .finally(() => {
         setLoading(false); 
       });
   };
-  
 
-  const addToBookshelf = (name, description, genre) => {
-    setLoading(true); 
-    fetch("/bookshelves", {
+  {/*Update Bookshelf/Path bookshelf function */}
+  const updateBookshelf = (shelf, bookId) => {
+    if (!bookId || !shelf.id) {
+      console.error("Invalid shelf or book ID");
+      return;
+    }
+  
+    setLoading(true);
+    return fetch(`/bookshelves/${shelf.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ book_id: bookId }),
+    })
+      .then((response) => response.json())
+      .then((shelfData) => {
+        setUser((prevUser) => ({
+          ...prevUser,
+          bookshelves: prevUser.bookshelves.map((existingShelf) =>
+            existingShelf.id === shelf.id
+              ? { ...existingShelf, books: [...existingShelf.books, { id: bookId }] } 
+              : existingShelf
+          ),
+        }));
+        setCreateBookError(null);
+      })
+      .catch((error) => {
+        setCreateBookError(error.message);
+        console.error("Error adding book to bookshelf:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  
+  
+  {/*Creating A Book/Post a book function */}
+  const createBook = (title, authors, description, coverImageUrl, publishedDate) => {
+    if (!title || !authors || !description || !coverImageUrl || !publishedDate) {
+      console.error("Missing required fields for book creation");
+      return;
+    }
+  
+    setLoading(true);
+    return fetch("/books", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, description, genre }),
+      body: JSON.stringify({
+        title,
+        author: authors.join(", "),
+        synopsis: description,
+        cover_image: coverImageUrl,
+        progress: 0,
+        published_date: publishedDate || null,
+      }),
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.id) {
           setUser((prevUser) => ({
             ...prevUser,
-            bookshelves: [...prevUser.bookshelves, data], 
+            books: Array.isArray(prevUser.books) ? [...prevUser.books, data] : [data], // Default to an array if not iterable
           }));
+          return data;
         } else {
-          setCreateClubError("Failed to create bookshelf");
+          throw new Error("Failed to create book. Please try again.");
         }
       })
       .catch((error) => {
-        setCreateClubError("An error occurred. Please try again later.");
+        setCreateBookError(error.message);
+        console.error("Error creating book:", error);
+        throw error;
       })
       .finally(() => {
-        setLoading(false); 
+        setLoading(false);
       });
   };
-
+  
+  
+  {/*FetchBooks/Get Function */}
   const fetchBooks = (searchQuery, filterType) => {
     setLoading(true);
     setError(null);
@@ -129,7 +190,7 @@ function MyContextProvider({ children }) {
       });
   };
 
- 
+  {/*Login/Post Function */}
   const login = async (username, password) => {
     setLoginError(null);
     setLoading(true);
@@ -164,7 +225,7 @@ function MyContextProvider({ children }) {
     }
   };
   
-  
+  {/*Signup/Post Function */}
   const signup=(username,password)=>{
     setSignUpError(null);
     setLoading(true);
@@ -196,7 +257,8 @@ function MyContextProvider({ children }) {
         setLoading(false);
       });
   };
-
+ 
+  {/* Logout/Delete Function*/}
   const logout = () => {
     fetch("/logout", {
       method: "DELETE",
@@ -205,7 +267,7 @@ function MyContextProvider({ children }) {
       },
     })
       .then(() => {
-        console.log("logout")
+        //console.log("logout")
         setUser(null);
         setIsLoggedIn(false)
       })
@@ -214,6 +276,7 @@ function MyContextProvider({ children }) {
       });
   };
 
+  {/*Useffect/CheckSession Function */}
   useEffect(() => {
     fetch("/check_session", {
       method: 'GET',
@@ -254,6 +317,9 @@ function MyContextProvider({ children }) {
       logout,
       createBookclub,
       createBookshelf,
+      createBook,
+      createBookError,
+      updateBookshelf,
     }}>
       {children}
     </MyContext.Provider>
