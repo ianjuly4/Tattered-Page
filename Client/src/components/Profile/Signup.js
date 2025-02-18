@@ -6,7 +6,7 @@ import { MyContext } from "../../MyContext";
 import { NavLink, useNavigate } from "react-router-dom";
 
 function Signup() {
-  const { signup, setErrorMessage } = useContext(MyContext);
+  const { signup, setError } = useContext(MyContext);
 
   const navigate= useNavigate()
 
@@ -28,7 +28,7 @@ function Signup() {
           navigate('/account')
           console.log("Login successful");
         } else {
-          setErrorMessage("Invalid username or password.");
+          setError("Invalid username or password.");
         }
       },
   });
@@ -88,9 +88,6 @@ function Signup() {
                 {formik.touched.password && formik.errors.password && (
                   <div className="text-red-500 text-sm">{formik.errors.password}</div>
                 )}
-                <label className="label">
-                  <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
-                </label>
               </div>
 
               {/* Submit Button */}
@@ -98,6 +95,7 @@ function Signup() {
                 <button type="submit" className="btn btn-primary">
                   Create Account
                 </button>
+
               </div>
             </form>
           </div>

@@ -3,6 +3,7 @@ import Header from "../Header.js";
 import { MyContext } from "../../MyContext.js";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
+import bookNook from "../../assets/bookNook.jpg"
 
 function Account() {
     const { user, loading, error } = useContext(MyContext);
@@ -15,18 +16,39 @@ function Account() {
         }
     });
 
+    const backgroundStyle = {
+        backgroundImage: `url(${bookNook})`,
+        backgroundSize: "100%",
+        backgroundPosition: "center",
+        minHeight: "100vh",
+        filter: "blur(6px)",
+        opacity: 0.6,
+        backgroundRepeat: "no-repeat",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: -1,
+      };
+    
+      
+
     return (
         <div>
             <div className="sticky top-0 z-10">
                 <Header />
             </div>
 
+            {/* Background div */}
+            <div style={backgroundStyle}></div>
+
             {/* Loading and Error States */}
             {loading && <p className="text-center text-xl">Loading...</p>}
             {error && <p className="text-center text-red-500 text-xl">{error}</p>}
 
             {/* Full-screen container */}
-            <div className="hero bg-secondary min-h-screen flex flex-col items-center justify-center">
+            <div className="hero  min-h-screen flex flex-col items-center justify-center">
                 {/* Profile content container */}
                 <div className="hero-content flex flex-col items-center space-y-6 w-full max-w-4xl px-4">
                     {/* Welcome message */}
