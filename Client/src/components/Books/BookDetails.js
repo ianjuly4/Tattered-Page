@@ -6,17 +6,10 @@ import { NavLink, useParams } from "react-router-dom";
 import BookshelvesCard from "../Bookshelves/BookshelvesCard";
 
 function BookDetails() {
-  const { bookKey } = useParams();
+  const { bookId } = useParams();
   const { books, user, isLoggedIn, createBook } = useContext(MyContext);
   const { bookshelves } = user || {};
-  const bookId = bookKey.replace('/works/', '');
   const book = books.find((book) => book.id === bookId);
-
-  //if (!book) {
-    //return <div>Book not found.</div>;
-  //}
-
-  console.log(book)
 
   const { volumeInfo } = book;
   const { title, authors, description, imageLinks, categories, pageCount, publishedDate } = volumeInfo;
@@ -47,10 +40,18 @@ function BookDetails() {
           </figure>
 
           <div className="text-center mb-4">
-            <div className="max-h-48 overflow-y-auto px-4" style={{ maxHeight: '12rem', minHeight: '6rem' }}>
-              <p className="text-sm">{description || "No description available."}</p>
+              <div 
+                className="max-h-48 overflow-y-auto px-4 mx-auto" 
+                style={{
+                  maxHeight: '12rem', 
+                  minHeight: '6rem', 
+                  maxWidth: '600px', 
+                  width: '100%', 
+                }}
+              >
+                <p className="text-sm">{description || "No description available."}</p>
+              </div>
             </div>
-          </div>
 
           {authors && authors.length > 0 && (
             <p className="text-center mb-4 text-lg">By {authors.join(", ")}</p>
@@ -111,7 +112,7 @@ function BookDetails() {
 
       <footer className="bg-white py-6 border-t-4 text-black">
         <div className="container mx-auto text-center">
-          <p>&copy; 2025 The Tattered Page. All rights reserved. | Made with ❤️ for book lovers</p>
+          <p>&copy; 2025 The Tattered Page. All rights reserved. Made with ❤️ for book lovers</p>
         </div>
       </footer>
     </div>

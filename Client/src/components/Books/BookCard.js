@@ -31,7 +31,7 @@ function BookCard({ book }) {
           {description ? description.substring(0, 100) + "..." : "No description available."}
         </p>
         <div className="card-actions justify-end">
-          {/* Optional actions like "Add to Wishlist" can go here */}
+         
         </div>
       </div>
     </div>

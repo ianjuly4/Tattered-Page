@@ -12,6 +12,7 @@ import Bookclubs from "./components/Bookclubs/Bookclubs";
 import UsersBookclubs from "./components/Bookclubs/UsersBookclubs";
 import UserBookshelves from "./components/Bookshelves/UserBookshelves";
 import BookshelfDetails from "./components/Bookshelves/BookshelfDetail"
+import UserBookDetails from "./components/Books/UserBookDetails";
 
 
 const routes = [
@@ -28,12 +29,12 @@ const routes = [
     element: <SearchResults />,
   },
   {
-    path: "/books/:bookKey", 
-    element: <BookDetails />,
-  },
-  {
     path: "/books/:bookId",
     element: <BookDetails/>
+  },
+  {
+    path: "/users/:userId/books/:bookId",
+    element: <UserBookDetails/>
   },
   {
     path: "/bookshelves",

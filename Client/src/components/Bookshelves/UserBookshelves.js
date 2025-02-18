@@ -98,16 +98,16 @@ function UserBookshelves() {
 
                     {/* Carousel for Books inside the Bookshelf */}
                     <div className="carousel mt-4 w-full overflow-x-auto flex gap-6 py-4">
-                      {shelf.books && shelf.books.length > 0 ? (
-                        shelf.books.map((book, idx) => {
+                    {shelf.books && shelf.books.length > 0 ? (
+                        shelf.books.map((book) => {
                           const authors = Array.isArray(book.author)
                             ? book.author.join(", ")
                             : book.author;
 
                           return (
                             <div
-                              key={idx}
-                              id={`book-carousel-item-${idx}`}
+                              key={book.id}  
+                              id={`book-carousel-item-${book.id}`}  
                               className="carousel-item w-40 flex-shrink-0"
                             >
                               <div className="card bg-gray-200 rounded-lg shadow-lg">
@@ -129,6 +129,7 @@ function UserBookshelves() {
                       ) : (
                         <div>No books available for this bookshelf.</div>
                       )}
+
                     </div>
 
                     <button className="btn btn-primary btn-sm mt-4">View Shelf</button>
@@ -144,53 +145,59 @@ function UserBookshelves() {
             </div>
 
             <h2 className="text-5xl mt-12 font-semibold text-left mb-6">All Books You've Added</h2>
-            <div className="py-8 p-8 container bg-secondary rounded-lg">
-              <div className="max-h-96 overflow-y-auto px-4 rounded-lg shadow-md">
-                {/* Consistent Grid for Books */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {books.length > 0 ? (
-                  books.map((book) => (
-                      <div className="p-4">
-                        <div className="card w-32 bg-gray-200 rounded-lg shadow-lg">
-                          <img
-                            src={book.cover_image}
-                            alt={book.title}
-                            className="w-full h-32 object-cover rounded-t-lg"
-                          />
-                          <div className="p-4">
-                            <h3 className="font-semibold">{book.title}</h3>
-                            <p className="text-sm text-gray-500">
-                              {(() => {
-                                let authors = book.author;
-                                
-                                if (typeof authors === 'string') {
-                                  try {
-                                    if (authors.startsWith("{") && authors.endsWith("}")) {
-                                      authors = authors.slice(1, -1).split(",").map(item => item.replace(/"/g, '').trim());
+                <div className="py-8 p-8 container bg-secondary rounded-lg">
+                  <div className="max-h-96 overflow-y-auto px-4 rounded-lg shadow-md">
+                    {/* Consistent Grid for Books */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {books.length > 0 ? (
+                        books.map((book) => (
+                          <div key={book.id} className="p-4">
+                            {/* Wrap only the book card (excluding the delete button) with NavLink */}
+                            <NavLink to={`/users/${user.id}/books/${book.id}`} className="card bg-gray-200 rounded-lg shadow-lg w-full">
+                              <img
+                                src={book.cover_image}
+                                alt={book.title}
+                                className="w-full h-32 object-cover rounded-t-lg"
+                              />
+                              <div className="p-4">
+                                <h3 className="font-semibold">{book.title}</h3>
+                                <p className="text-sm text-gray-500">
+                                  {(() => {
+                                    let authors = book.author;
+                                    if (typeof authors === 'string') {
+                                      try {
+                                        if (authors.startsWith("{") && authors.endsWith("}")) {
+                                          authors = authors.slice(1, -1).split(",").map(item => item.replace(/"/g, '').trim());
+                                        }
+                                      } catch (error) {
+                                        console.error('Error parsing author string:', error);
+                                        return authors;
+                                      }
                                     }
-                                  } catch (error) {
-                                    console.error('Error parsing author string:', error);
-                                    return authors;
-                                  }
-                                }
-                                return Array.isArray(authors) ? authors.join(", ") : authors;
-                              })()}
-                            </p>
+                                    return Array.isArray(authors) ? authors.join(", ") : authors;
+                                  })()}
+                                </p>
+                              </div>
+                            </NavLink>
+
+                            {/* Place Delete Button outside the NavLink */}
+                            <button 
+                              onClick={() => handleDeleteBook(book.id)} 
+                              type="button" 
+                              className="btn mt-4 w-full"
+                            >
+                              Delete Book
+                            </button>
                           </div>
-                          <button onClick={() => handleDeleteBook(book.id)} type="submit" className="btn">
-                            Delete Book
-                          </button>
+                        ))
+                      ) : (
+                        <div className="col-span-3 text-left py-8">
+                          <h3 className="text-xl">No books have been added yet. Please add some books to your bookshelves!</h3>
                         </div>
-                      </div>
-                  ))
-                ) : (
-                  <div className="col-span-3 text-left py-8">
-                    <h3 className="text-xl">No books have been added yet. Please add some books to your bookshelves!</h3>
+                      )}
+                    </div>
                   </div>
-                )}
                 </div>
-              </div>
-            </div>
 
             {/* Form to create a bookshelf */}
             <h2 className="text-3xl justify-center flex items-center font-bold mt-24 text-left">Create A Bookshelf</h2>
@@ -246,7 +253,7 @@ function UserBookshelves() {
       {/* Footer */}
       <footer className="bg-white mt-20 py-6 border-t-4 text-black">
         <div className="container mx-auto text-center">
-          <p>&copy; 2025 The Tattered Page. All rights reserved. | Made with ❤️ for book lovers</p>
+          <p>&copy; 2025 The Tattered Page. All rights reserved. Made with ❤️ for book lovers</p>
         </div>
       </footer>
     </div>

@@ -177,7 +177,7 @@ function MyContextProvider({ children }) {
         if (data.id) {
           setUser((prevUser) => ({
             ...prevUser,
-            books: Array.isArray(prevUser.books) ? [...prevUser.books, data] : [data], // Default to an array if not iterable
+            books: Array.isArray(prevUser.books) ? [...prevUser.books, data] : [data], 
           }));
           return data;
         } else {

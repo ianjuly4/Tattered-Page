@@ -66,7 +66,7 @@ function BookShelves() {
       {/* Footer */}
       <footer className="bg-white py-6 border-t-4 text-black mt-auto">
         <div className="container mx-auto text-center">
-          <p>&copy; 2025 The Tattered Page. All rights reserved. | Made with ❤️ for book lovers</p>
+          <p>&copy; 2025 The Tattered Page. All rights reserved. Made with ❤️ for book lovers</p>
         </div>
       </footer>
     </div>
