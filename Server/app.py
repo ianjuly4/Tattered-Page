@@ -103,7 +103,17 @@ class BookshelvesById(Resource):
 
 api.add_resource(BookshelvesById, "/bookshelves/<int:id>")
 
-
+class BooksById(Resource):
+    def delete(self, id):
+        book = Book.query.filter(Book.id == id).first()
+        if not book:
+            return make_response({"error": "Book not found"}, 404)
+        
+        db.session.delete(book)
+        db.session.commit()
+        return make_response({"message": "Book successfully deleted"}, 200)
+    
+api.add_resource(BooksById, "/books/<int:id>")
 
 class Books(Resource):
     def get(self):
@@ -178,16 +188,13 @@ api.add_resource(Bookclub, "/bookclub")
 
 
 class Users(Resource):
-    def get(self):
+    def get(self, id):
         
-        user_id = session.get("user_id")
-        if not user_id:
-            return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
         
-        users = User.query.all()
-        return make_response([user.to_dict() for user in users], 200)
+        user = User.query.filter(User.id == id).first()
+        return make_response(user.to_dict(rules=('-_password_hash',)), 200)
     
-api.add_resource(Users, '/users') 
+api.add_resource(Users, '/users/<int:id>') 
 
 
 class Signup(Resource):

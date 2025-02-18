@@ -2,34 +2,18 @@ import React, { useContext, useEffect, useState } from "react";
 import { MyContext } from "../../MyContext";
 import Header from "../Header";
 import BookCard from "./BookCard";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function SearchResults() {
   const { books, loading, error } = useContext(MyContext);
   const [isLoading, setIsLoading] = useState(true);
-  const [fromLanding, setFromLanding] = useState(false);
-  const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
 
-  const location = useLocation();
-  const from = location.state?.from || "/";  
-
-
+  
   useEffect(() => {
     if (!loading && books) {
       setIsLoading(false);
     }
   }, [loading, books]);
-
-  useEffect(() => {
-    if (from === '/') {
-      setFromLanding(true);
-      setShowWelcomeMessage(true);  
-    } else {
-      setFromLanding(false);
-      setShowWelcomeMessage(false); 
-    }
-  }, [from]);
-
 
 
   if (isLoading) {
@@ -53,7 +37,7 @@ function SearchResults() {
         <div className="bg-secondary">
           
           {/* Conditional rendering for the landing page welcome message */}
-          {showWelcomeMessage && (
+          { books && !error && (
             <div className="py-8 text-center">
               <h2 className="text-2xl font-semibold">Welcome, please use the search bar to find books.</h2>
               <p className="mt-4">Start exploring our collection of books by searching for titles, authors, or genres.</p>
@@ -61,6 +45,7 @@ function SearchResults() {
           )}
 
           {/* Render books if available */}
+          
           {books && books.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {books.map((book) => (
@@ -73,7 +58,7 @@ function SearchResults() {
             </div>
           ) : (
             // Show "No books found" message if no books are found and not from landing
-            !showWelcomeMessage && error && (
+            books && error && (
               <div className="col-span-3 text-center py-8">
                 <h3 className="text-xl">{error}</h3>
                 <p>Please try a different search or explore other categories.</p>
@@ -85,11 +70,11 @@ function SearchResults() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white  py-6 border-t-4 text-black">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2025 The Tattered Page. All rights reserved. | Made with ❤️ for book lovers</p>
-        </div>
-      </footer>
+      <footer className="fixed bottom-0 left-0 w-full bg-white py-6 border-t-4 text-black z-10">
+          <div className="container mx-auto text-center">
+            <p>&copy; 2025 The Tattered Page. All rights reserved. | Made with ❤️ for book lovers</p>
+          </div>
+        </footer>
     </div>
   );
 }

@@ -104,7 +104,7 @@ function Navbar() {
 
         {/* Display error or loading */}
         {loading && <div>Loading...</div>}
-        {booksError && <div className="text-white text-xs">{booksError}</div>}
+        {/*{booksError && <div className="text-white text-xs">{booksError}</div>}*/}
       </div>
 
       {/* Avatar and Dropdown */}

@@ -18,6 +18,7 @@ function MyContextProvider({ children }) {
   const [createShelfError, setCreateShelfError] = useState(null)
 
 
+
   const createBookclub = (name, description) => {
     setCreateClubError(null);
     setLoading(true);
@@ -114,6 +115,30 @@ function MyContextProvider({ children }) {
         setLoading(false);
       });
   };
+
+  {/*Delete Book/Delete function */}
+  const deleteBook = (bookId) => {
+    fetch(`/books/${bookId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete book.");
+        }
+        setUser((prevUser) => ({
+          ...prevUser,
+          books: prevUser.books.filter((book) => book.id !== bookId),
+        }));
+        setError("Book deleted successfully!");
+      })
+      .catch((error) => {
+        console.error("Error deleting book:", error);
+        setError("Error deleting book. Please try again.");
+      });
+  };
   
   
   {/*Creating A Book/Post a book function */}
@@ -122,6 +147,15 @@ function MyContextProvider({ children }) {
       console.error("Missing required fields for book creation");
       return;
     }
+  
+    console.log({
+      title,
+      author: authors.join(", "),
+      synopsis: description,
+      cover_image: coverImageUrl,
+      progress: 0,
+      published_date: publishedDate || null,
+    });
   
     setLoading(true);
     return fetch("/books", {
@@ -182,6 +216,7 @@ function MyContextProvider({ children }) {
           setBooks(data.items); 
         } else {
           setError("No books found.");
+          setBooks([])
         }
       })
       .catch((error) => {
@@ -320,6 +355,7 @@ function MyContextProvider({ children }) {
       createBook,
       createBookError,
       updateBookshelf,
+      deleteBook
     }}>
       {children}
     </MyContext.Provider>

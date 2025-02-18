@@ -7,7 +7,7 @@ from datetime import datetime
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
-    serialize_rules = ("-bookshelves.user", "-bookclubs.users")  
+    serialize_rules = ("-bookshelves.user", "-bookclubs.users", '-books.users', "-bookclubs.books")
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False, unique=True)
@@ -18,6 +18,7 @@ class User(db.Model, SerializerMixin):
     streak = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
+    books=db.relationship('Book', back_populates='user', cascade='all, delete-orphan')
     bookshelves = db.relationship('BookShelf', back_populates='user', cascade='all, delete-orphan')
     bookclubs = db.relationship('Bookclub', secondary='bookclub_users', back_populates='users')
     
@@ -89,7 +90,7 @@ bookshelf_books = db.Table('bookshelf_books',
 class Book(db.Model, SerializerMixin):
     __tablename__ = "books"
 
-    erialize_rules = ('-bookshelves.books', '-bookclubs.books')
+    serialize_rules = ('-bookshelves.books', '-bookclubs.books', '-user.books', '-user.bookshelves', '-user.bookclubs')
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
@@ -101,6 +102,7 @@ class Book(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False) 
     last_read_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
 
+    user = db.relationship('User', back_populates='books')
     bookshelves = db.relationship('BookShelf', secondary='bookshelf_books', back_populates="books")
     bookclubs = db.relationship('Bookclub', secondary='bookclub_books', back_populates='books')
 

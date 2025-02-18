@@ -7,11 +7,12 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 
 function UserBookshelves() {
-  const { user, isLoggedIn, createBookshelf } = useContext(MyContext);
+  const { user, isLoggedIn, createBookshelf, deleteBook } = useContext(MyContext);
   const { bookshelves, books } = user || {};
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-
+  
+  console.log(books)
 
   const formSchema = yup.object().shape({
     name: yup.string().required("Must Enter A Bookshelf Name.").max(25),
@@ -46,7 +47,7 @@ function UserBookshelves() {
     return <div>You need to log in to view this page.</div>;
   }
 
-  const allBooks = bookshelves ? bookshelves.flatMap((shelf) => shelf.books || []) : [];
+  const allBooks = Array.isArray(bookshelves) ? bookshelves.flatMap((shelf) => shelf.books || []) : [];
 
   const backgroundStyle = {
     backgroundImage: `url(${library})`,
@@ -63,14 +64,8 @@ function UserBookshelves() {
     bottom: 0,
     zIndex: -1,
   };
-  const handleDeleteBook = (bookId, shelfId) => {
-    const updatedBookshelves = bookshelves.map(shelf => {
-      if (shelf.id === shelfId) {
-        shelf.books = shelf.books.filter(book => book.id !== bookId);
-      }
-      return shelf;
-    });
-    updatedBookshelves(updatedBookshelves);
+  const handleDeleteBook = (bookId) => {
+    deleteBook(bookId)
   };
   
   
@@ -93,58 +88,59 @@ function UserBookshelves() {
             <div className="text-2xl mt-6">
               {/* Bookshelf Section */}
               <div className="space-y-8">
-                {bookshelves && bookshelves.length > 0 ? (
-                  bookshelves.map((shelf) => (
-                    <div
-                      key={shelf.id}
-                      className="p-4 bg-secondary rounded-lg shadow-lg max-w-4xl mx-auto"
-                    >
-                      <h2 className="text-3xl font-semibold">{shelf.name}</h2>
+              {bookshelves && bookshelves.length > 0 ? (
+                bookshelves.map((shelf) => (
+                  <div
+                    key={shelf.id}
+                    className="p-4 bg-secondary rounded-lg shadow-lg max-w-4xl mx-auto"
+                  >
+                    <h2 className="text-3xl font-semibold">{shelf.name}</h2>
 
-                      {/* Carousel for Books inside the Bookshelf */}
-                      <div className="carousel mt-4 w-full overflow-x-auto flex gap-6 py-4">
-                        {shelf.books && shelf.books.length > 0 ? (
-                          shelf.books.map((book, idx) => {
-                            const authors = Array.isArray(book.author)
-                              ? book.author.join(", ")
-                              : book.author;
+                    {/* Carousel for Books inside the Bookshelf */}
+                    <div className="carousel mt-4 w-full overflow-x-auto flex gap-6 py-4">
+                      {shelf.books && shelf.books.length > 0 ? (
+                        shelf.books.map((book, idx) => {
+                          const authors = Array.isArray(book.author)
+                            ? book.author.join(", ")
+                            : book.author;
 
-                            return (
-                              <div
-                                key={idx}
-                                id={`book-carousel-item-${idx}`}
-                                className="carousel-item w-40 flex-shrink-0"
-                              >
-                                <div className="card bg-gray-200 rounded-lg shadow-lg">
-                                  <img
-                                    src={book.cover_image}
-                                    alt={book.title}
-                                    className="w-full h-48 object-cover rounded-t-lg"
-                                  />
-                                  <button
-                                    onClick={() => handleDeleteBook(book.id, shelf.id)}
-                                    className="btn btn-primary btn-sm "
-                                  >
-                                    Remove Book
-                                  </button>
-                                </div>
+                          return (
+                            <div
+                              key={idx}
+                              id={`book-carousel-item-${idx}`}
+                              className="carousel-item w-40 flex-shrink-0"
+                            >
+                              <div className="card bg-gray-200 rounded-lg shadow-lg">
+                                <img
+                                  src={book.cover_image}
+                                  alt={book.title}
+                                  className="w-full h-48 object-cover rounded-t-lg"
+                                />
+                                <button
+                                  onClick={() => handleDeleteBook(book.id, shelf.id)}
+                                  className="btn btn-primary btn-sm "
+                                >
+                                  Remove Book
+                                </button>
                               </div>
-                            );
-                          })
-                        ) : (
-                          <div>No books available for this bookshelf.</div>
-                        )}
-                      </div>
-
-                      <button className="btn btn-primary btn-sm mt-4">View Shelf</button>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div>No books available for this bookshelf.</div>
+                      )}
                     </div>
-                  ))
-                ) : (
-                  <div className="col-span-3 text-left">
-                    <p>No Bookshelves Found, Please Create One.</p>
+
+                    <button className="btn btn-primary btn-sm mt-4">View Shelf</button>
                   </div>
-                )}
-              </div>
+                ))
+              ) : (
+                <div className="col-span-3 text-left">
+                  <p>No Bookshelves Found, Please Create One.</p>
+                </div>
+              )}
+            </div>
+
             </div>
 
             <h2 className="text-5xl mt-12 font-semibold text-left mb-6">All Books You've Added</h2>
@@ -154,7 +150,6 @@ function UserBookshelves() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {books.length > 0 ? (
                   books.map((book) => (
-                    <NavLink key={book.id} to={`/books/${book.id}`} className="block">
                       <div className="p-4">
                         <div className="card w-32 bg-gray-200 rounded-lg shadow-lg">
                           <img
@@ -182,9 +177,11 @@ function UserBookshelves() {
                               })()}
                             </p>
                           </div>
+                          <button onClick={() => handleDeleteBook(book.id)} type="submit" className="btn">
+                            Delete Book
+                          </button>
                         </div>
                       </div>
-                    </NavLink>
                   ))
                 ) : (
                   <div className="col-span-3 text-left py-8">
