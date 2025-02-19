@@ -12,8 +12,8 @@ function Signup() {
   const location = useLocation()  
 
   const formSchema = yup.object().shape({
-    username: yup.string().required("Must enter a username.").max(25),
-    password: yup.string().required("Must enter a password").max(25),
+    username: yup.string().required("Must enter a username.").max(50),
+    password: yup.string().required("Must enter a password").max(50),
   });
 
   const formik = useFormik({
@@ -25,9 +25,9 @@ function Signup() {
     onSubmit: async (values) => {
       const success = await signup(values.username, values.password);
       if (success) {
-        console.log(user);
+        console.log();
         //setUser(user)
-        navigate(`/users/${user.id}`);
+        //navigate(`/users/${user.id}`);
         console.log("Signup successful");
       } else {
         console.log(error);

@@ -189,7 +189,7 @@ class Bookclub(Resource):
 api.add_resource(Bookclub, "/bookclub")
 
 
-class Users(Resource):
+class UsersById(Resource):
     def get(self, id):
         user = User.query.filter(User.id == id).first()
         return make_response(user.to_dict(rules=('-_password_hash',)), 200)
@@ -201,12 +201,12 @@ class Users(Resource):
         
         db.session.delete(user)
         db.session.commit()
-        return make_response({"message": "Review successfully deleted"}, 200)
+        return make_response({"message": "User successfully deleted"}, 200)
     
-api.add_resource(Users, '/users/<int:id>') 
+api.add_resource(UsersById, '/users/<int:id>') 
 
 
-class Signup(Resource):
+class Users(Resource):
     def post(self):
         data = request.get_json()
         
@@ -221,19 +221,20 @@ class Signup(Resource):
 
         user = User.query.filter(User.username == username).first()
         if user:
-            session['user_id'] = user.id
             return make_response({"error": "Username Already Taken."}, 422)
 
-  
         new_user = User(username=username)
         new_user.password_hash = password  
 
         db.session.add(new_user)
         db.session.commit()
 
-        return make_response({'message': 'Signup successful', 'user': new_user.to_dict(rules=('-_password_hash',))}, 200)
+        session['user_id'] = new_user.id
+
+        return make_response(new_user.to_dict(rules=('-_password_hash',)), 201)
+
     
-api.add_resource(Signup, '/signup')
+api.add_resource(Users, '/users')
 
 
 

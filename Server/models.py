@@ -49,17 +49,6 @@ class User(db.Model, SerializerMixin):
             raise ValueError("Password hash cannot be empty")
         return password_hash
     
-    @hybrid_property
-    def accolade_object(self):
-        if isinstance(self.accolade, str):
-            return {}  
-        return self.accolade
-
-    @hybrid_property
-    def goal_object(self):
-        if isinstance(self.goal, str):
-            return {} 
-        return self.goal
     
 
 # One to Many

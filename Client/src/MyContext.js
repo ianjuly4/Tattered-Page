@@ -13,7 +13,7 @@ function MyContextProvider({ children }) {
   const [bookclubs, setBookclubs] = useState([]);
 
   
-
+  {/*Create/Post BookShelf */}
   const createBookclub = (name, description) => {
     setLoading(true);
     setError(null);  
@@ -44,6 +44,7 @@ function MyContextProvider({ children }) {
       });
   };
 
+  {/*Create/Post BookShelf */}
   const createBookshelf = (name, description, genre) => {
     setLoading(true);
     setError(null);
@@ -74,6 +75,7 @@ function MyContextProvider({ children }) {
       });
   };
 
+  {/*Patch/Update Bookshelve */}
   const updateBookshelf = (shelf, bookId) => {
     if (!bookId || !shelf.id) {
       setError("Invalid shelf or book ID");
@@ -109,6 +111,7 @@ function MyContextProvider({ children }) {
       });
   };
 
+  {/* Delete/Delete Book function */}
   const deleteBook = (bookId) => {
     setLoading(true);
     setError(null);
@@ -242,7 +245,7 @@ function MyContextProvider({ children }) {
 
   
   {/*Login Post Function */}
-  const login = (username, password) => {
+  const login = async(username, password) => {
     setLoading(true);
     setError(null);
   
@@ -278,11 +281,11 @@ function MyContextProvider({ children }) {
   
   
   {/*Signup Post Function */}
-  const signup = (username, password) => {
+  const signup = async(username, password) => {
     setLoading(true);
     setError(null);
 
-    fetch("/signup", {
+    fetch("/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -291,16 +294,18 @@ function MyContextProvider({ children }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.id) {
-          console.log(data)
+        //console.log('Server response:', data); 
+        if (data) {
+          console.log(data); 
           setIsLoggedIn(true);
-          setUser(data);
+          setUser(data); 
           return true;
         } else {
           setError(data.error || "Signup failed");
-          return false
+          return false;
         }
       })
+      
       .catch((error) => {
         setError(error || "An error occurred. Please try again later.");
       })
