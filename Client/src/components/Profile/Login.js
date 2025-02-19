@@ -7,7 +7,7 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Header from "../Header";
 
 function Login() {
-  const { login, user, books } = useContext(MyContext);
+  const { login, user, books, error, setError } = useContext(MyContext);
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,31 +30,26 @@ function Login() {
       if (success) {
         console.log("Login successful");
       } else {
-        setErrorMessage("Invalid username or password.");
+        setError("Invalid username or password.");
       }
     },
   });
 
   useEffect(() => {
+    
     if (user) {
       //console.log("User logged in:", user);
       if (from && from !== "/dashboard") {
         navigate(from);  
       } else if (user.id) {
-        if (user.bookclubs && user.bookclubs.length > 0) {
-          navigate(`/users/${user.id}/bookclubs`);
-        } else if (user.bookshelves && user.bookshelves.length > 0) {
-          navigate(`/users/${user.id}/bookshelves`);
-        } else if (books.length>0){
-          navigate("/dashboard") 
-        }else {
-          navigate("/account");
-        }
-      } else {
         navigate("/dashboard");
       }
     }
   }, [user, from, navigate]);
+
+  useEffect(() => {
+    setError(null); 
+  }, [location]);
 
   return (
     <div>
@@ -112,16 +107,13 @@ function Login() {
                 )}
               </div>
 
-              {/* Error Message (if login fails) */}
-              {errorMessage && (
-                <div className="text-red-500 text-sm mt-2">{errorMessage}</div>
-              )}
-
               {/* Submit Button */}
               <div className="form-control mt-6">
                 <button type="submit" className="btn btn-primary">
                   Login
                 </button>
+                   {/* Error Message (if login fails) */}
+                {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
               </div>
             </form>
           </div>

@@ -2,19 +2,24 @@ import React, { useContext, useEffect } from "react";
 import Header from "../Header.js";
 import { MyContext } from "../../MyContext.js";
 import { useNavigate } from "react-router-dom";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import bookNook from "../../assets/bookNook.jpg"
 
 function Account() {
-    const { user, loading, error } = useContext(MyContext);
+    const { user, loading, error, setError } = useContext(MyContext);
     const { bookclubs, bookshelves } = user || {};
     const navigate = useNavigate();
+    const location = useLocation()
 
     useEffect(() => {
         if (!user) {
-            navigate("/login", { state: { from: "/account" } });
+            navigate('/login')
         }
     });
+
+    useEffect(() => {
+        setError(null); 
+    }, [location]);
 
     const backgroundStyle = {
         backgroundImage: `url(${bookNook})`,

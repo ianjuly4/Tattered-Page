@@ -2,8 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { MyContext } from "./MyContext"; 
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { useNavigate } from "react-router-dom";
-import { NavLink } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 
 function Navbar() {
   const { fetchBooks,  
@@ -14,9 +13,10 @@ function Navbar() {
     handleLogout,
     logout, 
     user } = useContext(MyContext);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [dropdownOpen, setDropdownOpen] = useState(false); 
+    
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false); 
 
   const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ function Navbar() {
         setIsAuthenticated(false);
       }
       setIsLoading(false);
-    }, [user, isLoggedIn]);
+  }, [user, isLoggedIn]);
 
   const formSchema = yup.object().shape({
     searchTerm: yup.string().required("Must enter a search term").max(100),
@@ -46,10 +46,12 @@ function Navbar() {
     },
   });
 
- 
   const handleDropdownToggle = () => {
-    //console.log("navbar is dropped down")
     setDropdownOpen(!dropdownOpen);
+  };
+
+  const handleDropdownClose = () => {
+    setDropdownOpen(false);
   };
 
   return (
@@ -61,11 +63,14 @@ function Navbar() {
       </div>
       <div className="flex-none gap-2">
         <ul className="flex space-x-5">
-          <NavLink to ={'/bookclubs'}>
+          <NavLink to={'/bookclubs'}>
             <li>Bookclubs</li>
           </NavLink>
           <NavLink to={"/bookshelves"}>
             <li>Bookshelves</li>
+          </NavLink>
+          <NavLink to={"/books"}>
+            <li>Search Results</li>
           </NavLink>
         </ul>
 
@@ -104,7 +109,6 @@ function Navbar() {
 
         {/* Display error or loading */}
         {loading && <div>Loading...</div>}
-        {/*{booksError && <div className="text-white text-xs">{booksError}</div>}*/}
       </div>
 
       {/* Avatar and Dropdown */}
@@ -125,8 +129,7 @@ function Navbar() {
             ) : (
               <div className="avatar placeholder">
                 <div className="bg-secondary text-neutral-content w-53 rounded-full">
-                  {/* If there's no avatar, display initials */}
-                  <span>{user?.username ? user.username: "UN"}</span>
+                  <span>{user?.username ? user.username : "UN"}</span>
                 </div>
               </div>
             )}
@@ -138,27 +141,61 @@ function Navbar() {
           <ul
             tabIndex={0}
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
-            style={{ display: dropdownOpen ? "block" : "none" }} 
           >
-            <li>
-              <NavLink to={"/account"}>Profile</NavLink>
-            </li>
-            
+            {user?.id && (
+              <li>
+                <NavLink 
+                  to={`/users/${user.id}`}
+                  onClick={handleDropdownClose} 
+                  className={({ isActive }) => 
+                    isActive ? ' text-white ' : ''
+                  }
+                >
+                  Profile
+                </NavLink>
+              </li>
+            )}
+
             {/* Conditionally render Login/Logout */}
             {isLoggedIn ? (
               <li>
-                <a onClick={logout}>Logout</a>
+                <a 
+                  onClick={() => {
+                    logout();
+                    handleDropdownClose(); 
+                  }}
+                >
+                  Logout
+                </a>
               </li>
             ) : (
-              <li>
-                <NavLink to={"/login"}>Login</NavLink>
-              </li>
+              <>
+                <li>
+                  <NavLink 
+                    to={"/login"} 
+                    onClick={handleDropdownClose} 
+                    className={({ isActive }) => 
+                      isActive ? ' text-white ' : ''
+                    }
+                  >
+                    Login
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink 
+                    to={"/users"} 
+                    onClick={handleDropdownClose} 
+                    className={({ isActive }) => 
+                      isActive ? ' text-white ' : ''
+                    }
+                  >
+                    Signup
+                  </NavLink>
+                </li>
+              </>
             )}
-            <li>
-              <NavLink to={"/signup"}>Signup</NavLink>
-            </li>
           </ul>
-          )}
+        )}
       </div>
     </div>
   );

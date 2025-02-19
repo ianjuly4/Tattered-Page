@@ -1,20 +1,20 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Header from "../Header";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { MyContext } from "../../MyContext";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation} from "react-router-dom";
 
 function Signup() {
-  const { signup, setError } = useContext(MyContext);
+  const { signup, setError, error, user } = useContext(MyContext);
 
-  const navigate= useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation()
 
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
     password: yup.string().required("Must enter a password").max(25),
   });
-
 
   const formik = useFormik({
     initialValues: {
@@ -22,17 +22,20 @@ function Signup() {
       password: "",
     },
     validationSchema: formSchema,
-      onSubmit: async (values) => {
-        const success = await signup(values.username, values.password);
-        if (success) {
-          navigate('/account')
-          console.log("Login successful");
-        } else {
-          setError("Invalid username or password.");
-        }
-      },
+    onSubmit: async (values) => {
+      const success = await signup(values.username, values.password);
+      if (success) {
+        navigate(`/users/${user.id}`);
+        console.log("Signup successful");
+      } else {
+        setError("Invalid username or password.");
+      }
+    },
   });
-
+  useEffect(() => {
+    setError(null); 
+  }, [location]);
+  
   return (
     <div>
       <div className="sticky top-0 z-10">
@@ -52,6 +55,7 @@ function Signup() {
           </div>
           <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
             <form className="card-body" onSubmit={formik.handleSubmit}>
+
               {/* Username Field */}
               <div className="form-control">
                 <label className="label">
@@ -95,14 +99,15 @@ function Signup() {
                 <button type="submit" className="btn btn-primary">
                   Create Account
                 </button>
-
+                {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
               </div>
             </form>
           </div>
         </div>
       </div>
-    {/* Footer */}
-    <footer className="bg-white py-6 border-t-4 text-black">
+
+      {/* Footer */}
+      <footer className="bg-white py-6 border-t-4 text-black">
         <div className="container mx-auto text-center">
           <p>&copy; 2025 The Tattered Page. All rights reserved. Made with ❤️ for book lovers</p>
         </div>

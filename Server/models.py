@@ -125,6 +125,12 @@ class Book(db.Model, SerializerMixin):
         if not cover_image:
             raise ValueError("Cover image URL cannot be empty")
         return cover_image
+    
+    @validates('synopsis')
+    def validate_cover_image(self, key, synopsis):
+        if not synopsis:
+            raise ValueError("Synopsis cannot be empty")
+        return synopsis
 
 
 # BookClub-Book (many-to-many relationship between book and bookclub through the 'bookclub_books' table)

@@ -13,6 +13,7 @@ function UserBookshelves() {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  console.log(bookshelves)
   const formSchema = yup.object().shape({
     name: yup.string().required("Must Enter A Bookshelf Name.").max(25),
     description: yup.string().required("Must Enter A Bookshelf Description").max(1000),
@@ -44,7 +45,7 @@ function UserBookshelves() {
   }
 
   const handleDeleteBook = (bookId) => {
-    deleteBook(bookId); // Delete book without redirecting
+    deleteBook(bookId); 
   };
 
   const backgroundStyle = {
@@ -65,7 +66,9 @@ function UserBookshelves() {
 
   return (
     <div>
-      <Header />
+      <div>
+        <Header />
+      </div>
       {/* Background */}
       <div style={backgroundStyle}></div>
 
@@ -104,8 +107,9 @@ function UserBookshelves() {
                         <div>No books available for this bookshelf.</div>
                       )}
                     </div>
-
+                      <NavLink to={`/users/${user.id}/bookshelves/${shelf.id}`}>
                     <button className="btn btn-primary btn-sm mt-4">View Shelf</button>
+                    </NavLink>
                   </div>
                 ))
               ) : (

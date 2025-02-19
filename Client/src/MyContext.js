@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 
-
 const API_KEY = "AIzaSyBf_grAHTnhr09zZ0oZI_NQ8AlSyBeXS_s";
 const MyContext = createContext();
 
@@ -8,20 +7,14 @@ function MyContextProvider({ children }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [signUpError, setSignUpError] = useState(null)
-  const [loginError, setLoginError] = useState(null);
+  const [bookError, setBookError] = useState(null)  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null)
-  const [createClubError, setCreateClubError] = useState(null);
-  const [createBookError, setCreateBookError] = useState(null)
-  const [bookclubs, setBookclubs] = useState([])
-  const [createShelfError, setCreateShelfError] = useState(null)
-
-
+  const [user, setUser] = useState(null);
+  const [bookclubs, setBookclubs] = useState([]);
 
   const createBookclub = (name, description) => {
-    setCreateClubError(null);
     setLoading(true);
+    setError(null);  
 
     fetch("/bookclub", {
       method: "POST",
@@ -35,25 +28,24 @@ function MyContextProvider({ children }) {
         if (data.id) {
           setUser((prevUser) => ({
             ...prevUser,
-            bookshelves: [...prevUser.bookclubs, data], 
+            bookshelves: [...prevUser.bookclubs, data],
           }));
         } else {
-          setCreateClubError("Failed to create bookclub");
+          setError("Failed to create bookclub");
         }
       })
       .catch((error) => {
-        setCreateClubError("An error occurred. Please try again later.");
+        setError("An error occurred. Please try again later.");
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
-  
-  
-  {/* CreateBookshelf/Post Function */}
   const createBookshelf = (name, description, genre) => {
-    setLoading(true); 
+    setLoading(true);
+    setError(null);
+
     fetch("/bookshelves", {
       method: "POST",
       headers: {
@@ -66,29 +58,30 @@ function MyContextProvider({ children }) {
         if (data.id) {
           setUser((prevUser) => ({
             ...prevUser,
-            bookshelves: [...prevUser.bookshelves, data], 
+            bookshelves: [...prevUser.bookshelves, data],
           }));
         } else {
-          setCreateShelfError("Failed to create bookshelf");
+          setError("Failed to create bookshelf");
         }
       })
       .catch((error) => {
-        setCreateShelfError("An error occurred. Please try again later.");
+        setError("An error occurred. Please try again later.");
       })
       .finally(() => {
-        setLoading(false); 
+        setLoading(false);
       });
   };
 
-  {/*Update Bookshelf/Path bookshelf function */}
   const updateBookshelf = (shelf, bookId) => {
     if (!bookId || !shelf.id) {
-      console.error("Invalid shelf or book ID");
+      setError("Invalid shelf or book ID");
       return;
     }
-  
+
     setLoading(true);
-    return fetch(`/bookshelves/${shelf.id}`, {
+    setError(null);
+
+    fetch(`/bookshelves/${shelf.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -101,23 +94,23 @@ function MyContextProvider({ children }) {
           ...prevUser,
           bookshelves: prevUser.bookshelves.map((existingShelf) =>
             existingShelf.id === shelf.id
-              ? { ...existingShelf, books: [...existingShelf.books, { id: bookId }] } 
+              ? { ...existingShelf, books: [...existingShelf.books, { id: bookId }] }
               : existingShelf
           ),
         }));
-        setCreateBookError(null);
       })
       .catch((error) => {
-        setCreateBookError(error.message);
-        console.error("Error adding book to bookshelf:", error);
+        setError("Error adding book to bookshelf: " + error.message);
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
-  {/*Delete Book/Delete function */}
   const deleteBook = (bookId) => {
+    setLoading(true);
+    setError(null);
+
     fetch(`/books/${bookId}`, {
       method: "DELETE",
       headers: {
@@ -135,30 +128,33 @@ function MyContextProvider({ children }) {
         setError("Book deleted successfully!");
       })
       .catch((error) => {
-        console.error("Error deleting book:", error);
         setError("Error deleting book. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
-  
-  
-  {/*Creating A Book/Post a book function */}
+
   const createBook = (title, authors, description, coverImageUrl, publishedDate) => {
     if (!title || !authors || !description || !coverImageUrl || !publishedDate) {
-      console.error("Missing required fields for book creation");
+      setError("Missing required fields for book creation");
       return;
     }
-  
-    console.log({
-      title,
-      author: authors.join(", "),
-      synopsis: description,
-      cover_image: coverImageUrl,
-      progress: 0,
-      published_date: publishedDate || null,
-    });
-  
+
+    const isValidDate = (dateString) => {
+      const date = new Date(dateString);
+      return !isNaN(date.getTime());
+    };
+
+    if (!isValidDate(publishedDate)) {
+      setError("Invalid date format for publishedDate. Using null.");
+      publishedDate = null;
+    }
+
     setLoading(true);
-    return fetch("/books", {
+    setError(null);
+
+    fetch("/books", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -169,7 +165,7 @@ function MyContextProvider({ children }) {
         synopsis: description,
         cover_image: coverImageUrl,
         progress: 0,
-        published_date: publishedDate || null,
+        published_date: publishedDate,
       }),
     })
       .then((response) => response.json())
@@ -177,29 +173,25 @@ function MyContextProvider({ children }) {
         if (data.id) {
           setUser((prevUser) => ({
             ...prevUser,
-            books: Array.isArray(prevUser.books) ? [...prevUser.books, data] : [data], 
+            books: Array.isArray(prevUser.books) ? [...prevUser.books, data] : [data],
           }));
           return data;
         } else {
-          throw new Error("Failed to create book. Please try again.");
+          setError("Failed to create book. Please try again.");
         }
       })
       .catch((error) => {
-        setCreateBookError(error.message);
-        console.error("Error creating book:", error);
-        throw error;
+        setError("Error creating book: " + error.message);
       })
       .finally(() => {
         setLoading(false);
       });
   };
-  
-  
-  {/*FetchBooks/Get Function */}
+
   const fetchBooks = (searchQuery, filterType) => {
     setLoading(true);
     setError(null);
-    
+
     let url = `https://www.googleapis.com/books/v1/volumes?q=`;
 
     if (filterType === "title") url += `intitle:${searchQuery}`;
@@ -213,10 +205,11 @@ function MyContextProvider({ children }) {
       .then((data) => {
         setLoading(false);
         if (data.items && data.items.length > 0) {
-          setBooks(data.items); 
+          setBooks(data.items);
+          sessionStorage.setItem("books", JSON.stringify(data.items));
         } else {
           setError("No books found.");
-          setBooks([])
+          setBooks([]);
         }
       })
       .catch((error) => {
@@ -225,11 +218,10 @@ function MyContextProvider({ children }) {
       });
   };
 
-  {/*Login/Post Function */}
   const login = async (username, password) => {
-    setLoginError(null);
     setLoading(true);
-  
+    setError(null);
+
     try {
       const response = await fetch("/login", {
         method: "POST",
@@ -237,33 +229,30 @@ function MyContextProvider({ children }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
-        credentials: 'include'
+        credentials: "include",
       });
-  
+
       const data = await response.json();
-  
+
       if (data.user) {
         setIsLoggedIn(true);
         setUser(data.user);
-        console.log(`${data.user.username} logged in`);
-        return true;  
+        return true;
       } else {
-        setLoginError(data.error || "Login failed");
-        return false; 
+        setError(data.error || "Login failed");
+        return false;
       }
     } catch (error) {
-      console.error("Login Error:", error);
-      setLoginError("An error occurred. Please try again later.");
-      return false;  
+      setError("An error occurred. Please try again later.");
+      return false;
     } finally {
-      setLoading(false);  
+      setLoading(false);
     }
   };
-  
-  {/*Signup/Post Function */}
-  const signup=(username,password)=>{
-    setSignUpError(null);
+
+  const signup = (username, password) => {
     setLoading(true);
+    setError(null);
 
     fetch("/signup", {
       method: "POST",
@@ -274,26 +263,21 @@ function MyContextProvider({ children }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.id) {  
+        if (data.id) {
           setIsLoggedIn(true);
-          setUser(data);  
-          console.log("User created");
-          console.log(data)
+          setUser(data);
         } else {
-          setSignUpError(data.message || "Signup failed");  
+          setError(data.message || "Signup failed");
         }
       })
-      
       .catch((error) => {
-        console.error("Login Error:", error);
-        setLoginError("An error occurred. Please try again later.");
+        setError("An error occurred. Please try again later.");
       })
       .finally(() => {
         setLoading(false);
       });
   };
- 
-  {/* Logout/Delete Function*/}
+
   const logout = () => {
     fetch("/logout", {
       method: "DELETE",
@@ -302,61 +286,63 @@ function MyContextProvider({ children }) {
       },
     })
       .then(() => {
-        //console.log("logout")
         setUser(null);
-        setIsLoggedIn(false)
+        setIsLoggedIn(false);
       })
       .catch((error) => {
-        console.error("Logout Error:", error);
+        setError("Logout Error: " + error.message);
       });
   };
 
-  {/*Useffect/CheckSession Function */}
   useEffect(() => {
-    fetch("/check_session", {
-      method: 'GET',
-      credentials: 'include', 
-    })
-    .then((response) => {
-      //console.log(response);
-      if (!response.ok) {
-        throw new Error('Session not valid');  
-      }
-      return response.json();  
-    })
-    .then((userData) => {
-      //console.log(userData.id); 
-      setUser(userData);
-      setIsLoggedIn(true)
-    })
-    .catch((error) => {
-      console.error("Error checking session:", error);
-      setUser(null);
-      setIsLoggedIn(false)  
-    });
+    const storedBooks = sessionStorage.getItem("books");
+    if (storedBooks) {
+      setBooks(JSON.parse(storedBooks));
+    } else {
+      fetch("/check_session", {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Session not valid");
+          }
+          return response.json();
+        })
+        .then((userData) => {
+          setUser(userData);
+          setIsLoggedIn(true);
+          fetchBooks(userData.username);
+        })
+        .catch((error) => {
+          setUser(null);
+          setIsLoggedIn(false);
+          setBooks([]);
+          setError("Error checking session: " + error.message);
+        });
+    }
   }, []);
 
-
-
   return (
-    <MyContext.Provider value={{
-      books,
-      loading,
-      error,
-      loginError, 
-      isLoggedIn,
-      fetchBooks,
-      login,
-      user,
-      signup,
-      logout,
-      createBookclub,
-      createBookshelf,
-      createBook,
-      createBookError,
-      updateBookshelf,
-      deleteBook
-    }}>
+    <MyContext.Provider
+      value={{
+        books,
+        loading,
+        error,
+        setError,
+        isLoggedIn,
+        fetchBooks,
+        login,
+        user,
+        signup,
+        logout,
+        createBookclub,
+        createBookshelf,
+        createBook,
+        updateBookshelf,
+        deleteBook,
+      }}
+    >
       {children}
     </MyContext.Provider>
   );

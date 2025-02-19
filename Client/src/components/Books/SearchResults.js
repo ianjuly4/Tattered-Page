@@ -2,18 +2,23 @@ import React, { useContext, useEffect, useState } from "react";
 import { MyContext } from "../../MyContext";
 import Header from "../Header";
 import BookCard from "./BookCard";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 function SearchResults() {
-  const { books, loading, error } = useContext(MyContext);
+  const { books, loading, error, setError, bookError } = useContext(MyContext);
   const [isLoading, setIsLoading] = useState(true);
 
-  console.log(books)
+  const location = useLocation()
+
   useEffect(() => {
     if (!loading && books) {
       setIsLoading(false);
     }
-  }, [loading, books]);
+  }, [loading, books, location]);
+
+  useEffect(() => {
+    setError(null); 
+  }, [location]);
 
 
   if (isLoading) {

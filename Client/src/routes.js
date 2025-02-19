@@ -50,13 +50,13 @@ const routes = [
     element: <BookshelfDetails/>
   },
   {
-    path: "/account",
+    path: "/users/:userId",
     element: <Account />,
-  },
+  }, 
   {
-    path: "/signup",
+    path: "/users",
     element: <Signup />,
-  },
+  }, 
   {
     path: "/login",
     element: <Login />,

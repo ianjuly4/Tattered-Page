@@ -26,10 +26,9 @@ module.exports = {
           "primary": "#9075d8", 
           "neutral": "#cea2d7", 
         },
-      },
-      "light", "dark", "aqua", "pastel", "sunset", "night", "valentine", 
+      }, 
     ],  
-    darkTheme: "night", 
+
     base: true, 
     styled: true,
     utils: true, 

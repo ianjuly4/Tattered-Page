@@ -17,6 +17,7 @@ function UserBookDetails() {
     if (!book) {
       return <div>Book not found</div>;
     }
+    
     const { title, author, synopsis, cover_image, published_date } = book;
   
     return (
