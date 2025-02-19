@@ -1,34 +1,51 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Header from "../Header";
 import { MyContext } from "../../MyContext";
 import defaultbookimage from "../../assets/defaultbookimage.jpg";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useParams, useLocation } from "react-router-dom";
 import BookshelvesCard from "../Bookshelves/BookshelvesCard";
 
 function BookDetails() {
   const { bookId } = useParams();
-  const { books, user, isLoggedIn, createBook } = useContext(MyContext);
+  const { books, user, isLoggedIn, createBook, error, setError } = useContext(MyContext);
   const { bookshelves } = user || {};
+
+  const location = useLocation()
+
+  
+   useEffect(() => {
+      setError(null); 
+    }, [location]);
+
   const book = books.find((book) => book.id === bookId);
 
-  const { volumeInfo } = book;
-  const { title, authors, description, imageLinks, categories, pageCount, publishedDate } = volumeInfo;
+
+  if (!book) {
+    return <div>Loading...</div>; 
+  }
+
+  const { volumeInfo,  } = book || {};
+  const { title, authors, description, imageLinks, categories, pageCount, publishedDate } = volumeInfo || {};
 
   const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
 
+
+  const isBookInLibrary = user ? user.books.some((book) => book.id === bookId) : false;
+
   const handleAddtoLibrary = () => {
-    createBook(title, authors, description, coverImageUrl, publishedDate)
-  }
+    const key = bookId
+    createBook(title, authors, description, coverImageUrl, publishedDate, key);
+  };
+ 
 
   return (
     <div>
-      <div className=" top-0 z-10">
+      <div className="top-0 z-10">
         <Header />
       </div>
 
       <div className="p-4">
         <div className="card bg-secondary shadow-xl p-6 rounded-lg">
-
           <h2 className="text-3xl font-bold text-center mb-4">{title}</h2>
 
           <figure className="flex justify-center mb-6">
@@ -40,30 +57,30 @@ function BookDetails() {
           </figure>
 
           <div className="text-center mb-4">
-              <div 
-                className="max-h-48 overflow-y-auto px-4 mx-auto" 
-                style={{
-                  maxHeight: '12rem', 
-                  minHeight: '6rem', 
-                  maxWidth: '600px', 
-                  width: '100%', 
-                }}
-              >
-                <p className="text-sm">{description || "No description available."}</p>
-              </div>
+            <div
+              className="max-h-48 overflow-y-auto px-4 mx-auto"
+              style={{
+                maxHeight: "12rem",
+                minHeight: "6rem",
+                maxWidth: "800px",
+                width: "100%",
+              }}
+            >
+              <p className="text-sm">{description || "No description available."}</p>
             </div>
+          </div>
 
           {authors && authors.length > 0 && (
             <p className="text-center mb-4 text-lg">By {authors.join(", ")}</p>
           )}
 
-          {categories && (
+          {/*{categories && (
             <p className="text-center mb-4 text-lg">Categories: {categories.join(", ")}</p>
-          )}
+          )}*/}
 
-          {pageCount && (
+          {/*{pageCount && (
             <p className="text-center mb-4 text-lg">Page Count: {pageCount}</p>
-          )}
+          )}*/}
 
           {publishedDate && (
             <p className="text-center mb-4 text-lg">Published Date: {publishedDate}</p>
@@ -76,23 +93,34 @@ function BookDetails() {
                 <NavLink to={`/users/${user.id}/bookshelves`}>
                   <button className="btn btn-primary btn-sm">Go To Your Bookshelves</button>
                 </NavLink>
-                  <button onClick={handleAddtoLibrary} className="btn btn-primary btn-sm">Add to Your library</button>
-                
+                {isBookInLibrary ? (
+                <button 
+                  className="btn btn-primary btn-sm bg-blue-500 text-white cursor-not-allowed border-2 border-blue-700 opacity-80"
+                  disabled
+                >
+                  Currently in Library
+                </button>
+              ) : (
+                <button 
+                  onClick={handleAddtoLibrary} 
+                  className="btn btn-primary btn-sm"
+                >
+                  Add to Your Library
+                </button>
+              )}
               </div>
             </div>
           )}
-
+          {error && <div className="text-white text-right text-sm mb-4">{error}</div>}
           <div className="mt-6 p-4 border border-black rounded-lg shadow-lg">
             {isLoggedIn ? (
               <>
                 <div className="flex overflow-x-auto space-x-4">
                   {bookshelves && bookshelves.length > 0 ? (
                     bookshelves.map((shelf) => (
-                      
-                        <div className="w-60 p-4 flex-none">
-                          <BookshelvesCard key={shelf.id} shelf={shelf} book={book} />
-                        </div>
-                      
+                      <div className="w-60 p-4 flex-none" key={shelf.id}>
+                        <BookshelvesCard shelf={shelf} book={book} />
+                      </div>
                     ))
                   ) : (
                     <div className="col-span-3 text-center">

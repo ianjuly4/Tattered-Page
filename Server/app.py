@@ -136,9 +136,10 @@ class Books(Resource):
         cover_image = data.get("cover_image")
         progress = data.get("progress", 0)  
         published_date = data.get("published_date")
+        key = data.get("key")
 
 
-        if not title or not author or not synopsis or not cover_image:
+        if not title or not author or not synopsis or not cover_image or key:
             return make_response({"message": "All book fields are required."}, 400)
         
         new_book = Book(
@@ -149,6 +150,7 @@ class Books(Resource):
             progress=progress,
             published_date=published_date,
             user_id=user_id,
+            key=key
         )
 
         db.session.add(new_book)
@@ -189,10 +191,17 @@ api.add_resource(Bookclub, "/bookclub")
 
 class Users(Resource):
     def get(self, id):
-        
-        
         user = User.query.filter(User.id == id).first()
         return make_response(user.to_dict(rules=('-_password_hash',)), 200)
+    
+    def delete(self, id):
+        user = User.query.filter(User.id == id).first()
+        if not user:
+            return make_response({"message": "User not found"}, 404)
+        
+        db.session.delete(user)
+        db.session.commit()
+        return make_response({"message": "Review successfully deleted"}, 200)
     
 api.add_resource(Users, '/users/<int:id>') 
 
@@ -200,6 +209,7 @@ api.add_resource(Users, '/users/<int:id>')
 class Signup(Resource):
     def post(self):
         data = request.get_json()
+        
         if not data:
             return make_response({"message": "Invalid data. No data provided."}, 400)
 
@@ -207,33 +217,41 @@ class Signup(Resource):
         password = data.get('password')
 
         if not username or not password:
-            return make_response({"message": "Username and password are required."}, 422)
+            return make_response({"error": "Username And Password Are Required."}, 422)
 
-      
         user = User.query.filter(User.username == username).first()
         if user:
-            return make_response({"message": "Username already taken."}, 422)
+            session['user_id'] = user.id
+            return make_response({"error": "Username Already Taken."}, 422)
 
-      
+  
         new_user = User(username=username)
-        new_user.password_hash = password 
+        new_user.password_hash = password  
 
         db.session.add(new_user)
         db.session.commit()
 
-        return make_response(new_user.to_dict(), 201)
+        return make_response({'message': 'Signup successful', 'user': new_user.to_dict(rules=('-_password_hash',))}, 200)
     
-api.add_resource(Signup, "/signup")
+api.add_resource(Signup, '/signup')
+
+
 
 class CheckSession(Resource):
     def get(self):
-  
-        user = User.query.filter(User.id == session.get('user_id')).first()
+        print(f"Session contents: {session}")
+        user_id = session.get('user_id')
+        if not user_id:
+            return make_response({"message": "No user currently logged in"}, 401)
+
+        user = User.query.filter(User.id == user_id).first()
+
         if user:
             return make_response(user.to_dict(rules=('-_password_hash',)), 200)
-        return make_response({"message": "No user currently logged in"}, 401)
-
-api.add_resource(CheckSession, '/check_session')
+        else:
+            return make_response({"message": "User not found"}, 404)
+        
+api.add_resource(CheckSession, "/check_session")
 
 
 class Login(Resource):
@@ -246,24 +264,23 @@ class Login(Resource):
 
         user = User.query.filter(User.username == username).first()
         
-        if user:
-            print(f"User found: {user.username}")
-            if user.authenticate(password):
-                session['user_id'] = user.id
-                print("/login",session)
-                return make_response({'message': 'Login successful', 'user': user.to_dict()}, 200)
-            else:
-                print(f"Password mismatch for user {username}")
-        else:
+        if not user:
             print(f"User not found: {username}")
-        
-        return make_response({'error': 'Invalid username or password'}, 401)
+            return make_response({'error': 'Username Not Found'}, 401)
+        else:
+            print(f"User found: {user.username}")
+
+        if user.authenticate(password):
+            session['user_id'] = user.id
+            print("/login",session)
+            return make_response({'message': 'Login successful', 'user': user.to_dict(rules=('-_password_hash',))}, 200)
+        else:
+            print(f"Password mismatch for user {username}")
     
 api.add_resource(Login, '/login')   
 
 class Logout(Resource):
     def delete(self):
-        print("/logout", session)
         session['user_id'] = None
         return make_response({'message': 'Logged out successfully'}, 200)
 

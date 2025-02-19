@@ -1,8 +1,8 @@
-"""create all tables
+"""create tables
 
-Revision ID: 711d5b6b490d
-Revises: 0e758ce5ef9b
-Create Date: 2025-02-17 20:44:52.067773
+Revision ID: ffd4d658ebb2
+Revises: 
+Create Date: 2025-02-19 02:38:06.152012
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '711d5b6b490d'
-down_revision = '0e758ce5ef9b'
+revision = 'ffd4d658ebb2'
+down_revision = None
 branch_labels = None
 depends_on = None
 
@@ -31,8 +31,8 @@ def upgrade():
     sa.Column('username', sa.String(), nullable=False),
     sa.Column('_password_hash', sa.String(), nullable=False),
     sa.Column('avatar', sa.String(), nullable=True),
-    sa.Column('accolade', sa.String(), nullable=True),
-    sa.Column('goal', sa.String(), nullable=True),
+    sa.Column('accolades', sa.JSON(), nullable=True),
+    sa.Column('goals', sa.JSON(), nullable=True),
     sa.Column('streak', sa.String(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
@@ -55,6 +55,9 @@ def upgrade():
     sa.Column('synopsis', sa.String(), nullable=False),
     sa.Column('cover_image', sa.String(), nullable=False),
     sa.Column('progress', sa.Integer(), nullable=True),
+    sa.Column('google_key', sa.String(), nullable=False),
+    sa.Column('review', sa.Integer(), nullable=True),
+    sa.Column('comment', sa.String(), nullable=True),
     sa.Column('published_date', sa.Date(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('last_read_at', sa.DateTime(), nullable=True),

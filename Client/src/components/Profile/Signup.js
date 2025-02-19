@@ -6,10 +6,10 @@ import { MyContext } from "../../MyContext";
 import { NavLink, useNavigate, useLocation} from "react-router-dom";
 
 function Signup() {
-  const { signup, setError, error, user } = useContext(MyContext);
+  const { signup, setError, error, user, setUser, isLoggedIn } = useContext(MyContext);
 
   const navigate = useNavigate();
-  const location = useLocation()
+  const location = useLocation()  
 
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
@@ -25,16 +25,26 @@ function Signup() {
     onSubmit: async (values) => {
       const success = await signup(values.username, values.password);
       if (success) {
+        console.log(user);
+        //setUser(user)
         navigate(`/users/${user.id}`);
         console.log("Signup successful");
       } else {
-        setError("Invalid username or password.");
+        console.log(error);
+        //setError("Invalid username or password.");
       }
     },
   });
+ 
   useEffect(() => {
     setError(null); 
   }, [location]);
+
+  useEffect(()=>{
+      if (user && isLoggedIn){
+        navigate(`/users/${user.id}`)
+      }
+    })
   
   return (
     <div>

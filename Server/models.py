@@ -13,8 +13,8 @@ class User(db.Model, SerializerMixin):
     username = db.Column(db.String, nullable=False, unique=True)
     _password_hash = db.Column(db.String, nullable=False)
     avatar = db.Column(db.String, nullable=True)
-    accolade = db.Column(db.String, nullable=True)
-    goal = db.Column(db.String, nullable=True)
+    accolades = db.Column(db.JSON, nullable=True)
+    goals = db.Column(db.JSON, nullable=True)
     streak = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
@@ -48,6 +48,19 @@ class User(db.Model, SerializerMixin):
         if not password_hash:
             raise ValueError("Password hash cannot be empty")
         return password_hash
+    
+    @hybrid_property
+    def accolade_object(self):
+        if isinstance(self.accolade, str):
+            return {}  
+        return self.accolade
+
+    @hybrid_property
+    def goal_object(self):
+        if isinstance(self.goal, str):
+            return {} 
+        return self.goal
+    
 
 # One to Many
 class BookShelf(db.Model, SerializerMixin):
@@ -98,6 +111,9 @@ class Book(db.Model, SerializerMixin):
     synopsis = db.Column(db.String, nullable=False)
     cover_image = db.Column(db.String, nullable=False)
     progress = db.Column(db.Integer, nullable=True)
+    google_key=db.Column(db.String, nullable=False)
+    review=db.Column(db.Integer, nullable=True)
+    comment=db.Column(db.String, nullable=True)
     published_date=db.Column(db.Date, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False) 
     last_read_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)

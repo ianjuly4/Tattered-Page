@@ -6,7 +6,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import bookNook from "../../assets/bookNook.jpg"
 
 function Account() {
-    const { user, loading, error, setError } = useContext(MyContext);
+    const { user, loading, error, setError, deleteAccount } = useContext(MyContext);
     const { bookclubs, bookshelves } = user || {};
     const navigate = useNavigate();
     const location = useLocation()
@@ -37,7 +37,9 @@ function Account() {
         zIndex: -1,
       };
     
-      
+    const handleDeleteAccount = () => {
+        deleteAccount(user.id)
+    }
 
     return (
         <div>
@@ -146,6 +148,7 @@ function Account() {
                         {/* Member Since */}
                         <h1 className="text-xl font-bold">Member since: {new Date(user?.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</h1>
                     </div>
+                    <button onClick={handleDeleteAccount} className="btn btn-primary btn-sm">Delete Account</button>
                 </div>
             </div>
         {/* Footer */}

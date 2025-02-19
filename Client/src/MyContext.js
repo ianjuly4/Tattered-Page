@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
+
 
 const API_KEY = "AIzaSyBf_grAHTnhr09zZ0oZI_NQ8AlSyBeXS_s";
 const MyContext = createContext();
@@ -7,10 +8,11 @@ function MyContextProvider({ children }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [bookError, setBookError] = useState(null)  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [bookclubs, setBookclubs] = useState([]);
+
+  
 
   const createBookclub = (name, description) => {
     setLoading(true);
@@ -135,11 +137,13 @@ function MyContextProvider({ children }) {
       });
   };
 
-  const createBook = (title, authors, description, coverImageUrl, publishedDate) => {
-    if (!title || !authors || !description || !coverImageUrl || !publishedDate) {
+  {/* Create Post Book */}
+  const createBook = (title, authors, description, coverImageUrl, publishedDate, key) => {
+    if (!title || !authors || !description || !coverImageUrl || !publishedDate || !key) {
       setError("Missing required fields for book creation");
       return;
     }
+    //console.log(title, authors, description, coverImageUrl, publishedDate, bookId)
 
     const isValidDate = (dateString) => {
       const date = new Date(dateString);
@@ -166,6 +170,7 @@ function MyContextProvider({ children }) {
         cover_image: coverImageUrl,
         progress: 0,
         published_date: publishedDate,
+        key: key
       }),
     })
       .then((response) => response.json())
@@ -218,38 +223,61 @@ function MyContextProvider({ children }) {
       });
   };
 
-  const login = async (username, password) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-        credentials: "include",
+  {/*Delete Account */}
+  const deleteAccount = (userId) => {
+    fetch(`/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(() => {
+        setUser(null);
+        setIsLoggedIn(false);
+      })
+      .catch((error) => {
+        setError("Delete Account Error: " + error.message);
       });
-
-      const data = await response.json();
-
-      if (data.user) {
-        setIsLoggedIn(true);
-        setUser(data.user);
-        return true;
-      } else {
-        setError(data.error || "Login failed");
-        return false;
-      }
-    } catch (error) {
-      setError("An error occurred. Please try again later.");
-      return false;
-    } finally {
-      setLoading(false);
-    }
   };
 
+  
+  {/*Login Post Function */}
+  const login = (username, password) => {
+    setLoading(true);
+    setError(null);
+  
+    return fetch("/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.user && data.user.id) {
+          setUser(data.user);  
+          console.log("Login successful", data.user);
+          setIsLoggedIn(true);
+          return true;
+        } else {
+          setError(data.error || "An error occurred. Please try again.");
+          return false;
+        }
+      })
+      .catch((error) => {
+        setError(error.message || "An error occurred. Please try again later.");
+        return false;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  
+  
+  
+  
+  {/*Signup Post Function */}
   const signup = (username, password) => {
     setLoading(true);
     setError(null);
@@ -264,20 +292,24 @@ function MyContextProvider({ children }) {
       .then((response) => response.json())
       .then((data) => {
         if (data.id) {
+          console.log(data)
           setIsLoggedIn(true);
           setUser(data);
+          return true;
         } else {
-          setError(data.message || "Signup failed");
+          setError(data.error || "Signup failed");
+          return false
         }
       })
       .catch((error) => {
-        setError("An error occurred. Please try again later.");
+        setError(error || "An error occurred. Please try again later.");
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
+  {/* Logout Delete Function */}
   const logout = () => {
     fetch("/logout", {
       method: "DELETE",
@@ -294,33 +326,34 @@ function MyContextProvider({ children }) {
       });
   };
 
+  {/* Check Session Get Function */}
   useEffect(() => {
     const storedBooks = sessionStorage.getItem("books");
     if (storedBooks) {
       setBooks(JSON.parse(storedBooks));
-    } else {
-      fetch("/check_session", {
-        method: "GET",
-        credentials: "include",
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Session not valid");
-          }
-          return response.json();
-        })
-        .then((userData) => {
-          setUser(userData);
-          setIsLoggedIn(true);
-          fetchBooks(userData.username);
-        })
-        .catch((error) => {
-          setUser(null);
-          setIsLoggedIn(false);
-          setBooks([]);
-          setError("Error checking session: " + error.message);
-        });
     }
+    fetch("/check_session", {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Session not valid");
+        }
+        return response.json();
+      })
+      .then((userData) => {
+        console.log(userData)
+        setUser(userData);
+        setIsLoggedIn(true);
+        
+      })
+      .catch((error) => {
+        setUser(null);
+        setIsLoggedIn(false);
+        setBooks([]);
+        console.log("Error checking session: " + error.message);
+      });
   }, []);
 
   return (
@@ -341,6 +374,7 @@ function MyContextProvider({ children }) {
         createBook,
         updateBookshelf,
         deleteBook,
+        deleteAccount
       }}
     >
       {children}

@@ -14,14 +14,26 @@ function BookShelves() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user && isLoggedIn) {
+    if (isLoggedIn) {
       setIsAuthenticated(true);
+      setIsLoading(false); 
       navigate(`/users/${user.id}/bookshelves`);
     } else {
       setIsAuthenticated(false);
+      setIsLoading(false); 
     }
-    setIsLoading(false);
-  }, [user, isLoggedIn]);
+  }, [user, isLoggedIn, navigate]);
+
+  if (isLoading) {
+    return (
+      <div>
+        <Header />
+        <div className="hero bg-secondary min-h-screen flex justify-center items-center">
+          <div>Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-secondary min-h-screen flex flex-col"> 

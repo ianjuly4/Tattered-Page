@@ -1,5 +1,5 @@
 // Login Component
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { MyContext } from "../../MyContext";
@@ -7,13 +7,12 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Header from "../Header";
 
 function Login() {
-  const { login, user, books, error, setError } = useContext(MyContext);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const { login, user, error, setError, isLoggedIn } = useContext(MyContext);
+  
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || "/dashboard";  
+ 
 
-  //console.log(from)
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
     password: yup.string().required("Must enter a password").max(25),
@@ -26,27 +25,30 @@ function Login() {
     },
     validationSchema: formSchema,
     onSubmit: async (values) => {
-      const success = await login(values.username, values.password);
-      if (success) {
-        console.log("Login successful");
-      } else {
-        setError("Invalid username or password.");
+      try {
+        const success = await login(values.username, values.password);
+        if (success) {
+          if (user && user.id) {
+            //navigate(`/users/${user.id}`);
+          } else {
+            //console.log("User data not available for navigation");
+          }
+          loginFormik.resetForm(); 
+        } else {
+          console.log("Login failed");
+        }
+      } catch (error) {
+        console.log("Error during login:", error.message);
       }
     },
   });
-
-  useEffect(() => {
-    
-    if (user) {
-      //console.log("User logged in:", user);
-      if (from && from !== "/dashboard") {
-        navigate(from);  
-      } else if (user.id) {
-        navigate("/dashboard");
-      }
+  
+  useEffect(()=>{
+    if (user && isLoggedIn){
+      navigate(`/users/${user.id}`)
     }
-  }, [user, from, navigate]);
-
+  })
+  
   useEffect(() => {
     setError(null); 
   }, [location]);
@@ -62,7 +64,7 @@ function Login() {
           <div className="text-center lg:text-left">
             <h1 className="text-5xl font-bold">Login now!</h1>
             <p className="py-6">Please login to utilize all of the features of the Tattered Page.</p>
-            <NavLink to={"/signup"}>
+            <NavLink to={"/users"}>
               <p>Don't have an account? Click here to create one.</p>
             </NavLink>
           </div>

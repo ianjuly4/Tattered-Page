@@ -5,14 +5,7 @@ import * as yup from "yup";
 import { useNavigate, NavLink } from "react-router-dom";
 
 function Navbar() {
-  const { fetchBooks,  
-    loading, 
-    error: booksError, 
-    loginError, 
-    isLoggedIn,
-    handleLogout,
-    logout, 
-    user } = useContext(MyContext);
+  const { fetchBooks, loading, isLoggedIn, logout, user } = useContext(MyContext);
     
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);

@@ -13,7 +13,6 @@ function UserBookshelves() {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  console.log(bookshelves)
   const formSchema = yup.object().shape({
     name: yup.string().required("Must Enter A Bookshelf Name.").max(25),
     description: yup.string().required("Must Enter A Bookshelf Description").max(1000),
@@ -117,35 +116,41 @@ function UserBookshelves() {
               )}
             </div>
 
-            {/* All Books Added */}
-            <h2 className="text-5xl mt-12 font-semibold text-left mb-6">All Books You've Added</h2>
-            <div className="py-8 p-8 container bg-secondary rounded-lg">
-              <div className="max-h-96 overflow-y-auto px-4 rounded-lg shadow-md">
-                {/* Grid for Books */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {books.length > 0 ? (
-                    books.map((book) => (
-                      <div key={book.id} className="p-4">
-                        {/* Book card wrapped with NavLink */}
-                        <NavLink to={`/users/${user.id}/books/${book.id}`} className="card bg-gray-200 rounded-lg shadow-lg w-full">
-                          <UserBookCard book={book} />
-                        </NavLink>
-                        
-                        <button
-                          onClick={() => handleDeleteBook(book.id)}
-                          type="button"
-                          className="btn w-full mt-2"
-                        >
-                          Delete Book
-                        </button>
+           {/* All Books Added */}
+              <h2 className="text-5xl mt-12 font-semibold text-left mb-6">All Books You've Added</h2>
+              <div className="py-8 p-8 container ">
+                <div className="max-h-96 overflow-y-auto px-4 ">
+                  {/* Check if there are books, otherwise show a placeholder */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {books.length > 0 ? (
+                      books.map((book) => (
+                        <div key={book.id} className="p-4">
+                          {/* Book card wrapped with NavLink */}
+                          <NavLink to={`/users/${user.id}/books/${book.id}`} className="card bg-gray-200 rounded-lg shadow-lg w-full">
+                            <UserBookCard book={book} />
+                          </NavLink>
+                          
+                          <button
+                            onClick={() => handleDeleteBook(book.id)}
+                            type="button"
+                            className="btn w-full mt-2"
+                          >
+                            Delete Book
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="col-span-4 p-8">
+                        <p className="text-xl font-semibold text-left mb-4">
+                          No books have been added yet. Please add some books to your bookshelves!
+                        </p>
                       </div>
-                    ))
-                  ) : (
-                    <div>No books have been added yet. Please add some books to your bookshelves!</div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+
+
 
             {/* Create Bookshelf Form */}
             <h2 className="text-3xl justify-center flex items-center font-bold mt-24 text-left">Create A Bookshelf</h2>
