@@ -141,12 +141,12 @@ function MyContextProvider({ children }) {
   };
 
   {/* Create Post Book */}
-  const createBook = (title, authors, description, coverImageUrl, publishedDate, key) => {
-    if (!title || !authors || !description || !coverImageUrl || !publishedDate || !key) {
+  const createBook = (title, authors, description, coverImageUrl, publishedDate, bookId) => {
+    if (!title || !authors || !description || !coverImageUrl || !publishedDate || !bookId) {
       setError("Missing required fields for book creation");
       return;
     }
-    //console.log(title, authors, description, coverImageUrl, publishedDate, bookId)
+    console.log(title, authors, description, coverImageUrl, publishedDate, bookId)
 
     const isValidDate = (dateString) => {
       const date = new Date(dateString);
@@ -173,7 +173,7 @@ function MyContextProvider({ children }) {
         cover_image: coverImageUrl,
         progress: 0,
         published_date: publishedDate,
-        key: key
+        google_key: bookId
       }),
     })
       .then((response) => response.json())

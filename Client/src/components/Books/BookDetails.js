@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import Header from "../Header";
 import { MyContext } from "../../MyContext";
 import defaultbookimage from "../../assets/defaultbookimage.jpg";
-import { NavLink, useParams, useLocation } from "react-router-dom";
+import { NavLink, useParams, useLocation, useNavigate } from "react-router-dom";
 import BookshelvesCard from "../Bookshelves/BookshelvesCard";
 
 function BookDetails() {
@@ -11,30 +11,41 @@ function BookDetails() {
   const { bookshelves } = user || {};
 
   const location = useLocation()
-
-  
-   useEffect(() => {
-      setError(null); 
-    }, [location]);
+  const navigate = useNavigate()
 
   const book = books.find((book) => book.id === bookId);
 
+  console.log(book)
+  useEffect(() => {
+    setError(null); 
+  }, [location]);
+
+  useEffect(() => {
+    if (user && user.books && bookId) {
+      
+      const userBook = user.books.find((book) => book.google_key === bookId);
+      
+      if (userBook) {
+        console.log('Book is in the library:', bookId);
+        navigate(`/users/${user.id}/books/${userBook.id}`);
+      }
+    }
+  }, [user, bookId, navigate]);
+  
+  
 
   if (!book) {
     return <div>Loading...</div>; 
   }
 
-  const { volumeInfo,  } = book || {};
+  const { volumeInfo } = book || {};
   const { title, authors, description, imageLinks, categories, pageCount, publishedDate } = volumeInfo || {};
 
   const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
 
-
-  const isBookInLibrary = user ? user.books.some((book) => book.id === bookId) : false;
-
+ 
   const handleAddtoLibrary = () => {
-    const key = bookId
-    createBook(title, authors, description, coverImageUrl, publishedDate, key);
+    createBook(title, authors, description, coverImageUrl, publishedDate, bookId);
   };
  
 
@@ -93,24 +104,15 @@ function BookDetails() {
                 <NavLink to={`/users/${user.id}/bookshelves`}>
                   <button className="btn btn-primary btn-sm">Go To Your Bookshelves</button>
                 </NavLink>
-                {isBookInLibrary ? (
-                <button 
-                  className="btn btn-primary btn-sm bg-blue-500 text-white cursor-not-allowed border-2 border-blue-700 opacity-80"
-                  disabled
-                >
-                  Currently in Library
-                </button>
-              ) : (
                 <button 
                   onClick={handleAddtoLibrary} 
                   className="btn btn-primary btn-sm"
                 >
                   Add to Your Library
                 </button>
-              )}
               </div>
             </div>
-          )}
+            )}
           {error && <div className="text-white text-right text-sm mb-4">{error}</div>}
           <div className="mt-6 p-4 border border-black rounded-lg shadow-lg">
             {isLoggedIn ? (

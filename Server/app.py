@@ -127,6 +127,7 @@ class Books(Resource):
         data = request.get_json()
 
         user_id = session.get('user_id')
+        print(user_id)
         if not user_id:
             return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
 
@@ -136,10 +137,11 @@ class Books(Resource):
         cover_image = data.get("cover_image")
         progress = data.get("progress", 0)  
         published_date = data.get("published_date")
-        key = data.get("key")
+        google_key = data.get("google_key")
+        
+        ##print(title, author, synopsis, cover_image, progress, published_date, google_key)
 
-
-        if not title or not author or not synopsis or not cover_image or key:
+        if not title or not author or not synopsis or not cover_image or not google_key:
             return make_response({"message": "All book fields are required."}, 400)
         
         new_book = Book(
@@ -150,7 +152,7 @@ class Books(Resource):
             progress=progress,
             published_date=published_date,
             user_id=user_id,
-            key=key
+            google_key=google_key
         )
 
         db.session.add(new_book)

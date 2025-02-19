@@ -7,12 +7,13 @@ import { NavLink, useParams } from "react-router-dom";
 import BookshelvesCard from "../Bookshelves/BookshelvesCard";
 
 function UserBookDetails() {
-    const { bookId } = useParams();
-    const { user, isLoggedIn, createBook } = useContext(MyContext);
-    const { bookshelves, books } = user;
+  const { bookId } = useParams();
+  const { user, isLoggedIn, createBook } = useContext(MyContext);
+  const { bookshelves, books } = user;
   
-    const book = books.find((book) => book.id === Number(bookId)); 
-  
+  const book = books.find((book) => book.id === Number(bookId)); 
+
+  console.log(book)
    
     if (!book) {
       return <div>Book not found</div>;
