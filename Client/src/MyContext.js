@@ -78,38 +78,43 @@ function MyContextProvider({ children }) {
   {/*Patch/Update Bookshelve */}
   const updateBookshelf = (shelf, bookId) => {
     if (!bookId || !shelf.id) {
-      setError("Invalid shelf or book ID");
-      return;
+        setError("Invalid shelf or book ID");
+        return;
     }
 
     setLoading(true);
     setError(null);
 
+    // Send the book_id to add it to the bookshelf
     fetch(`/bookshelves/${shelf.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ book_id: bookId }),
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ book_id: bookId }),
     })
-      .then((response) => response.json())
-      .then((shelfData) => {
-        setUser((prevUser) => ({
-          ...prevUser,
-          bookshelves: prevUser.bookshelves.map((existingShelf) =>
-            existingShelf.id === shelf.id
-              ? { ...existingShelf, books: [...existingShelf.books, { id: bookId }] }
-              : existingShelf
-          ),
-        }));
-      })
-      .catch((error) => {
-        setError("Error adding book to bookshelf: " + error.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+        .then((response) => response.json())
+        .then((shelfData) => {
+            // Ensure the bookshelf data comes back as expected
+            if (shelfData.books) {
+                setUser((prevUser) => ({
+                    ...prevUser,
+                    bookshelves: prevUser.bookshelves.map((existingShelf) =>
+                        existingShelf.id === shelf.id
+                            ? { ...existingShelf, books: [...existingShelf.books, { id: bookId }] }
+                            : existingShelf
+                    ),
+                }));
+            }
+        })
+        .catch((error) => {
+            setError("Error adding book to bookshelf: " + error.message);
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+};
+
 
   {/* Delete/Delete Book function */}
   const deleteBook = (bookId) => {
@@ -185,7 +190,7 @@ function MyContextProvider({ children }) {
           }));
           return data;
         } else {
-          setError("Failed to create book. Please try again.");
+          setError(error || "Failed to create book. Please try again.");
         }
       })
       .catch((error) => {

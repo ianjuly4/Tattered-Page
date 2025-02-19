@@ -22,11 +22,9 @@ function BookDetails() {
 
   useEffect(() => {
     if (user && user.books && bookId) {
-      
       const userBook = user.books.find((book) => book.google_key === bookId);
-      
       if (userBook) {
-        console.log('Book is in the library:', bookId);
+        //console.log('Book is in the library:', bookId);
         navigate(`/users/${user.id}/books/${userBook.id}`);
       }
     }

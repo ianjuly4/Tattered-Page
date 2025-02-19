@@ -14,9 +14,9 @@ function UserBookshelves() {
   const navigate = useNavigate();
 
   const formSchema = yup.object().shape({
-    name: yup.string().required("Must Enter A Bookshelf Name.").max(25),
+    name: yup.string().required("Must Enter A Bookshelf Name.").max(50),
     description: yup.string().required("Must Enter A Bookshelf Description").max(1000),
-    genre: yup.string().required("Must Enter A Bookshelf Genre").max(25),
+    genre: yup.string().required("Must Enter A Bookshelf Genre").max(50),
   });
 
   const formik = useFormik({
@@ -28,6 +28,7 @@ function UserBookshelves() {
     },
   });
 
+  
   useEffect(() => {
     if (!user && !isLoggedIn) {
       navigate("/bookshelves");
@@ -47,6 +48,7 @@ function UserBookshelves() {
     deleteBook(bookId); 
   };
 
+  
   const backgroundStyle = {
     backgroundImage: `url(${library})`,
     backgroundSize: "150%",
@@ -129,7 +131,6 @@ function UserBookshelves() {
                           <NavLink to={`/users/${user.id}/books/${book.id}`} className="card bg-gray-200 rounded-lg shadow-lg w-full">
                             <UserBookCard book={book} />
                           </NavLink>
-                          
                           <button
                             onClick={() => handleDeleteBook(book.id)}
                             type="button"
@@ -149,8 +150,6 @@ function UserBookshelves() {
                   </div>
                 </div>
               </div>
-
-
 
             {/* Create Bookshelf Form */}
             <h2 className="text-3xl justify-center flex items-center font-bold mt-24 text-left">Create A Bookshelf</h2>

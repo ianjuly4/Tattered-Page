@@ -7,7 +7,13 @@ from datetime import datetime
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
-    serialize_rules = ("-bookshelves.user", "-bookclubs.users", '-books.users', "-bookclubs.books")
+    serialize_rules = (
+        "-bookshelves.user", 
+        "-bookclubs.users", 
+        "-books.users", 
+        "-bookclubs.books", 
+        "-books.bookshelves"
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False, unique=True)
@@ -55,7 +61,7 @@ class User(db.Model, SerializerMixin):
 class BookShelf(db.Model, SerializerMixin):
     __tablename__ = "bookshelves"
 
-    serialize_rules = ('-user.bookshelves', '-books.bookshelves')
+    serialize_rules = ('-user.bookshelves', '-books.bookshelves', "-books.bookshelves")
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -92,7 +98,15 @@ bookshelf_books = db.Table('bookshelf_books',
 class Book(db.Model, SerializerMixin):
     __tablename__ = "books"
 
-    serialize_rules = ('-bookshelves.books', '-bookclubs.books', '-user.books', '-user.bookshelves', '-user.bookclubs')
+    serialize_rules = (
+        '-bookshelves.books', 
+        '-bookclubs.books', 
+        '-user.books', 
+        '-user.bookshelves', 
+        '-user.bookclubs'
+    )
+
+    
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
@@ -147,7 +161,7 @@ bookclub_books = db.Table('bookclub_books',
 class Bookclub(db.Model, SerializerMixin):
     __tablename__= "bookclubs"
 
-    serialize_rules = ("-chatlogs.bookclub", "-users.bookclubs")  
+    serialize_rules = ("-chatlogs.bookclub", "-users.bookclubs", "-books.bookclubs")    
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)

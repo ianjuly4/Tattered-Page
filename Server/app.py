@@ -82,6 +82,12 @@ class Bookshelves(Resource):
 api.add_resource(Bookshelves, "/bookshelves")
 
 class BookshelvesById(Resource):
+    def get(self, id):
+        shelf = BookShelf.query.filter(BookShelf.id == id).first()
+        if shelf:
+            return make_response(shelf.to_dict(), 200)
+        return make_response({"message": "Bookshelf not found"}, 404)
+
     def patch(self, id):
         data = request.get_json()
 
@@ -91,10 +97,10 @@ class BookshelvesById(Resource):
         book = Book.query.filter(Book.id == book_id).first()
 
         if not bookshelf or not book:
-            return make_response({"message": "Bookshelf or Book not found."}, 404)
+            return make_response({"error": "Bookshelf or Book not found."}, 404)
 
         if book in bookshelf.books:
-            return make_response({"message": "This book is already in the bookshelf."}, 400)
+            return make_response({"error": "This book is already in the bookshelf."}, 400)
         
         bookshelf.books.append(book)
         db.session.commit()
@@ -129,7 +135,7 @@ class Books(Resource):
         user_id = session.get('user_id')
         print(user_id)
         if not user_id:
-            return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
+            return make_response({"error": "Unauthorized, Please Login to Continue"}, 401)
 
         title = data.get("title")
         author = data.get("author")
@@ -142,7 +148,7 @@ class Books(Resource):
         ##print(title, author, synopsis, cover_image, progress, published_date, google_key)
 
         if not title or not author or not synopsis or not cover_image or not google_key:
-            return make_response({"message": "All book fields are required."}, 400)
+            return make_response({"error": "All book fields are required."}, 400)
         
         new_book = Book(
             title=title,
@@ -209,6 +215,12 @@ api.add_resource(UsersById, '/users/<int:id>')
 
 
 class Users(Resource):
+    def get(self, id):
+        user = User.query.filter(User.id == id).first()
+        if user:
+            return make_response(user.to_dict(), 200)
+        return make_response({"message": "user not found"}, 404)
+    
     def post(self):
         data = request.get_json()
         
@@ -218,7 +230,7 @@ class Users(Resource):
         username = data.get('username')
         password = data.get('password')
 
-        if not username or not password:
+        if not username and not password:
             return make_response({"error": "Username And Password Are Required."}, 422)
 
         user = User.query.filter(User.username == username).first()
