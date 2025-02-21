@@ -106,8 +106,6 @@ class Book(db.Model, SerializerMixin):
         '-user.bookclubs'
     )
 
-    
-
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     author = db.Column(db.String, nullable=False)
@@ -146,7 +144,7 @@ class Book(db.Model, SerializerMixin):
         return cover_image
     
     @validates('synopsis')
-    def validate_cover_image(self, key, synopsis):
+    def validate_synopsis(self, key, synopsis):
         if not synopsis:
             raise ValueError("Synopsis cannot be empty")
         return synopsis

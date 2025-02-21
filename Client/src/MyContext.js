@@ -11,7 +11,53 @@ function MyContextProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
 
+  {/*Create/Post Chatlog function*/}
+  const createChatlog = (bookclubId) => {
+    setError(null); 
+    
+    fetch('/chatlogs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        bookclub_id: bookclubId,
+      }),
+    })
+      .then((response) => {
+      
+        if (!response.ok) {
+          return Promise.reject(new Error('Failed to create chatlog.'));
+        }
+        return response.json(); 
+      })
+      .then((data) => {
+      
+        console.log('Chatlog created successfully:', data);
+        
+        setUser((prevUser) => ({
+          ...prevUser,
+          bookclubs: prevUser.bookclubs.map((bookclub) => {
+            if (bookclub.id === bookclubId) {
+              return {
+                ...bookclub,
+                chatlogs: [...bookclub.chatlogs, data], 
+              };
+            }
+            return bookclub;
+          }),
+        }));
+      })
+      .catch((error) => {
+        
+        console.error('Error:', error);
+        setError(error.message); 
+      });
+  };
+  
+  
 
+  
   
   {/*Create/Post Bookclub */}
   const createBookclub = (name, description) => {
@@ -33,11 +79,11 @@ function MyContextProvider({ children }) {
             bookclubs: [...prevUser.bookclubs, data],
           }));
         } else {
-          setError(error ||"Failed to create bookclub");
+          setError(error.message ||"Failed to create bookclub");
         }
       })
       .catch((error) => {
-        setError(error || "An error occurred. Please try again later.");
+        setError(error.mesage || "An error occurred. Please try again later.");
       })
       .finally(() => {
         setLoading(false);
@@ -64,11 +110,11 @@ function MyContextProvider({ children }) {
             bookshelves: [...prevUser.bookshelves, data],
           }));
         } else {
-          setError(error || "Failed to create bookshelf");
+          setError(error.message || "Failed to create bookshelf");
         }
       })
       .catch((error) => {
-        setError(error || "An error occurred. Please try again later.");
+        setError(error.message || "An error occurred. Please try again later.");
       })
       .finally(() => {
         setLoading(false);
@@ -136,7 +182,7 @@ function MyContextProvider({ children }) {
         setError(error || "Book deleted successfully!");
       })
       .catch((error) => {
-        setError(error || "Error deleting book. Please try again.");
+        setError(error.message + "Error deleting book. Please try again.");
       })
       .finally(() => {
         setLoading(false);
@@ -205,11 +251,11 @@ function MyContextProvider({ children }) {
           }));
           return data;
         } else {
-          throw new Error("Failed to create book. Please try again.");
+          throw new Error(error.message + "Failed to create book. Please try again.");
         }
       })
       .catch((error) => {
-        setError(`Error creating book: ${error.message}`);
+        setError('Error creating book'+ error.message);
       })
       .finally(() => {
         setLoading(false);
@@ -277,8 +323,8 @@ function MyContextProvider({ children }) {
         console.log(`${attribute} updated successfully!`);
       })
       .catch((error) => {
-        console.error(`Error updating ${attribute}:`, error);
-        setError("An unexpected error occurred.");
+        console.error(`Error updating ${attribute}:`, error.message);
+        setError("An unexpected error occurred." + error.message);
       });
   };
   
@@ -304,7 +350,7 @@ function MyContextProvider({ children }) {
 
   
   {/*Login Post Function */}
-  const login = async(username, password) => {
+  const login = async (username, password) => {
     setLoading(true);
     setError(null);
   
@@ -318,17 +364,17 @@ function MyContextProvider({ children }) {
       .then((response) => response.json())
       .then((data) => {
         if (data.user && data.user.id) {
-          setUser(data.user);  
+          setUser(data.user);
           console.log("Login successful", data.user);
           setIsLoggedIn(true);
           return true;
         } else {
-          setError(error || "An error occurred. Please try again.");
+          setError("An error occurred. Please try again.");  
           return false;
         }
       })
       .catch((error) => {
-        setError(error || "An error occurred. Please try again later.");
+        setError(error.message || "An error occurred. Please try again later.");
         return false;
       })
       .finally(() => {
@@ -338,7 +384,7 @@ function MyContextProvider({ children }) {
   
   
   
-  
+
   {/*Signup Post Function */}
   const signup = async(username, password) => {
     setLoading(true);
@@ -360,13 +406,13 @@ function MyContextProvider({ children }) {
           setUser(data); 
           return true;
         } else {
-          setError(data.error || "Signup failed");
+          setError("Signup failed");
           return false;
         }
       })
       
       .catch((error) => {
-        setError(error || "An error occurred. Please try again later.");
+        setError(error.message + "An error occurred. Please try again later.");
       })
       .finally(() => {
         setLoading(false);
@@ -439,7 +485,8 @@ function MyContextProvider({ children }) {
         updateBookshelf,
         deleteBook,
         deleteAccount,
-        updateUserAttribute
+        updateUserAttribute,
+        createChatlog
       }}
     >
       {children}

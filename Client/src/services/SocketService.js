@@ -34,13 +34,14 @@ const connectSocket = () => {
   });
 };
 
-const sendMessage = (message) => {
+const sendMessage = (chatlogId, message) => {
   if (socket.connected) {
-    socket.emit('chat_message', { message });
+    socket.emit('chat_message', { chatlogId, message });
   } else {
     console.warn("Socket is not connected, message not sent.");
   }
 };
+
 
 const listenForMessages = (callback) => {
   const handleMessage = (data) => {
