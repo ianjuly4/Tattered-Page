@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { connectSocket, sendMessage, listenForMessages, disconnectSocket } from "../../services/SocketService"; // Fixed import
-import "../ChatComponent.css";
-import Header from "../Header";
+import { connectSocket, sendMessage, listenForMessages, disconnectSocket } from "../../services/SocketService"; // Updated import
+
 
 const BookclubChat = () => {
   const [message, setMessage] = useState("");
@@ -11,7 +10,7 @@ const BookclubChat = () => {
   useEffect(() => {
     connectSocket();  // Establish the connection to the backend
 
-    // Set up a listener for incoming messages
+    // Set up a listener for incoming messages and get the unsubscribe function
     const unsubscribe = listenForMessages((data) => {
       setChat((prevChat) => [...prevChat, data.message]); // Append new messages to the state
     });
@@ -19,7 +18,7 @@ const BookclubChat = () => {
     return () => {
       // Cleanup by disconnecting the socket when the component unmounts
       disconnectSocket();
-      unsubscribe(); // Remove the listener
+      unsubscribe(); // Call the unsubscribe function to remove the listener
     };
   }, []);
 
@@ -31,33 +30,35 @@ const BookclubChat = () => {
   };
 
   return (
-    <div>
-      <div className="sticky top-0 z-10">
-        <Header />
-      </div>
-      <div className="chat-container bg-primary">
-        <h1>Chat Room</h1>
-        
-        {/* Message box container */}
-        <div className="message-box">
-          <ul className="message-list">
-            {chat.map((msg, idx) => (
-              <li key={idx} className="message-item">{msg}</li>
-            ))}
-          </ul>
-        </div>
+    <div className="max-w-6xl w-full mx-auto p-6 border rounded-lg shadow-lg">
+      <h1 className="text-2xl text-center text-center font-semibold mb-6">Chat Room</h1>
 
-        {/* Input section */}
-        <div className="input-container">
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message"
-            className="message-input"
-          />
-          <button onClick={handleSendMessage} className="send-button">Send</button>
-        </div>
+      {/* Message box container */}
+      <div className="message-box  p-4 rounded-lg min-h-[400px] max-h-[600px] overflow-y-auto mb-6">
+        <ul className="message-list space-y-4">
+          {chat.map((msg, idx) => (
+            <li key={idx} className="message-item p-3 bg-accent text-white rounded-lg">
+              {msg}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Input section */}
+      <div className="input-container flex space-x-4">
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type a message"
+          className="w-full p-3 rounded-lg border border-secondary focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+        <button
+          onClick={handleSendMessage}
+          className="p-3 bg-primary text-white rounded-lg transition duration-200 hover:bg-accent"
+        >
+          Send
+        </button>
       </div>
     </div>
   );

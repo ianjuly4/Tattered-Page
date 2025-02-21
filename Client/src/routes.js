@@ -72,7 +72,7 @@ const routes = [
     element: <UsersBookclubs />,
   },
   {
-    path: "/users/:userId/bookclubs/:bookclubId",
+    path: "/users/:userId/bookclubs/:clubId",
     element: <BookclubDetails/>
   },
   {

@@ -1,35 +1,30 @@
+// services/SocketService.js
 import { io } from "socket.io-client";
 
-// Setup the socket connection
 const socket = io("http://localhost:5555", {
-  transports: ["websocket"],  // Ensures WebSocket is used (important for production)
+  transports: ["websocket"],
   cors: {
-    origin: "http://localhost:3000",  // Make sure this matches your React app URL in production
+    origin: "http://localhost:3000",  // Ensure this matches your React app URL
     methods: ["GET", "POST"]
   },
-  // Optionally pass user data if needed for syncing with logged-in user
   query: {
-    userId: localStorage.getItem("user_id") || "",  // Retrieve the user ID (replace with actual user ID source)
+    userId: localStorage.getItem("user_id") || "",  // User data (if needed)
   }
 });
 
-// Connect and emit a custom event
 const connectSocket = () => {
   socket.on('connect', () => {
     console.log("Connected to WebSocket server with ID:", socket.id);
   });
 
-  // Listen for errors
   socket.on('connect_error', (err) => {
     console.error("Connection failed:", err.message);
   });
 
   socket.on('disconnect', (reason) => {
-    console.log("Disconnected from WebSocket server, reason:", reason);
-    // Optionally, try to reconnect manually if required
+    console.log("Disconnected from WebSocket server:", reason);
   });
 
-  // Handle reconnection attempts
   socket.on('reconnect', (attemptNumber) => {
     console.log(`Reconnected to the server on attempt ${attemptNumber}`);
   });
@@ -39,7 +34,6 @@ const connectSocket = () => {
   });
 };
 
-// Send a chat message
 const sendMessage = (message) => {
   if (socket.connected) {
     socket.emit('chat_message', { message });
@@ -48,14 +42,20 @@ const sendMessage = (message) => {
   }
 };
 
-// Listen for chat messages
 const listenForMessages = (callback) => {
-  socket.on('chat_message', (data) => {
+  const handleMessage = (data) => {
     callback(data);
-  });
+  };
+
+  // Listen for messages from the server
+  socket.on('chat_message', handleMessage);
+
+  // Return an unsubscribe function
+  return () => {
+    socket.off('chat_message', handleMessage);  // Remove the event listener when called
+  };
 };
 
-// Disconnect the socket
 const disconnectSocket = () => {
   if (socket.connected) {
     socket.disconnect();

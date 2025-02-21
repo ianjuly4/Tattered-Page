@@ -41,7 +41,7 @@ function UserBookDetails() {
   }
 
   const book = books.find((book) => book.id === Number(bookId));
-  console.log(book)
+ 
 
   if (!book) {
     return <div>Book not found</div>;

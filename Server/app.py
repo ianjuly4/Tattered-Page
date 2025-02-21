@@ -10,7 +10,7 @@ from datetime import datetime
 @app.route('/<path:path>')
 def index(path=None):
     return send_from_directory(os.path.join(app.static_folder), 'index.html')
-""""
+
 # Handle socket connection
 @socketio.on('connect')
 def handle_connect():
@@ -34,7 +34,7 @@ def handle_disconnect():
 def handle_message(message):
     print(f"Received message: {message}")
     socketio.emit('message', {'data': message})  # Emit the message with a custom event
-"""
+
 
 
 class Bookshelves(Resource):
@@ -237,11 +237,12 @@ api.add_resource(UsersById, '/users/<int:id>')
 
 
 class Users(Resource):
-    def get(self, id):
-        user = User.query.filter(User.id == id).first()
-        if user:
-            return make_response(user.to_dict(), 200)
-        return make_response({"message": "user not found"}, 404)
+    def get(self):
+        user_dict_list = [user.to_dict() for user in User.query.all()]
+        if user_dict_list:
+            return user_dict_list, 200
+        else:
+            return {"error": "No Users Found"}, 404
     
     def post(self):
         data = request.get_json()

@@ -5,7 +5,7 @@ function UserBookCard({ book }) {
     const authors = typeof author === 'string' ? author.split(',').map(a => a.trim()) : [];
   
     return (
-      <div className="card bg-primary w-44 overflow-hidden rounded-lg shadow-lg p-2">
+      <div className="card bg-primary w-44 overflow-hidden rounded-lg shadow-lg p-1">
         <figure className="flex justify-center items-center p-0 m-0"> 
           <img
             src={cover_image}
@@ -14,7 +14,8 @@ function UserBookCard({ book }) {
           />
         </figure>
         <div className="card-body p-2"> 
-          <h2 className="book-title text-lg font-semibold mt-2"> 
+          <h2 className="book-title text-lg font-semibold mt-1"> 
+
             {title}
           </h2>
           <p className="text-sm mt-1"> 

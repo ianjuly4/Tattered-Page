@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 
 
 function BookclubCard({ club, user }) {
-    
+
     return (
         <div className="card bg-secondary w-32 shadow-md p-2">
             <div className="card-body p-2">
@@ -21,7 +21,6 @@ function BookclubCard({ club, user }) {
                         : "No description available."}
                 </p>
 
-                {/* Conditionally render button */}
                 <div className="card-actions mt-3">
                     <NavLink to={`/users/${user.id}/bookclubs/${club.id}`}>
                     <button className="btn btn-primary btn-xs w-full text-sm mt-2">View Club</button>
