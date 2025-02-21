@@ -3,6 +3,7 @@ import { MyContext } from "../../MyContext";
 import Header from "../Header";
 import BookCard from "./BookCard";
 import { NavLink, useLocation } from "react-router-dom";
+import Footer from "../Footer"
 
 function SearchResults() {
   const { books, loading, error, setError, bookError } = useContext(MyContext);
@@ -73,13 +74,7 @@ function SearchResults() {
 
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="fixed bottom-0 left-0 w-full bg-white py-6 border-t-4 text-black z-10">
-          <div className="container mx-auto text-center">
-            <p>&copy; 2025 The Tattered Page. All rights reserved. Made with ❤️ for book lovers</p>
-          </div>
-        </footer>
+      <Footer/>
     </div>
   );
 }

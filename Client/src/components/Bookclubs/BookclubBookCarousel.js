@@ -1,12 +1,12 @@
 import React from "react";
-
-import UserBookCard from "./UserBookCard";
+import UserBookCard from "../Books/UserBookCard";
+import { NavLink } from "react-router-dom";
 
 function BookclubBookCarousel({ user, bookclub }) {
     const { books } = bookclub || {}; 
 
     return (
-        <div className="py-8 p-8 container border">
+        <div className="py-8 p-8 container bg-primary border rounded-lg shadow-lg">
             <div className="max-h-60 overflow-y-auto px-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1">
                     {books && books.length > 0 ? (
@@ -17,9 +17,13 @@ function BookclubBookCarousel({ user, bookclub }) {
                         ))
                     ) : (
                         <div className="col-span-4 p-8">
+                            
                             <p className="text-xl font-semibold text-left mb-4">
-                                No books have been added yet. Please add some books to this Bookclub!
+                                No books have been added yet. Please add some books to this Bookclub! Click here to go to Bookshelves
                             </p>
+                            <NavLink to={`/users/:userId/bookshelves`}>
+                                <button className="justify-center btn-black bg-secondary border rounded"> Go to Bookshelves</button>
+                            </NavLink>
                         </div>
                     )}
                 </div>

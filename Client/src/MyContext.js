@@ -145,12 +145,13 @@ function MyContextProvider({ children }) {
 
   {/* Create Post Book */}
   const createBook = (title, authors, description, coverImageUrl, publishedDate, bookId) => {
+    // Check if all required fields are provided
     if (!title || !authors || !description || !coverImageUrl || !publishedDate || !bookId) {
       setError("Missing required fields for book creation");
       return;
     }
-    console.log(title, authors, description, coverImageUrl, publishedDate, bookId);
   
+    // Validate the published date format
     const isValidDate = (dateString) => {
       const date = new Date(dateString);
       return !isNaN(date.getTime());
@@ -158,49 +159,63 @@ function MyContextProvider({ children }) {
   
     if (!isValidDate(publishedDate)) {
       setError("Invalid date format for publishedDate. Using null.");
-      publishedDate = null; 
+      publishedDate = null;  // Use null if the date is invalid
     }
   
+    // Prepare the author string in case it's an array
+    const authorString = Array.isArray(authors) ? authors.join(", ") : authors;
+  
+    // Set loading state
     setLoading(true);
     setError(null);
   
-    
-    const authorString = Array.isArray(authors) ? authors.join(", ") : authors;
+    // Prepare the request body
+    const requestBody = {
+      title,
+      author: authorString,
+      synopsis: description,
+      cover_image: coverImageUrl,
+      progress: 0,
+      published_date: publishedDate,
+      google_key: bookId
+    };
   
+    // Send the POST request to create the book
     fetch("/books", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        title,
-        author: authorString,
-        synopsis: description,
-        cover_image: coverImageUrl,
-        progress: 0,
-        published_date: publishedDate,
-        google_key: bookId
-      }),
+      body: JSON.stringify(requestBody),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        // Check if the response is successful
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        return response.json();
+      })
       .then((data) => {
+        // Check if the returned data contains an ID
         if (data.id) {
+          // Update the user state with the new book
           setUser((prevUser) => ({
             ...prevUser,
             books: Array.isArray(prevUser.books) ? [...prevUser.books, data] : [data],
           }));
           return data;
         } else {
-          setError("Failed to create book. Please try again.");
+          throw new Error("Failed to create book. Please try again.");
         }
       })
       .catch((error) => {
-        setError("Error creating book: " + error.message);
+        setError(`Error creating book: ${error.message}`);
       })
       .finally(() => {
         setLoading(false);
       });
   };
+  
   
   {/*Fetch Books */}
   const fetchBooks = (searchQuery, filterType) => {
@@ -308,12 +323,12 @@ function MyContextProvider({ children }) {
           setIsLoggedIn(true);
           return true;
         } else {
-          setError(data.error || "An error occurred. Please try again.");
+          setError(error || "An error occurred. Please try again.");
           return false;
         }
       })
       .catch((error) => {
-        setError(error.message || "An error occurred. Please try again later.");
+        setError(error || "An error occurred. Please try again later.");
         return false;
       })
       .finally(() => {

@@ -3,6 +3,7 @@ import Header from "../Header";
 import { MyContext } from "../../MyContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import animecoffeeshop from "../../assets/animecoffeeshop.jpg";
+import Footer from "../Footer"
 
 function Bookclubs() {
   const { user, isLoggedIn } = useContext(MyContext);
@@ -79,15 +80,7 @@ function Bookclubs() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white py-6 border-t-4 text-black mt-auto">
-        <div className="container mx-auto text-center">
-          <p>
-            &copy; 2025 The Tattered Page. All rights reserved. | Made with ❤️ for
-            book lovers
-          </p>
-        </div>
-      </footer>
+    <Footer/>
     </div>
   );
 }

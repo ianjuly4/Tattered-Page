@@ -30,8 +30,8 @@ const BookclubChat = () => {
   };
 
   return (
-    <div className="max-w-6xl w-full mx-auto p-6 border rounded-lg shadow-lg">
-      <h1 className="text-2xl text-center text-center font-semibold mb-6">Chat Room</h1>
+    <div className="max-w-6xl w-full mx-auto  bg-primary p-6 border rounded-lg shadow-lg">
+      <h1 className="text-2xl text-center bg-font-semibold mb-6">Chat Room</h1>
 
       {/* Message box container */}
       <div className="message-box  p-4 rounded-lg min-h-[400px] max-h-[600px] overflow-y-auto mb-6">

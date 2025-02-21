@@ -5,6 +5,7 @@ import ChatBubble from "../assets/chatbubble.json";
 import Books from "../assets/books.json";
 import Bookanimation from "../assets/Bookanimation.json";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import Footer from "./Footer"
 
 const LandingPage = () => {
   const chatbubble = {
@@ -116,12 +117,8 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white py-6 border-t-4 text-black">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2025 The Tattered Page. All rights reserved. Made with ❤️ for book lovers</p>
-        </div>
-      </footer>
+    
+      <Footer/>
     </div>
   );
 };

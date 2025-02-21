@@ -4,6 +4,7 @@ import { MyContext } from "../../MyContext";
 import defaultbookimage from "../../assets/defaultbookimage.jpg";
 import { NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
 import BookshelvesCard from "../Bookshelves/BookshelvesCard";
+import Footer from "../Footer"
 
 function UserBookDetails() {
   const { bookId } = useParams();
@@ -124,11 +125,7 @@ function UserBookDetails() {
         </div>
       </div>
 
-      <footer className="bg-white py-6 border-t-4 text-black">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2025 The Tattered Page. All rights reserved. Made with ❤️ for book lovers</p>
-        </div>
-      </footer>
+     <Footer/>
     </div>
   );
 }

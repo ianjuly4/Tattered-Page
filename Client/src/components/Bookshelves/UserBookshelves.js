@@ -6,6 +6,7 @@ import library from "../../assets/library.jpg";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import UserBookCard from "../Books/UserBookCard";
+import Footer from "../Footer"
 
 function UserBookshelves() {
   const { user, isLoggedIn, createBookshelf, deleteBook } = useContext(MyContext);
@@ -200,12 +201,7 @@ function UserBookshelves() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white mt-20 py-6 border-t-4 text-black">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2025 The Tattered Page. All rights reserved. Made with ❤️ for book lovers</p>
-        </div>
-      </footer>
+     <Footer/>
     </div>
   );
 }

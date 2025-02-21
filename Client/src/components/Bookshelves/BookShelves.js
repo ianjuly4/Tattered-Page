@@ -3,6 +3,7 @@ import Header from "../Header";
 import library from "../../assets/library.jpg";
 import { MyContext } from "../../MyContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import Footer from "../Footer"
 
 function BookShelves() {
   const { user, isLoggedIn } = useContext(MyContext);
@@ -75,12 +76,7 @@ function BookShelves() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white py-6 border-t-4 text-black mt-auto">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2025 The Tattered Page. All rights reserved. Made with ❤️ for book lovers</p>
-        </div>
-      </footer>
+      <Footer/>
     </div>
   );
 }

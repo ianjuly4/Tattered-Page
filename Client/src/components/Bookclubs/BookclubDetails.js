@@ -2,10 +2,10 @@ import React, { useContext, useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { MyContext } from "../../MyContext";
 import Header from "../Header";
-import animecoffeeshop from "../../assets/animecoffeeshop.jpg";
-import BookclubBookCarousel from "../Books/BookclubBookCarousel";
+import BookclubBookCarousel from "./BookclubBookCarousel";
 import BookclubChat from "../Bookclubs/BookclubChat"; 
 import BookclubMembers from "./BookclubMembers";
+import Footer from "../Footer";
 
 function BookclubDetails() {
   const { user, isLoggedIn, setError } = useContext(MyContext);
@@ -45,26 +45,12 @@ function BookclubDetails() {
     return <div className="text-center py-10">Loading...</div>;
   }
 
-  const backgroundStyle = {
-    backgroundImage: `url(${animecoffeeshop})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    minHeight: "200vh",
-    filter: "blur(6px)",
-    opacity: 0.6,
-    backgroundRepeat: "no-repeat",
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: -1,
-  };
+  
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="bg-secondary">
       {/* Background Image */}
-      <div style={backgroundStyle}></div>
+     
 
       {/* Header */}
       <Header />
@@ -101,12 +87,7 @@ function BookclubDetails() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white py-6 border-t-4 text-black mt-auto">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2025 The Tattered Page. All rights reserved. Made with ❤️ for book lovers</p>
-        </div>
-      </footer>
+     <Footer/>
     </div>
   );
 }

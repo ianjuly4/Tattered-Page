@@ -24,7 +24,7 @@ const BookclubMembers = () => {
   }, [search, users]);
 
   return (
-    <div className="max-w-6xl w-full mx-auto p-6 border rounded-lg shadow-lg">
+    <div className="max-w-6xl w-full mx-auto bg-primary p-6 border rounded-lg shadow-lg">
       <h1 className="text-2xl text-center text-white font-semibold mb-6">Invite User</h1>
 
       {/* Search Input */}
