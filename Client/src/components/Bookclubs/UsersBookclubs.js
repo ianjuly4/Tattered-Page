@@ -1,3 +1,4 @@
+// UsersBookclubs.js
 import React, { useContext, useState, useEffect } from "react";
 import Header from "../Header";
 import { MyContext } from "../../MyContext";
@@ -5,15 +6,14 @@ import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import animecoffeeshop from "../../assets/animecoffeeshop.jpg";
-
+import BookclubCard from "./BookclubCard";  
 
 function UsersBookclubs() {
-  const { user, isLoggedIn, createbookclub } = useContext(MyContext);
+  const { user, isLoggedIn, createBookclub, error } = useContext(MyContext);
   const { bookclubs } = user || {};  
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
- 
   const formSchema = yup.object().shape({
     name: yup.string().required("Must Enter A BookClub Name.").max(50),
     description: yup.string().required("Must Enter A Bookclub Description ").max(1000),
@@ -26,54 +26,50 @@ function UsersBookclubs() {
     },
     validationSchema: formSchema,
     onSubmit: (values) => {
-      console.log(values.name, values.description);
-      createbookclub(values.name, values.description);
+      createBookclub(values.name, values.description);
     },
   });
 
   useEffect(() => {
-   
     if (!user && !isLoggedIn) {
       navigate("/bookclubs");
     } else if (user) {
-  
       navigate(`/users/${user.id}/bookclubs`);
     }
     setIsLoading(false);
   }, [user, isLoggedIn, navigate]);
 
- 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
- 
   if (!user) {
     return <div>You need to log in to view this page.</div>;
   }
+
   const backgroundStyle = {
-      backgroundImage: `url(${animecoffeeshop})`,
-      backgroundSize: "150%",  
-      backgroundPosition: "center",
-      minHeight: "100vh",
-      filter: "blur(6px)", 
-      opacity: 0.6,
-      backgroundRepeat: "no-repeat",
-      position: "absolute",  
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      zIndex: -1, 
-    };
+    backgroundImage: `url(${animecoffeeshop})`,
+    backgroundSize: "150%",
+    backgroundPosition: "center",
+    minHeight: "125vh",
+    filter: "blur(6px)",
+    opacity: 0.6,
+    backgroundRepeat: "no-repeat",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: -1,
+  };
 
   return (
     <div>
-      <div className=" top-0 z-10">
+      <div className="top-0 z-10">
         <Header />
       </div>
       <div style={backgroundStyle}></div>
-      <div className="hero  min-h-screen">
+      <div className="hero min-h-screen">
         <div className="hero-content flex-col lg:flex-row">
           <div className="text-center lg:text-left">
             <h1 className="text-5xl font-bold">{"Bookclub Dashboard"}</h1>
@@ -82,15 +78,11 @@ function UsersBookclubs() {
               <p className="mt-3">Here are your current book clubs:</p>
 
               {/* Bookclubs Carousel */}
-              <div className="border p-4 rounded-lg bg-white shadow-lg">
+              <div className="p-4 ">
                 <div className="flex overflow-x-auto space-x-4">
                   {bookclubs && bookclubs.length > 0 ? (
                     bookclubs.map((club, index) => (
-                      <div key={index} className="w-60 p-4 bg-white rounded-xl shadow-lg flex-none">
-                        <h2 className="text-xl font-semibold">{club.name}</h2>
-                        <p>{club.description}</p>
-                        <button className="btn btn-primary btn-sm mt-4">Join Club</button>
-                      </div>
+                      <BookclubCard key={index} club={club} user={user} />
                     ))
                   ) : (
                     <div className="col-span-3 text-center">
@@ -134,6 +126,7 @@ function UsersBookclubs() {
                 <button type="submit" className="btn btn-primary">
                   Create Bookclub
                 </button>
+                {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
               </div>
             </form>
           </div>

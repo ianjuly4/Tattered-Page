@@ -7,12 +7,13 @@ import BookShelves from "./components/Bookshelves/BookShelves";
 import Account from "./components/Profile/Account";
 import Login from "./components/Profile/Login";
 import Signup from "./components/Profile/Signup";
-
 import Bookclubs from "./components/Bookclubs/Bookclubs";
 import UsersBookclubs from "./components/Bookclubs/UsersBookclubs";
+import BookclubDetails from "./components/Bookclubs/BookclubDetails";
 import UserBookshelves from "./components/Bookshelves/UserBookshelves";
 import BookshelfDetails from "./components/Bookshelves/BookshelfDetail"
 import UserBookDetails from "./components/Books/UserBookDetails";
+
 
 
 const routes = [
@@ -69,6 +70,10 @@ const routes = [
   {
     path: "/users/:userId/bookclubs",  
     element: <UsersBookclubs />,
+  },
+  {
+    path: "/users/:userId/bookclubs/:bookclubId",
+    element: <BookclubDetails/>
   },
   {
     path: "*", 

@@ -10,15 +10,15 @@ function MyContextProvider({ children }) {
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [bookclubs, setBookclubs] = useState([]);
+
 
   
-  {/*Create/Post BookShelf */}
+  {/*Create/Post Bookclub */}
   const createBookclub = (name, description) => {
     setLoading(true);
     setError(null);  
 
-    fetch("/bookclub", {
+    fetch("/bookclubs", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,14 +30,14 @@ function MyContextProvider({ children }) {
         if (data.id) {
           setUser((prevUser) => ({
             ...prevUser,
-            bookshelves: [...prevUser.bookclubs, data],
+            bookclubs: [...prevUser.bookclubs, data],
           }));
         } else {
-          setError("Failed to create bookclub");
+          setError(error ||"Failed to create bookclub");
         }
       })
       .catch((error) => {
-        setError("An error occurred. Please try again later.");
+        setError(error || "An error occurred. Please try again later.");
       })
       .finally(() => {
         setLoading(false);
@@ -64,11 +64,11 @@ function MyContextProvider({ children }) {
             bookshelves: [...prevUser.bookshelves, data],
           }));
         } else {
-          setError("Failed to create bookshelf");
+          setError(error || "Failed to create bookshelf");
         }
       })
       .catch((error) => {
-        setError("An error occurred. Please try again later.");
+        setError(error || "An error occurred. Please try again later.");
       })
       .finally(() => {
         setLoading(false);
@@ -133,10 +133,10 @@ function MyContextProvider({ children }) {
           ...prevUser,
           books: prevUser.books.filter((book) => book.id !== bookId),
         }));
-        setError("Book deleted successfully!");
+        setError(error || "Book deleted successfully!");
       })
       .catch((error) => {
-        setError("Error deleting book. Please try again.");
+        setError(error || "Error deleting book. Please try again.");
       })
       .finally(() => {
         setLoading(false);

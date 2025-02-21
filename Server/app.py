@@ -2,7 +2,7 @@
 from flask import Flask, render_template, request, make_response, session, send_from_directory
 from flask_restful import Api, Resource
 from config import app, db, bcrypt, migrate, api, os, socketio
-from models import User, BookShelf, Bookclub, Book
+from models import User, BookShelf, Bookclub, Book, bookclub_users
 from datetime import datetime
 
 
@@ -169,32 +169,41 @@ class Books(Resource):
 api.add_resource(Books, "/books")
 
 
-class Bookclub(Resource):
+
+class Bookclubs(Resource):
+    
     def post(self):
         data = request.get_json()
         
-
         user_id = session.get('user_id')
-        if not user_id:
-            return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
         
-        name=data.get('name'),
-        description=data.get('description')
+        if not user_id:
+            return make_response({"error": "Unauthorized, Please Login to Continue"}, 401)
+        
+        name = data.get('name')
+        description = data.get('description')
 
-        if not name and not description:
-            return make_response({"message": "All bookclub fields are required"}, 400)
+        if not name or not description:
+            return make_response({"error": "All bookclub fields are required"}, 400)
 
         new_bookclub = Bookclub(
             name=name,
             description=description
         )
 
+        user = User.query.get(user_id)
+        
+        if not user:
+            return make_response({"error": "User not found"}, 404)
+
+        new_bookclub.users.append(user)
+
         db.session.add(new_bookclub)
         db.session.commit()
 
         return make_response(new_bookclub.to_dict(), 201)
-    
-api.add_resource(Bookclub, "/bookclub")
+
+api.add_resource(Bookclubs, "/bookclubs")
 
 
 class UsersById(Resource):
