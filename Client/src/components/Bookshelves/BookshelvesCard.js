@@ -4,8 +4,8 @@ import { MyContext } from "../../MyContext";
 
 function BookshelvesCard({ shelf, book, bookId }) {
     const { updateBookshelf } = useContext(MyContext);
-    
-    const getBookshelfCoverImage = (shelf) => {
+
+const getBookshelfCoverImage = (shelf) => {
         if (shelf.books && shelf.books.length > 0) {
             const firstBook = shelf.books[0];
             return firstBook.cover_image || defaultbookimage;
@@ -14,6 +14,7 @@ function BookshelvesCard({ shelf, book, bookId }) {
         }
     };
   
+    console.log(bookId)
 
     // Initially check if the book is already in the shelf
     const isBookInShelf = shelf.books.some((shelfBook) => shelfBook.id === bookId);

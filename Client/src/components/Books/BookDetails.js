@@ -15,7 +15,7 @@ function BookDetails() {
 
   const book = books.find((book) => book.id === bookId);
 
-  console.log(book)
+  console.log(bookshelves)
   useEffect(() => {
     setError(null); 
   }, [location]);
@@ -119,7 +119,7 @@ function BookDetails() {
                   {bookshelves && bookshelves.length > 0 ? (
                     bookshelves.map((shelf) => (
                       <div className="w-60 p-4 flex-none" key={shelf.id}>
-                        <BookshelvesCard shelf={shelf} book={book} />
+                        <BookshelvesCard shelf={shelf} book={book}  bookId={book.id} />
                       </div>
                     ))
                   ) : (

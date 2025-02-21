@@ -7,7 +7,7 @@ import BookShelves from "./components/Bookshelves/BookShelves";
 import Account from "./components/Profile/Account";
 import Login from "./components/Profile/Login";
 import Signup from "./components/Profile/Signup";
-import Avatars from "./components/Profile/Avatars";
+
 import Bookclubs from "./components/Bookclubs/Bookclubs";
 import UsersBookclubs from "./components/Bookclubs/UsersBookclubs";
 import UserBookshelves from "./components/Bookshelves/UserBookshelves";
@@ -61,10 +61,7 @@ const routes = [
     path: "/login",
     element: <Login />,
   },
-  {
-    path: "/avatar",
-    element: <Avatars />,
-  },
+  
   {
     path: "/bookclubs",
     element: <Bookclubs />,

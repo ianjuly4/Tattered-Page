@@ -202,6 +202,19 @@ class UsersById(Resource):
         user = User.query.filter(User.id == id).first()
         return make_response(user.to_dict(rules=('-_password_hash',)), 200)
     
+    def patch(self, id):
+        data = request.get_json()
+        user = User.query.filter(User.id == id).first()
+        if not user:
+            return make_response({"error": "User not found"}, 404)
+
+        for attr, value in data.items():
+            setattr(user, attr, value)
+
+        db.session.commit()
+        return make_response(user.to_dict(), 200)
+
+    
     def delete(self, id):
         user = User.query.filter(User.id == id).first()
         if not user:

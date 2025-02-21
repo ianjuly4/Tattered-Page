@@ -81,11 +81,9 @@ function MyContextProvider({ children }) {
         setError("Invalid shelf or book ID");
         return;
     }
-
     setLoading(true);
     setError(null);
 
-    // Send the book_id to add it to the bookshelf
     fetch(`/bookshelves/${shelf.id}`, {
         method: "PATCH",
         headers: {
@@ -95,7 +93,7 @@ function MyContextProvider({ children }) {
     })
         .then((response) => response.json())
         .then((shelfData) => {
-            // Ensure the bookshelf data comes back as expected
+    
             if (shelfData.books) {
                 setUser((prevUser) => ({
                     ...prevUser,
@@ -151,21 +149,24 @@ function MyContextProvider({ children }) {
       setError("Missing required fields for book creation");
       return;
     }
-    console.log(title, authors, description, coverImageUrl, publishedDate, bookId)
-
+    console.log(title, authors, description, coverImageUrl, publishedDate, bookId);
+  
     const isValidDate = (dateString) => {
       const date = new Date(dateString);
       return !isNaN(date.getTime());
     };
-
+  
     if (!isValidDate(publishedDate)) {
       setError("Invalid date format for publishedDate. Using null.");
-      publishedDate = null;
+      publishedDate = null; 
     }
-
+  
     setLoading(true);
     setError(null);
-
+  
+    
+    const authorString = Array.isArray(authors) ? authors.join(", ") : authors;
+  
     fetch("/books", {
       method: "POST",
       headers: {
@@ -173,7 +174,7 @@ function MyContextProvider({ children }) {
       },
       body: JSON.stringify({
         title,
-        author: authors.join(", "),
+        author: authorString,
         synopsis: description,
         cover_image: coverImageUrl,
         progress: 0,
@@ -190,7 +191,7 @@ function MyContextProvider({ children }) {
           }));
           return data;
         } else {
-          setError(error || "Failed to create book. Please try again.");
+          setError("Failed to create book. Please try again.");
         }
       })
       .catch((error) => {
@@ -200,7 +201,8 @@ function MyContextProvider({ children }) {
         setLoading(false);
       });
   };
-
+  
+  {/*Fetch Books */}
   const fetchBooks = (searchQuery, filterType) => {
     setLoading(true);
     setError(null);
@@ -230,6 +232,43 @@ function MyContextProvider({ children }) {
         setError(error.message || "Something went wrong");
       });
   };
+
+  {/* Update User/ Patch Function */}
+  const updateUserAttribute = (attribute, value) => {
+    const updatedData = { [attribute]: value };
+  
+    fetch(`/users/${user.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedData),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => {
+            setError(data.error || "An error occurred, please try again.");
+            throw new Error("Failed to update");
+          });
+        }
+       
+        return response.json(); 
+      })
+      .then(() => {
+        setUser((prevUser) => ({
+          ...prevUser,
+          [attribute]: value, 
+        }));
+        console.log(`${attribute} updated successfully!`);
+      })
+      .catch((error) => {
+        console.error(`Error updating ${attribute}:`, error);
+        setError("An unexpected error occurred.");
+      });
+  };
+  
+  
+
 
   {/*Delete Account */}
   const deleteAccount = (userId) => {
@@ -384,7 +423,8 @@ function MyContextProvider({ children }) {
         createBook,
         updateBookshelf,
         deleteBook,
-        deleteAccount
+        deleteAccount,
+        updateUserAttribute
       }}
     >
       {children}

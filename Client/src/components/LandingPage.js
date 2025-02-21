@@ -110,7 +110,9 @@ const LandingPage = () => {
           <div className="flex-shrink-0">
             <Lottie options={chatbubble} height={150} width={150} />
           </div>
+          <NavLink to={'/bookclubs'}>
           <button className="btn btn-secondary mt-6">Join Now</button>
+          </NavLink>
         </div>
       </section>
 
