@@ -75,13 +75,93 @@ function MyContextProvider({ children }) {
         setError(error.message || 'Failed to send invite.');
       });
   };
+
+  // Patch/Accept or Reject Invite function
+  const patchInvite = (userId, bookclubId, response) => {
+    return fetch('/api/accept-invite', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        bookclub_id: bookclubId,
+        response: response,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Failed to patch invite');
+        }
+        return res.json(); // Resolve with JSON response
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        throw error; // Propagate the error for further handling
+      });
+  };
   
+
+  // Send the request to the backend to update the invite status
+  fetch(`/bookclubs_users`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      bookclub_id: bookclubId,
+      response: response,  // 'accepted' or 'rejected'
+    }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to update invite status");
+      }
+      return response.json(); // Parse the response as JSON
+    })
+    .then((data) => {
+      // Successfully updated the invite status, now update the state
+      setUser((prevUser) => ({
+        ...prevUser,
+        bookclubs: prevUser.bookclubs.map((bookclub) => {
+          if (bookclub.id === bookclubId) {
+            // Update the invite status in the specific bookclub
+            const updatedInvites = bookclub.invites
+              ? bookclub.invites.map((invite) => {
+                  if (invite.user_id === userId) {
+                    return { ...invite, status: response, responded_at: data.responded_at };
+                  }
+                  return invite;
+                })
+              : []; // Initialize if there were no invites before
+
+            return {
+              ...bookclub,
+              invites: updatedInvites, // Update the invites in state
+            };
+          }
+          return bookclub; // No change if it's a different bookclub
+        }),
+      }));
+      console.log(`Invite ${response} successfully:`, data); // Log successful response
+    })
+    .catch((error) => {
+      console.error('Error:', error.message);
+      setError(error.message || "Failed to update invite status.");
+    })
+    .finally(() => {
+      setLoading(false); // Set loading state back to false
+    });
+};
+
   
 
   //Create/Post Chatlog function
   const createChatlog = (bookclubId) => {
-    setError(null); 
-    
+    setError(null);
+  
+    // Send the request to the backend to create a chatlog
     fetch('/chatlogs', {
       method: 'POST',
       headers: {
@@ -92,35 +172,37 @@ function MyContextProvider({ children }) {
       }),
     })
       .then((response) => {
-      
         if (!response.ok) {
-          setError(error.message ||"Failed to create chatlog");
+          throw new Error("Failed to create chatlog");
         }
-        return response.json(); 
+        return response.json(); // Parse the response as JSON
       })
       .then((data) => {
-        console.log('Chatlog created successfully:', data);
-        
+        // Successfully created the chatlog, now update the state
         setUser((prevUser) => ({
           ...prevUser,
           bookclubs: prevUser.bookclubs.map((bookclub) => {
             if (bookclub.id === bookclubId) {
-              // Ensure chatlogs is an array
-              const chatlogs = Array.isArray(bookclub.chatlogs) ? [...bookclub.chatlogs, data] : [bookclub.chatlogs, data];
+              // Add the new chatlog to the bookclub's chatlogs
+              const updatedChatlogs = bookclub.chatlogs
+                ? [...bookclub.chatlogs, data] // Add the chatlog data received from backend
+                : [data]; // Initialize if there were no chatlogs before
               return {
                 ...bookclub,
-                chatlogs: chatlogs,
+                chatlogs: updatedChatlogs, // Update chatlogs in state
               };
             }
-            return bookclub;
+            return bookclub; // No change if it's a different bookclub
           }),
         }));
+        console.log('Chatlog created successfully:', data); // Log successful creation
       })
       .catch((error) => {
         console.error('Error:', error.message);
-        setError(error.message); 
+        setError(error.message || "Failed to create chatlog.");
       });
   };
+  
   
   
   //Delete Bookclub  
@@ -586,7 +668,8 @@ function MyContextProvider({ children }) {
         createChatlog,
         deleteBookclub,
         sendInvite,
-        invites
+        invites,
+        patchInvite
       }}
     >
       {children}

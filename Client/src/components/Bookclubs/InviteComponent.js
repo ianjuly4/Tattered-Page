@@ -4,40 +4,61 @@ import { useNavigate } from "react-router-dom";
 import InviteCard from "./InviteCard"; // Import InviteCard
 
 const InviteComponent = () => {
-  const { invites, setError, setUser } = useContext(MyContext);
+  const { invites, setError, setUser, patchInvite, userId } = useContext(MyContext);
   const navigate = useNavigate();
 
   // Separate the bookclubs by status
   const invitedBookclubs = invites.filter(invite => invite.status === 'invited');
   const acceptedBookclubs = invites.filter(invite => invite.status === 'accepted');
 
-  const acceptInvite = (bookclubId) => {
-    fetch(`/bookclub_users/accept/${bookclubId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return Promise.reject(new Error("Failed to accept invite."));
-        }
-        return response.json();
-      })
+  const acceptInvite = (userId, bookclubId) => {
+    patchInvite(userId, bookclubId, "accepted")
       .then(() => {
         setUser((prevUser) => ({
           ...prevUser,
-          bookclubs: [...prevUser.bookclubs, { id: bookclubId }],
+          bookclubs: prevUser.bookclubs.map((bookclub) => {
+            if (bookclub.id === bookclubId) {
+              const updatedInvites = bookclub.invites.map((invite) => {
+                if (invite.bookclub_id === bookclubId) {
+                  return { ...invite, status: "accepted" };
+                }
+                return invite;
+              });
+              return { ...bookclub, invites: updatedInvites };
+            }
+            return bookclub;
+          }),
         }));
-        navigate(`/bookclubs/${bookclubId}`);
       })
       .catch((error) => {
-        setError("Error accepting invite: " + error.message);
+        console.error("Failed to accept invite:", error);
+        setError("Failed to accept the invite.");
       });
   };
 
-  const declineInvite = (bookclubId) => {
-    setError(`You declined the invite to bookclub ${bookclubId}`);
+  const declineInvite = (userId, bookclubId) => {
+    patchInvite(userId, bookclubId, "rejected")
+      .then(() => {
+        setUser((prevUser) => ({
+          ...prevUser,
+          bookclubs: prevUser.bookclubs.map((bookclub) => {
+            if (bookclub.id === bookclubId) {
+              const updatedInvites = bookclub.invites.map((invite) => {
+                if (invite.bookclub_id === bookclubId) {
+                  return { ...invite, status: "rejected" };
+                }
+                return invite;
+              });
+              return { ...bookclub, invites: updatedInvites };
+            }
+            return bookclub;
+          }),
+        }));
+      })
+      .catch((error) => {
+        console.error("Failed to decline invite:", error);
+        setError("Failed to decline the invite.");
+      });
   };
 
   return (
@@ -50,8 +71,8 @@ const InviteComponent = () => {
               <InviteCard
                 key={invite.bookclub_id}
                 bookclub={invite}
-                onAccept={acceptInvite}
-                onDecline={declineInvite}
+                onAccept={() => acceptInvite(userId, invite.bookclub_id)}
+                onDecline={() => declineInvite(userId, invite.bookclub_id)}
               />
             ))}
           </div>
@@ -60,7 +81,6 @@ const InviteComponent = () => {
         <p className="text-center text-lg">No invitations at this time.</p>
       )}
 
-      {/* You can also render accepted bookclubs here, if desired */}
       {acceptedBookclubs.length > 0 && (
         <div>
           <h3 className="text-2xl font-semibold text-center mb-6">Accepted Bookclubs</h3>
