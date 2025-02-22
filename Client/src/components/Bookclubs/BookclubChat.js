@@ -8,17 +8,16 @@ const BookclubChat = ({ bookclub }) => {
   // Get chatlogs from the bookclub, assuming that bookclub contains chatlogs
   const { chatlogs } = bookclub || {};
   const [message, setMessage] = useState("");
-  const [chat, setChat] = useState(chatlogs || []);  // Initialize chat with existing chatlogs
+  const [chat, setChat] = useState(Array.isArray(chatlogs) ? chatlogs : []);  // Ensure chat is always an array
   const usersInChat = user?.chatUsers || []; // Users participating in the chat
 
   // Log chatlogs to verify data
-  console.log(chatlogs);
+  console.log("Chatlogs:", chatlogs);
   
   // Connect socket and listen for messages
   useEffect(() => {
-    // Only set up socket connection if chatlogs exist
-    if (!chatlogs || chatlogs.length === 0) return;
-
+    if (!Array.isArray(chatlogs) || chatlogs.length === 0) return; // Only set up socket connection if chatlogs exist and are an array
+    
     connectSocket(); // Establish connection to backend
     const unsubscribe = listenForMessages((data) => {
       // Append new messages to chat
@@ -78,7 +77,7 @@ const BookclubChat = ({ bookclub }) => {
             <ul className="message-list space-y-4">
               {chat.map((msg, idx) => (
                 <li key={idx} className="message-item p-3 bg-accent text-white rounded-lg">
-                  {msg.content || msg} {/* Assuming msg is an object with content */}
+                  {msg.content || msg} 
                 </li>
               ))}
             </ul>

@@ -40,49 +40,145 @@ def handle_message(message):
 def handle_connect():
     print("Client connected")
 
-class BookclubUsers(Resource):
-    def post(self):
-        data = request.get_json()
-        bookclub_id = data.get('bookclub_id')
-        user_id_to_invite = data.get('user_id')  # ID of the user you want to invite
+class UserInvites(Resource):
+    def get(self, id):
+      
+        user = User.query.filter(User.id == id).first()
 
-        # Check if the bookclub exists
-        bookclub = Bookclub.query.get(bookclub_id)
+        if not user:
+            return {"error": "User not found"}, 404
+        
+        invites = db.session.query(bookclub_users).filter_by(user_id=id, status='invited').all()
+
+        if not invites:
+            return {"error": "No invites found"}, 404
+
+        # Format the invites as a list of bookclub information
+        invites_list = []
+        for invite in invites:
+            # Fetch the bookclub associated with each invite
+            bookclub = Bookclub.query.filter_by(id=invite.bookclub_id).first()
+            if bookclub:
+                invites_list.append({
+                    'bookclub_id': invite.bookclub_id,
+                    'bookclub_name': bookclub.name,
+                    'status': invite.status,
+                })
+
+        # Create and return a proper response
+        response = make_response(jsonify(invites_list))  # manually wrap with Response
+        response.mimetype = 'application/json'  # explicitly set mimetype
+        return response
+
+# Define the route to access the user's invites
+api.add_resource(UserInvites, "/users/<int:id>/invites")
+
+
+
+
+class AcceptInvite(Resource):
+    def patch(self, invite_id):
+        # Find the invite by its ID
+        invite = db.session.query(bookclub_users).filter_by(id=invite_id, status='invited').first()
+
+        if not invite:
+            return {"error": "Invite not found or already accepted"}, 404
+
+        # Update the invite status to accepted
+        invite.status = 'accepted'
+        invite.responded_at = datetime.utcnow()
+        db.session.commit()
+
+        # Emit an event for the acceptance (Socket.IO)
+        socketio.emit('invite_accepted', {
+            'bookclub_id': invite.bookclub_id,
+            'user_id': invite.user_id
+        }, room=invite.bookclub_id)
+
+        return jsonify({"message": "Invite accepted successfully"}), 200
+
+api.add_resource(AcceptInvite, "/invites/<int:invite_id>/accept")
+
+
+
+class BookclubUsersById(Resource):
+   
+    def patch(self, id):
+        bookclub_id, user_id = map(int, id.split('_'))
+
+        # Query the bookclub and user
+        bookclub = Bookclub.query.filter(Bookclub.id == bookclub_id).first()
         if not bookclub:
             return make_response({"error": "Bookclub not found"}, 404)
 
-        # Check if the user exists
-        user_to_invite = User.query.get(user_id_to_invite)
+        user = User.query.filter(User.id == user_id).first()
+        if not user:
+            return make_response({"error": "User not found"}, 404)
+
+        # Check if the user has an invite
+        existing_member = db.session.query(bookclub_users).filter_by(bookclub_id=bookclub_id, user_id=user_id).first()
+        if not existing_member or existing_member.status != 'invited':
+            return make_response({"error": "No pending invite found for this user"}, 400)
+
+        # Update the invite status to "accepted"
+        existing_member.status = 'accepted'
+        existing_member.responded_at = datetime.utcnow()
+        db.session.commit()
+
+        # Emit an event for the acceptance
+        socketio.emit('invite_accepted', {
+            'bookclub_id': bookclub_id,
+            'user_id': user_id
+        }, room=bookclub_id)
+
+        return jsonify({"message": "Invite accepted successfully"}), 200
+
+api.add_resource(BookclubUsersById, "/bookclub_users/<string:id>")
+
+
+class BookclubUsers(Resource):
+    def post(self):
+        data = request.get_json()
+        print(data)
+        bookclub_id = data.get('bookclub_id')
+        user_id = data.get('user_id')
+
+        # Query the bookclub and user
+        bookclub = Bookclub.query.filter(Bookclub.id == bookclub_id).first()
+        if not bookclub:
+            return make_response({"error": "Bookclub not found"}, 404)
+
+        user_to_invite = User.query.filter(User.id == user_id).first()
         if not user_to_invite:
             return make_response({"error": "User not found"}, 404)
 
-        # Check if the user is already in the bookclub or has a pending invite
-        existing_member = db.session.query(bookclub_users).filter_by(bookclub_id=bookclub_id, user_id=user_id_to_invite).first()
+        # Check if the user is already invited or a member
+        existing_member = db.session.query(bookclub_users).filter_by(bookclub_id=bookclub_id, user_id=user_id).first()
         if existing_member:
             if existing_member.status == 'accepted':
                 return make_response({"error": "User is already a member of this bookclub"}, 400)
             elif existing_member.status == 'invited':
                 return make_response({"error": "User already has a pending invite"}, 400)
 
-        # Add the user to the bookclub_users table with the status "invited"
+        # Insert a new invite into the bookclub_users table directly
         new_invite = bookclub_users.insert().values(
             bookclub_id=bookclub_id,
-            user_id=user_id_to_invite,
+            user_id=user_id,  # Make sure the correct user_id is used here
             status="invited",
             invited_at=datetime.utcnow()
         )
-        db.session.execute(new_invite)
+        db.session.execute(new_invite)  # Use execute() to run the insert
         db.session.commit()
 
-        # Emit event for the invite (could be via socketio or other means)
+        # Emit socket event for new invite
         socketio.emit('new_invite', {
             'bookclub_id': bookclub_id,
-            'user_id': user_id_to_invite
-        }, room=user_id_to_invite)  # Send this to the invited user
+            'user_id': user_id  # Ensure the correct user_id is emitted here as well
+        }, room=user_id)
 
-        return make_response({"message": "Invite sent successfully"}), 201
-
-api.add_resource(BookclubUsers, '/bookclub_users')
+        return make_response((new_invite.to_dict()), 201)
+    
+api.add_resource(BookclubUsers, "/bookclubs_users")
 
 
 class Chatlogs(Resource):

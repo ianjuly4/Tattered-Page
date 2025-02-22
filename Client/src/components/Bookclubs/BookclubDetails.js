@@ -65,7 +65,7 @@ function BookclubDetails() {
 
           {/* Bookclub Book Carousel */}
           <div className="mt-8">
-            <BookclubBookCarousel user={user} bookclub={bookclub} />
+            <BookclubBookCarousel user={user} bookclub={bookclub} bookclubId={bookclub.id} />
           </div>
 
           {/* Chatbox and Members section - Side by Side with Equal Sizes */}

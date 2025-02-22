@@ -10,6 +10,73 @@ function MyContextProvider({ children }) {
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [invites, setInvites] = useState([]);
+ 
+
+  // Assume you've added functionality for invites in the backend already, like fetching from /invites endpoint
+  useEffect(() => {
+    if (user && user.id) {
+      fetch(`/users/${user.id}/invites`)
+        .then((response) => response.json())
+        .then((data) => {
+
+          setInvites(data);
+        })
+        .catch((error) => {
+          setError('Error fetching invites: ' + error.message);
+        });
+    }
+  }, [user]);
+
+  //create invite for chatlog
+  const sendInvite = (userId, bookclubId) => {
+    console.log(userId, bookclubId);
+    setError(null);  // Clear any previous error
+    
+    fetch('/bookclubs_users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        bookclub_id: bookclubId,
+        user_id: userId,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          // Check for specific error message in response
+          return response.json().then((errorData) => {
+            const errorMessage = errorData.error || "Failed to send invite";
+            setError(errorMessage);
+            throw new Error(errorMessage);  // Throw an error to stop further execution
+          });
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log('Invite sent successfully:', data);
+        // Update the user state with the new invite
+        setUser((prevUser) => ({
+          ...prevUser,
+          bookclubs: prevUser.bookclubs.map((bookclub) => {
+            if (bookclub.id === bookclubId) {
+              return {
+                ...bookclub,
+                invites: [...(bookclub.invites || []), data],
+              };
+            }
+            return bookclub;
+          }),
+        }));
+      })
+      .catch((error) => {
+        console.error('Error:', error.message);
+        setError(error.message || 'Failed to send invite.');
+      });
+  };
+  
+  
 
   //Create/Post Chatlog function
   const createChatlog = (bookclubId) => {
@@ -27,7 +94,7 @@ function MyContextProvider({ children }) {
       .then((response) => {
       
         if (!response.ok) {
-          return Promise.reject(new Error('Failed to create chatlog.'));
+          setError(error.message ||"Failed to create chatlog");
         }
         return response.json(); 
       })
@@ -50,7 +117,7 @@ function MyContextProvider({ children }) {
         }));
       })
       .catch((error) => {
-        console.error('Error:', error);
+        console.error('Error:', error.message);
         setError(error.message); 
       });
   };
@@ -69,13 +136,14 @@ function MyContextProvider({ children }) {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to delete bookclub.");
+          setError(error.message ||"Failed to dlete bookclub");
+        
         }
         setUser((prevUser) => ({
           ...prevUser,
           bookclubs: prevUser.bookclubs.filter((bookclub) => bookclub.id !== clubId),
         }));
-        setError(error || "Bookclub deleted successfully!");
+        setError(error.message || "Bookclub deleted successfully!");
       })
       .catch((error) => {
         setError(error.message + "Error deleting bookclub. Please try again.");
@@ -516,7 +584,9 @@ function MyContextProvider({ children }) {
         deleteAccount,
         updateUserAttribute,
         createChatlog,
-        deleteBookclub
+        deleteBookclub,
+        sendInvite,
+        invites
       }}
     >
       {children}

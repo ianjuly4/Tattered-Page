@@ -1,24 +1,27 @@
-// UsersBookclubs.js
 import React, { useContext, useState, useEffect } from "react";
 import Header from "../Header";
 import { MyContext } from "../../MyContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import animecoffeeshop from "../../assets/animecoffeeshop.jpg";
-import BookclubCard from "./BookclubCard";  
+import BookclubCard from "./BookclubCard";
+import InviteComponent from "./InviteComponent"; // Import InviteComponent
 
 function UsersBookclubs() {
-  const { user, isLoggedIn, createBookclub, error } = useContext(MyContext);
+  const { user, isLoggedIn, createBookclub, error, invites, setError } = useContext(MyContext);
   const { bookclubs } = user || {};  
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Validation Schema for creating bookclub
   const formSchema = yup.object().shape({
     name: yup.string().required("Must Enter A BookClub Name.").max(50),
     description: yup.string().required("Must Enter A Bookclub Description ").max(1000),
   });
 
+  // Formik for handling form input
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -30,6 +33,7 @@ function UsersBookclubs() {
     },
   });
 
+  // Redirecting user to /bookclubs if not logged in, or navigating to their bookclubs page
   useEffect(() => {
     if (!user && !isLoggedIn) {
       navigate("/bookclubs");
@@ -39,6 +43,10 @@ function UsersBookclubs() {
     setIsLoading(false);
   }, [user, isLoggedIn, navigate]);
 
+  useEffect(() => {
+      setError(null); 
+  }, [location]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -47,6 +55,7 @@ function UsersBookclubs() {
     return <div>You need to log in to view this page.</div>;
   }
 
+  // Background style for page
   const backgroundStyle = {
     backgroundImage: `url(${animecoffeeshop})`,
     backgroundSize: "150%",
@@ -74,11 +83,21 @@ function UsersBookclubs() {
           <div className="text-center lg:text-left">
             <h1 className="text-5xl font-bold">{"Bookclub Dashboard"}</h1>
 
+            {/* Conditionally render the InviteComponent if there are any invites */}
+            {invites && invites.length > 0 ? (
+              <div>
+                <h2 className="text-2xl mt-6 mb-4">You Have Invitations!</h2>
+                <InviteComponent invites={invites} /> {/* Invite component as the carousel */}
+              </div>
+            ) : (
+              <p className="text-lg mt-4">You have no invites at the moment.</p>
+            )}
+            
             <div className="text-2xl mt-6">
               <p className="mt-3">Here are your current book clubs:</p>
 
               {/* Bookclubs Carousel */}
-              <div className="p-4 ">
+              <div className="p-4">
                 <div className="flex overflow-x-auto space-x-4">
                   {bookclubs && bookclubs.length > 0 ? (
                     bookclubs.map((club, index) => (

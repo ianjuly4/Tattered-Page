@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { MyContext } from '../../MyContext';
 
-const BookclubMembers = () => {
+const BookclubMembers = ({bookclub, bookclubId}) => {
+  const {sendInvite} = useContext(MyContext)
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [search, setSearch] = useState('');
@@ -13,15 +15,21 @@ const BookclubMembers = () => {
       });
   }, []);
 
+
   useEffect(() => {
     if (search === '') {
-      setFilteredUsers([]); // Keep filtered users empty when search is empty
+      setFilteredUsers([]); 
     } else {
       const regex = new RegExp(search.split('').join('.*'), 'i'); 
       const filtered = users.filter((user) => regex.test(user.username));
       setFilteredUsers(filtered);
     }
   }, [search, users]);
+
+  const handleInvite = (userId)=>{
+    console.log(userId, bookclub.id)
+    sendInvite(userId, bookclub.id)
+  }
 
   return (
     <div className="max-w-6xl w-full mx-auto bg-primary p-6 border rounded-lg shadow-lg">
@@ -45,7 +53,7 @@ const BookclubMembers = () => {
             filteredUsers.map((user) => (
               <li key={user.id} className="flex justify-between items-center text-white p-2 border-b">
                 <span>{user.username}</span>
-                <button className="bg-blue-500 text-white py-1 px-4 rounded-md hover:bg-blue-600">
+                <button onClick={()=>{handleInvite(user.id)}}className="bg-blue-500 text-white py-1 px-4 rounded-md hover:bg-blue-600">
                   Invite
                 </button>
               </li>
