@@ -6,7 +6,7 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import animecoffeeshop from "../../assets/animecoffeeshop.jpg";
 import BookclubCard from "./BookclubCard";
-import InviteComponent from "./InviteComponent"; // Import InviteComponent
+import InviteComponent from "./InviteComponent"; 
 
 function UsersBookclubs() {
   const { user, isLoggedIn, createBookclub, error, invites, setError } = useContext(MyContext);
@@ -15,13 +15,12 @@ function UsersBookclubs() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Validation Schema for creating bookclub
   const formSchema = yup.object().shape({
     name: yup.string().required("Must Enter A BookClub Name.").max(50),
     description: yup.string().required("Must Enter A Bookclub Description ").max(1000),
   });
 
-  // Formik for handling form input
+
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -33,7 +32,6 @@ function UsersBookclubs() {
     },
   });
 
-  // Redirecting user to /bookclubs if not logged in, or navigating to their bookclubs page
   useEffect(() => {
     if (!user && !isLoggedIn) {
       navigate("/bookclubs");
@@ -47,6 +45,7 @@ function UsersBookclubs() {
       setError(null); 
   }, [location]);
 
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -55,7 +54,8 @@ function UsersBookclubs() {
     return <div>You need to log in to view this page.</div>;
   }
 
-  // Background style for page
+
+
   const backgroundStyle = {
     backgroundImage: `url(${animecoffeeshop})`,
     backgroundSize: "150%",
@@ -72,6 +72,7 @@ function UsersBookclubs() {
     zIndex: -1,
   };
 
+  
   return (
     <div>
       <div className="top-0 z-10">
@@ -86,11 +87,11 @@ function UsersBookclubs() {
             {/* Conditionally render the InviteComponent if there are any invites */}
             {invites && invites.length > 0 ? (
               <div>
-                <h2 className="text-2xl mt-6 mb-4">You Have Invitations!</h2>
-                <InviteComponent invites={invites} /> {/* Invite component as the carousel */}
+                <h2 className="text-2xl mt-6 mb-4">You Have Bookclub Invitations!</h2>
+                <InviteComponent invites={invites} /> 
               </div>
             ) : (
-              <p className="text-lg mt-4">You have no invites at the moment.</p>
+              <p className="text-lg mt-4">You have no Bookclub invitations at the moment.</p>
             )}
             
             <div className="text-2xl mt-6">

@@ -66,4 +66,4 @@ const disconnectSocket = () => {
   }
 };
 
-export { connectSocket, sendMessage, listenForMessages, disconnectSocket };
+export { connectSocket, sendMessage, listenForMessages, disconnectSocket, socket };

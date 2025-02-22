@@ -27,6 +27,8 @@ class User(db.Model, SerializerMixin):
     books=db.relationship('Book', back_populates='user', cascade='all, delete-orphan')
     bookshelves = db.relationship('BookShelf', back_populates='user', cascade='all, delete-orphan')
     bookclubs = db.relationship('Bookclub', secondary='bookclub_users', back_populates='users')
+
+
     
     @hybrid_property
     def password_hash(self):

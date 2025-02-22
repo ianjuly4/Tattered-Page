@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, render_template, request, make_response, session, send_from_directory, jsonify
 from flask_restful import Api, Resource
 from config import app, db, bcrypt, migrate, api, os, socketio
@@ -16,66 +15,77 @@ def index(path=None):
 @socketio.on('connect')
 def handle_connect():
     print("A client has connected.")
+    # Send a confirmation message to the client
     socketio.emit('response', {'data': 'Connected successfully!'})
+
+
+# Handle joining a room (bookclub)
+@socketio.on('join_room')
+def handle_join_room(data):
+    bookclub_id = data.get('bookclub_id')
+    user_id = request.sid  # We will use the socket ID as the user identifier for now
+    print(f"User {user_id} joining room {bookclub_id}")
+    join_room(bookclub_id)  # Join the room associated with the bookclub
+    socketio.emit('response', {'data': f'User {user_id} joined bookclub {bookclub_id}'}, room=bookclub_id)
+
 
 # Handle receiving chat messages
 @socketio.on('chat_message')
 def handle_chat_message(data):
     print(f"Received message: {data}")
-
-    # Store the message in the database (creating a chatlog entry)
-    bookclub_id = data.get('bookclub_id')
-    user_id = data.get('user_id')
-    message_content = data.get('message')
-
-    new_message = Chatlog(content=message_content, bookclub_id=bookclub_id)
-    db.session.add(new_message)
-    db.session.commit()
+    bookclub_id = data.get('bookclub_id')  # Get the bookclub ID from the message
+    message = data.get('message')  # The actual message
 
     # Emit the message to all users in the room (bookclub)
     socketio.emit('chat_message', {
-        'user_id': user_id,
-        'message': message_content,
-        'created_at': new_message.created_at.isoformat()
-    }, room=bookclub_id)
+        'user': data.get('user'),
+        'message': message,
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }, room=bookclub_id)  # This sends the message to the specific bookclub's room
+
+    # Optionally, store the message in your database (you can later implement this)
+    # chatlog = Chatlog(bookclub_id=bookclub_id, user_id=data.get('user_id'), message=message)
+    # db.session.add(chatlog)
+    # db.session.commit()
 
 
-
-
+# Handle user disconnection
 @socketio.on('disconnect')
 def handle_disconnect():
-    """Handle user disconnection."""
-    user_id = request.sid  # or find the user based on the session ID
+    user_id = request.sid  # Get the socket ID (user identifier for now)
     print(f"User {user_id} disconnected")
 
-    # You can also handle user removal here if needed (optional)
-    socketio.emit('user_left', {'user_id': user_id}, room=bookclub_id)
+    # You can emit an event to notify others that the user has left
+    # Also, we can add logic here to remove the user from the bookclub room if needed
+    socketio.emit('user_left', {'user_id': user_id}, room=user_id)  # This is just a placeholder; adjust as necessary
 
 
-#Handle sent message
+# Handle sent messages from the client (chat messages)
 @socketio.on('message')
 def handle_message(message):
     print(f"Received message: {message}")
-    socketio.emit('message', {'data': message})  # Emit the message with a custom event
+    # Emit the message with a custom event
+    socketio.emit('message', {'data': message})  # Broadcast the message to all connected users
+
 
 
 class UserInvites(Resource):
     def get(self, id):
       
-        user = User.query.filter(User.id == id).first()
+        user_id = User.query.filter(User.id == id).first()
 
-        if not user:
+        if not user_id:
             return {"error": "User not found"}, 404
         
-        invites = db.session.query(bookclub_users).filter_by(user_id=id, status='invited').all()
+        invites = db.session.query(bookclub_users).filter_by(user_id = id).all()
 
         if not invites:
             return {"error": "No invites found"}, 404
 
-        # Format the invites as a list of bookclub information
+        
         invites_list = []
         for invite in invites:
-            # Fetch the bookclub associated with each invite
+
             bookclub = Bookclub.query.filter_by(id=invite.bookclub_id).first()
             if bookclub:
                 invites_list.append({
@@ -84,9 +94,8 @@ class UserInvites(Resource):
                     'status': invite.status,
                 })
 
-        # Create and return a proper response
-        response = make_response(jsonify(invites_list))  # manually wrap with Response
-        response.mimetype = 'application/json'  # explicitly set mimetype
+
+        response = make_response((invites_list)) 
         return response
 
 # Define the route to access the user's invites
@@ -94,28 +103,30 @@ api.add_resource(UserInvites, "/users/<int:id>/invites")
 
 
 class BookclubUsersById(Resource):
-    def patch(self):
+
+    def patch(self, id):
         data = request.get_json()
 
-        user_id = data.get('user_id')
         bookclub_id = data.get('bookclub_id')
         response = data.get('response')  # 'accepted' or 'rejected'
 
+        user_id = session.get("user_id")
+
         if not user_id or not bookclub_id or not response:
-            return jsonify({"error": "user_id, bookclub_id, and response are required"}), 400
+            return make_response({"error": "user_id, bookclub_id, and response are required"}), 400
 
         # Ensure user and bookclub exist
         user = User.query.get(user_id)
         bookclub = Bookclub.query.get(bookclub_id)
 
         if not user or not bookclub:
-            return jsonify({"error": "User or Bookclub not found"}), 404
+            return make_response({"error": "User or Bookclub not found"}), 404
 
         # Ensure the invite exists
         invite = db.session.query(bookclub_users).filter_by(user_id=user_id, bookclub_id=bookclub_id).first()
 
         if not invite:
-            return jsonify({"error": "Invite not found"}), 404
+            return make_response({"error": "Invite not found"}), 404
 
         # Update the status and responded_at fields
         invite.status = response  # 'accepted' or 'rejected'
@@ -123,7 +134,8 @@ class BookclubUsersById(Resource):
 
         db.session.commit()
 
-        return jsonify({"message": f"Invite {response} successfully"}), 200
+        return make_response({"message": f"Invite {response} successfully"}), 200
+    
 api.add_resource(BookclubUsersById, '/bookclubs_users/<string:id>')
 
 
@@ -453,7 +465,10 @@ api.add_resource(Books, "/books")
 class UsersById(Resource):
     def get(self, id):
         user = User.query.filter(User.id == id).first()
-        return make_response(user.to_dict(rules=('-_password_hash',)), 200)
+        if user:
+            return make_response(user.to_dict(rules=('-_password_hash', "-books.user", '-bookshelves.user', '-bookclubs.users')), 200)
+        return make_response({"error": "User not found"}, 404)
+
     
     def patch(self, id):
         data = request.get_json()

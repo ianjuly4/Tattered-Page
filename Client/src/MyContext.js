@@ -10,8 +10,7 @@ function MyContextProvider({ children }) {
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [invites, setInvites] = useState([]);
- 
+  const [invites, setInvites] = useState([])
 
   // Assume you've added functionality for invites in the backend already, like fetching from /invites endpoint
   useEffect(() => {
@@ -19,7 +18,7 @@ function MyContextProvider({ children }) {
       fetch(`/users/${user.id}/invites`)
         .then((response) => response.json())
         .then((data) => {
-
+          console.log(data)
           setInvites(data);
         })
         .catch((error) => {
@@ -77,85 +76,63 @@ function MyContextProvider({ children }) {
   };
 
   // Patch/Accept or Reject Invite function
-  const patchInvite = (userId, bookclubId, response) => {
-    return fetch('/api/accept-invite', {
+
+
+  // Send the request to the backend to update the invite status
+  const patchInvite = (userId,bookclubId, response)=>{
+    fetch(`/bookclubs_users`, {
       method: 'PATCH',
-      headers: {
+      headers: {  
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         user_id: userId,
         bookclub_id: bookclubId,
-        response: response,
+        response: response,  // 'accepted' or 'rejected'
       }),
     })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Failed to patch invite');
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to update invite status");
         }
-        return res.json(); // Resolve with JSON response
+        return response.json(); // Parse the response as JSON
+      })
+      .then((data) => {
+        // Successfully updated the invite status, now update the state
+        setUser((prevUser) => ({
+          ...prevUser,
+          bookclubs: prevUser.bookclubs.map((bookclub) => {
+            if (bookclub.id === bookclubId) {
+              // Update the invite status in the specific bookclub
+              const updatedInvites = bookclub.invites
+                ? bookclub.invites.map((invite) => {
+                    if (invite.user_id === userId) {
+                      return { ...invite, status: response, responded_at: data.responded_at };
+                    }
+                    return invite;
+                  })
+                : []; // Initialize if there were no invites before
+
+              return {
+                ...bookclub,
+                invites: updatedInvites, // Update the invites in state
+              };
+            }
+            return bookclub; // No change if it's a different bookclub
+          }),
+        }));
+        console.log(`Invite ${response} successfully:`, data); // Log successful response
       })
       .catch((error) => {
-        console.error('Error:', error);
-        throw error; // Propagate the error for further handling
+        console.error('Error:', error.message);
+        setError(error.message || "Failed to update invite status.");
+      })
+      .finally(() => {
+        setLoading(false); // Set loading state back to false
       });
   };
-  
 
-  // Send the request to the backend to update the invite status
-  fetch(`/bookclubs_users`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      user_id: userId,
-      bookclub_id: bookclubId,
-      response: response,  // 'accepted' or 'rejected'
-    }),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to update invite status");
-      }
-      return response.json(); // Parse the response as JSON
-    })
-    .then((data) => {
-      // Successfully updated the invite status, now update the state
-      setUser((prevUser) => ({
-        ...prevUser,
-        bookclubs: prevUser.bookclubs.map((bookclub) => {
-          if (bookclub.id === bookclubId) {
-            // Update the invite status in the specific bookclub
-            const updatedInvites = bookclub.invites
-              ? bookclub.invites.map((invite) => {
-                  if (invite.user_id === userId) {
-                    return { ...invite, status: response, responded_at: data.responded_at };
-                  }
-                  return invite;
-                })
-              : []; // Initialize if there were no invites before
-
-            return {
-              ...bookclub,
-              invites: updatedInvites, // Update the invites in state
-            };
-          }
-          return bookclub; // No change if it's a different bookclub
-        }),
-      }));
-      console.log(`Invite ${response} successfully:`, data); // Log successful response
-    })
-    .catch((error) => {
-      console.error('Error:', error.message);
-      setError(error.message || "Failed to update invite status.");
-    })
-    .finally(() => {
-      setLoading(false); // Set loading state back to false
-    });
-};
-
-  
+    
 
   //Create/Post Chatlog function
   const createChatlog = (bookclubId) => {

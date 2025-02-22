@@ -1,66 +1,15 @@
 import React, { useContext } from "react";
 import { MyContext } from "../../MyContext";
-import { useNavigate } from "react-router-dom";
-import InviteCard from "./InviteCard"; // Import InviteCard
+import InviteCard from "./InviteCard";
 
 const InviteComponent = () => {
-  const { invites, setError, setUser, patchInvite, userId } = useContext(MyContext);
-  const navigate = useNavigate();
-
-  // Separate the bookclubs by status
+  const { invites } = useContext(MyContext) || {};
+  
+  //console.log(invites)
   const invitedBookclubs = invites.filter(invite => invite.status === 'invited');
   const acceptedBookclubs = invites.filter(invite => invite.status === 'accepted');
 
-  const acceptInvite = (userId, bookclubId) => {
-    patchInvite(userId, bookclubId, "accepted")
-      .then(() => {
-        setUser((prevUser) => ({
-          ...prevUser,
-          bookclubs: prevUser.bookclubs.map((bookclub) => {
-            if (bookclub.id === bookclubId) {
-              const updatedInvites = bookclub.invites.map((invite) => {
-                if (invite.bookclub_id === bookclubId) {
-                  return { ...invite, status: "accepted" };
-                }
-                return invite;
-              });
-              return { ...bookclub, invites: updatedInvites };
-            }
-            return bookclub;
-          }),
-        }));
-      })
-      .catch((error) => {
-        console.error("Failed to accept invite:", error);
-        setError("Failed to accept the invite.");
-      });
-  };
-
-  const declineInvite = (userId, bookclubId) => {
-    patchInvite(userId, bookclubId, "rejected")
-      .then(() => {
-        setUser((prevUser) => ({
-          ...prevUser,
-          bookclubs: prevUser.bookclubs.map((bookclub) => {
-            if (bookclub.id === bookclubId) {
-              const updatedInvites = bookclub.invites.map((invite) => {
-                if (invite.bookclub_id === bookclubId) {
-                  return { ...invite, status: "rejected" };
-                }
-                return invite;
-              });
-              return { ...bookclub, invites: updatedInvites };
-            }
-            return bookclub;
-          }),
-        }));
-      })
-      .catch((error) => {
-        console.error("Failed to decline invite:", error);
-        setError("Failed to decline the invite.");
-      });
-  };
-
+  
   return (
     <div>
       {invitedBookclubs.length > 0 ? (
@@ -71,8 +20,7 @@ const InviteComponent = () => {
               <InviteCard
                 key={invite.bookclub_id}
                 bookclub={invite}
-                onAccept={() => acceptInvite(userId, invite.bookclub_id)}
-                onDecline={() => declineInvite(userId, invite.bookclub_id)}
+              
               />
             ))}
           </div>

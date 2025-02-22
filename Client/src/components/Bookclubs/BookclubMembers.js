@@ -2,10 +2,11 @@ import React, { useState, useEffect, useContext } from 'react';
 import { MyContext } from '../../MyContext';
 
 const BookclubMembers = ({bookclub, bookclubId}) => {
-  const {sendInvite} = useContext(MyContext)
+  const {sendInvite} = useContext(MyContext); // If you're keeping context logic
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [search, setSearch] = useState('');
+  const [invites, setInvites] = useState([]); // Store invites locally
 
   useEffect(() => {
     fetch('/users')
@@ -14,7 +15,6 @@ const BookclubMembers = ({bookclub, bookclubId}) => {
         setUsers(data); 
       });
   }, []);
-
 
   useEffect(() => {
     if (search === '') {
@@ -26,10 +26,15 @@ const BookclubMembers = ({bookclub, bookclubId}) => {
     }
   }, [search, users]);
 
-  const handleInvite = (userId)=>{
-    console.log(userId, bookclub.id)
-    sendInvite(userId, bookclub.id)
-  }
+  const handleInvite = (userId) => {
+    // Locally store the invite without calling the backend
+    const newInvite = { userId, bookclubId, timestamp: new Date().toISOString() };
+
+    setInvites((prevInvites) => [...prevInvites, newInvite]);
+
+    // If you want to simulate sending the invite (like a mock API call)
+    alert(`Invite sent to user ID: ${userId} for bookclub ID: ${bookclubId}`);
+  };
 
   return (
     <div className="max-w-6xl w-full mx-auto bg-primary p-6 border rounded-lg shadow-lg">
@@ -53,13 +58,27 @@ const BookclubMembers = ({bookclub, bookclubId}) => {
             filteredUsers.map((user) => (
               <li key={user.id} className="flex justify-between items-center text-white p-2 border-b">
                 <span>{user.username}</span>
-                <button onClick={()=>{handleInvite(user.id)}}className="bg-blue-500 text-white py-1 px-4 rounded-md hover:bg-blue-600">
+                <button onClick={() => handleInvite(user.id)} className="bg-blue-500 text-white py-1 px-4 rounded-md hover:bg-blue-600">
                   Invite
                 </button>
               </li>
             ))
           )}
         </ul>
+      )}
+
+      {/* Optionally, show a list of current invites */}
+      {invites.length > 0 && (
+        <div className="mt-4 p-4 rounded-lg bg-white text-black">
+          <h2 className="text-xl font-semibold">Sent Invitations</h2>
+          <ul>
+            {invites.map((invite, index) => (
+              <li key={index} className="border-b py-2">
+                User ID: {invite.userId} invited to Bookclub ID: {invite.bookclubId} on {invite.timestamp}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

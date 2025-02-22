@@ -4,7 +4,8 @@ import { MyContext } from "../../MyContext";
 
 
 function BookclubCard({ club, user }) {
-   const {deleteBookclub} = useContext(MyContext)
+   const {deleteBookclub, status} = useContext(MyContext)
+
    
     const handleBookclubDelete = (clubId)=>{
         deleteBookclub(clubId)
