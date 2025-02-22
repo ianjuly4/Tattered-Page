@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, render_template, request, make_response, session, send_from_directory
+from flask import Flask, render_template, request, make_response, session, send_from_directory, jsonify
 from flask_restful import Api, Resource
 from config import app, db, bcrypt, migrate, api, os, socketio
 from models import User, BookShelf, Bookclub, Book, bookclub_users, Chatlog
@@ -40,13 +40,71 @@ def handle_message(message):
 def handle_connect():
     print("Client connected")
 
-class Chatlogs(Resource):
+class BookclubUsers(Resource):
     def post(self):
         data = request.get_json()
         bookclub_id = data.get('bookclub_id')
+        user_id_to_invite = data.get('user_id')  # ID of the user you want to invite
+
+        # Check if the bookclub exists
+        bookclub = Bookclub.query.get(bookclub_id)
+        if not bookclub:
+            return make_response({"error": "Bookclub not found"}, 404)
+
+        # Check if the user exists
+        user_to_invite = User.query.get(user_id_to_invite)
+        if not user_to_invite:
+            return make_response({"error": "User not found"}, 404)
+
+        # Check if the user is already in the bookclub or has a pending invite
+        existing_member = db.session.query(bookclub_users).filter_by(bookclub_id=bookclub_id, user_id=user_id_to_invite).first()
+        if existing_member:
+            if existing_member.status == 'accepted':
+                return make_response({"error": "User is already a member of this bookclub"}, 400)
+            elif existing_member.status == 'invited':
+                return make_response({"error": "User already has a pending invite"}, 400)
+
+        # Add the user to the bookclub_users table with the status "invited"
+        new_invite = bookclub_users.insert().values(
+            bookclub_id=bookclub_id,
+            user_id=user_id_to_invite,
+            status="invited",
+            invited_at=datetime.utcnow()
+        )
+        db.session.execute(new_invite)
+        db.session.commit()
+
+        # Emit event for the invite (could be via socketio or other means)
+        socketio.emit('new_invite', {
+            'bookclub_id': bookclub_id,
+            'user_id': user_id_to_invite
+        }, room=user_id_to_invite)  # Send this to the invited user
+
+        return make_response({"message": "Invite sent successfully"}), 201
+
+api.add_resource(BookclubUsers, '/bookclub_users')
+
+
+class Chatlogs(Resource):
+    def get(self):
+        chatlog_dict_list = [chatlog.to_dict() for chatlog in Chatlog.query.all()]
+        if chatlog_dict_list:
+            return chatlog_dict_list, 200
+        else:
+            return {"error": "No Chatlogs Found"}, 404
+        
+    def post(self):
+        data = request.get_json()
+        bookclub_id = data.get('bookclub_id')
+
+        ##bookclub = Bookclub.query.filter(Bookclub.id == bookclub_id).first()
+        
+        ##if not bookclub:
+            ##return make_response({"error": "Bookclub not found"}, 404)
+        
         user_id = session.get('user_id')
         if not user_id:
-            return make_response({"message": "Unauthorized, Please Login to Continue"}, 401)
+            return make_response({"error": "Unauthorized, Please Login to Continue"}, 401)
 
         # Create a new chatlog
         new_chatlog = Chatlog(
@@ -56,23 +114,12 @@ class Chatlogs(Resource):
         db.session.add(new_chatlog)
         db.session.commit()
 
-        # Optionally, add user to the bookclub_users table
-        # Check if user is already a member
-        existing_member = db.session.query(bookclub_users).filter_by(bookclub_id=bookclub_id, user_id=user_id).first()
-        if not existing_member:
-            new_member = bookclub_users.insert().values(
-                bookclub_id=bookclub_id,
-                user_id=user_id,
-                status="invited",  # Set status as invited
-                invited_at=datetime.utcnow()
-            )
-            db.session.execute(new_member)
-            db.session.commit()
 
         # Emit event for new chatlog creation
         socketio.emit('new_chatlog_created', {'chatlog_id': new_chatlog.id}, room=bookclub_id)
 
-        return make_response({'message': 'Chatlog created successfully', 'chatlog_id': new_chatlog.id}), 201
+        return make_response(new_chatlog.to_dict(), 201)
+    
 api.add_resource(Chatlogs, "/chatlogs")
 
 class ChatlogsById(Resource):
@@ -121,6 +168,59 @@ class ChatlogsById(Resource):
     
 api.add_resource(ChatlogsById, "/chatlogs/<int:id>")
 
+class Bookclubs(Resource):
+    def get(self):
+    
+        bookclub_dict_list = [bookclub.to_dict() for bookclub in Bookclub.query.all()]
+        if bookclub_dict_list:
+            return bookclub_dict_list, 200
+        else:
+            return {"error": "No Bookclubs Found"}, 404
+    
+    def post(self):
+        data = request.get_json()
+        
+        user_id = session.get('user_id')
+        
+        if not user_id:
+            return make_response({"error": "Unauthorized, Please Login to Continue"}, 401)
+        
+        name = data.get('name')
+        description = data.get('description')
+
+        if not name or not description:
+            return make_response({"error": "All bookclub fields are required"}, 400)
+
+        new_bookclub = Bookclub(
+            name=name,
+            description=description
+        )
+
+        user = User.query.get(user_id)
+        
+        if not user:
+            return make_response({"error": "User not found"}, 404)
+
+        new_bookclub.users.append(user)
+
+        db.session.add(new_bookclub)
+        db.session.commit()
+
+        return make_response(new_bookclub.to_dict(), 201)
+
+api.add_resource(Bookclubs, "/bookclubs")
+
+class BookclubsById(Resource):
+    def delete(self, id):
+        bookclub = Bookclub.query.filter(Bookclub.id == id).first()
+        if not bookclub:
+            return make_response({"error": "Bookclub not found"}, 404)
+        
+        db.session.delete(bookclub)
+        db.session.commit()
+        return make_response({"message": "Bookclub successfully deleted"}, 200)
+
+api.add_resource(BookclubsById, '/bookclubs/<int:id>')
 
 class Bookshelves(Resource):
     def get(self):
@@ -252,46 +352,7 @@ class Books(Resource):
         return make_response(new_book.to_dict(), 201)
 
 api.add_resource(Books, "/books")
-
-
-
-class Bookclubs(Resource):
-    
-    def post(self):
-        data = request.get_json()
-        
-        user_id = session.get('user_id')
-        
-        if not user_id:
-            return make_response({"error": "Unauthorized, Please Login to Continue"}, 401)
-        
-        name = data.get('name')
-        description = data.get('description')
-
-        if not name or not description:
-            return make_response({"error": "All bookclub fields are required"}, 400)
-
-        new_bookclub = Bookclub(
-            name=name,
-            description=description
-        )
-
-        user = User.query.get(user_id)
-        
-        if not user:
-            return make_response({"error": "User not found"}, 404)
-
-        new_bookclub.users.append(user)
-
-        db.session.add(new_bookclub)
-        db.session.commit()
-
-        return make_response(new_bookclub.to_dict(), 201)
-
-api.add_resource(Bookclubs, "/bookclubs")
-
-
-
+       
 
 
 class UsersById(Resource):

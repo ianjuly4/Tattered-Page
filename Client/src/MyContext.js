@@ -11,7 +11,7 @@ function MyContextProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
 
-  {/*Create/Post Chatlog function*/}
+  //Create/Post Chatlog function
   const createChatlog = (bookclubId) => {
     setError(null); 
     
@@ -32,16 +32,17 @@ function MyContextProvider({ children }) {
         return response.json(); 
       })
       .then((data) => {
-      
         console.log('Chatlog created successfully:', data);
         
         setUser((prevUser) => ({
           ...prevUser,
           bookclubs: prevUser.bookclubs.map((bookclub) => {
             if (bookclub.id === bookclubId) {
+              // Ensure chatlogs is an array
+              const chatlogs = Array.isArray(bookclub.chatlogs) ? [...bookclub.chatlogs, data] : [bookclub.chatlogs, data];
               return {
                 ...bookclub,
-                chatlogs: [...bookclub.chatlogs, data], 
+                chatlogs: chatlogs,
               };
             }
             return bookclub;
@@ -49,17 +50,43 @@ function MyContextProvider({ children }) {
         }));
       })
       .catch((error) => {
-        
         console.error('Error:', error);
         setError(error.message); 
       });
   };
   
   
+  //Delete Bookclub  
+  const deleteBookclub = (clubId) => {
+    setLoading(true);
+    setError(null);
 
+    fetch(`/bookclubs/${clubId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete bookclub.");
+        }
+        setUser((prevUser) => ({
+          ...prevUser,
+          bookclubs: prevUser.bookclubs.filter((bookclub) => bookclub.id !== clubId),
+        }));
+        setError(error || "Bookclub deleted successfully!");
+      })
+      .catch((error) => {
+        setError(error.message + "Error deleting bookclub. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
   
   
-  {/*Create/Post Bookclub */}
+  //Create/Post Bookclub 
   const createBookclub = (name, description) => {
     setLoading(true);
     setError(null);  
@@ -90,7 +117,7 @@ function MyContextProvider({ children }) {
       });
   };
 
-  {/*Create/Post BookShelf */}
+  //Create/Post BookShelf
   const createBookshelf = (name, description, genre) => {
     setLoading(true);
     setError(null);
@@ -121,7 +148,9 @@ function MyContextProvider({ children }) {
       });
   };
 
-  {/*Patch/Update Bookshelve */}
+  
+
+  //Patch/Update Bookshelf
   const updateBookshelf = (shelf, bookId) => {
     if (!bookId || !shelf.id) {
         setError("Invalid shelf or book ID");
@@ -160,7 +189,7 @@ function MyContextProvider({ children }) {
 };
 
 
-  {/* Delete/Delete Book function */}
+  //Delete/Delete Book function 
   const deleteBook = (bookId) => {
     setLoading(true);
     setError(null);
@@ -189,7 +218,7 @@ function MyContextProvider({ children }) {
       });
   };
 
-  {/* Create Post Book */}
+  //Create Post Book 
   const createBook = (title, authors, description, coverImageUrl, publishedDate, bookId) => {
     // Check if all required fields are provided
     if (!title || !authors || !description || !coverImageUrl || !publishedDate || !bookId) {
@@ -263,7 +292,7 @@ function MyContextProvider({ children }) {
   };
   
   
-  {/*Fetch Books */}
+  //Fetch Books
   const fetchBooks = (searchQuery, filterType) => {
     setLoading(true);
     setError(null);
@@ -294,7 +323,7 @@ function MyContextProvider({ children }) {
       });
   };
 
-  {/* Update User/ Patch Function */}
+  //Update User/ Patch Function 
   const updateUserAttribute = (attribute, value) => {
     const updatedData = { [attribute]: value };
   
@@ -331,7 +360,7 @@ function MyContextProvider({ children }) {
   
 
 
-  {/*Delete Account */}
+  //Delete Account 
   const deleteAccount = (userId) => {
     fetch(`/users/${userId}`, {
       method: "DELETE",
@@ -349,7 +378,7 @@ function MyContextProvider({ children }) {
   };
 
   
-  {/*Login Post Function */}
+  //Login Post Function 
   const login = async (username, password) => {
     setLoading(true);
     setError(null);
@@ -385,7 +414,7 @@ function MyContextProvider({ children }) {
   
   
 
-  {/*Signup Post Function */}
+  ///Signup Post Function
   const signup = async(username, password) => {
     setLoading(true);
     setError(null);
@@ -419,7 +448,7 @@ function MyContextProvider({ children }) {
       });
   };
 
-  {/* Logout Delete Function */}
+  //Logout Delete Function 
   const logout = () => {
     fetch("/logout", {
       method: "DELETE",
@@ -436,7 +465,7 @@ function MyContextProvider({ children }) {
       });
   };
 
-  {/* Check Session Get Function */}
+  //Check Session Get Function 
   useEffect(() => {
     const storedBooks = sessionStorage.getItem("books");
     if (storedBooks) {
@@ -486,7 +515,8 @@ function MyContextProvider({ children }) {
         deleteBook,
         deleteAccount,
         updateUserAttribute,
-        createChatlog
+        createChatlog,
+        deleteBookclub
       }}
     >
       {children}

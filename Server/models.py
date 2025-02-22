@@ -99,11 +99,13 @@ class Book(db.Model, SerializerMixin):
     __tablename__ = "books"
 
     serialize_rules = (
+        
         '-bookshelves.books', 
         '-bookclubs.books', 
         '-user.books', 
         '-user.bookshelves', 
-        '-user.bookclubs'
+        '-user.bookclubs',
+        '-books.bookshelves',  
     )
 
     id = db.Column(db.Integer, primary_key=True)
@@ -169,7 +171,7 @@ class Bookclub(db.Model, SerializerMixin):
 
     books = db.relationship('Book', secondary='bookclub_books', back_populates='bookclubs')
     users = db.relationship('User', secondary='bookclub_users', back_populates='bookclubs')
-    chatlogs = db.relationship('Chatlog', back_populates='bookclub', cascade='all, delete-orphan')
+    chatlogs = db.relationship('Chatlog', back_populates='bookclub', cascade='all, delete-orphan', uselist=False)
 
     @validates('name')
     def validate_name(self, key, name):
@@ -186,7 +188,7 @@ class Bookclub(db.Model, SerializerMixin):
 class Chatlog(db.Model, SerializerMixin):
     __tablename__ = "chatlogs"
 
-    serialize_rules = ("-bookclub.chatlogs",)  
+    serialize_rules = ("-bookclub.chatlogs", '-users.chatlogs', '-books.chatlogs')  
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
