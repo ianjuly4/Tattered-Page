@@ -9,7 +9,7 @@ import UserBookCard from "../Books/UserBookCard";
 import Footer from "../Footer";
 
 function UserBookshelves() {
-  const { user, isLoggedIn, createBookshelf, deleteBook } = useContext(MyContext);
+  const { user, isLoggedIn, createBookshelf, deleteBook, deleteShelf } = useContext(MyContext);
   const { bookshelves, books } = user || {};
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -47,6 +47,9 @@ function UserBookshelves() {
   const handleDeleteBook = (bookId) => {
     deleteBook(bookId);
   };
+  const handleDeleteShelf = (shelfId) => {
+    deleteShelf(shelfId)
+  }
 
   const backgroundStyle = {
     backgroundImage: `url(${library})`,
@@ -107,6 +110,7 @@ function UserBookshelves() {
                     <NavLink to={`/users/${user.id}/bookshelves/${shelf.id}`}>
                       <button className="btn btn-primary btn-sm mt-4">View Shelf</button>
                     </NavLink>
+                    <button onClick={()=>handleDeleteShelf(shelf.id)}className="btn btn-primary btn-sm mt-4">Delete Shelf</button>
                   </div>
                 ))
               ) : (
@@ -155,7 +159,7 @@ function UserBookshelves() {
               Create A Bookshelf
             </h2>
             <form onSubmit={formik.handleSubmit}>
-              <label className="input bg-secondary input-bordered flex items-center gap-2">
+              <label className="input bg-secondary input-bordered  flex items-center gap-2">
                 <input
                   type="text"
                   className="grow"

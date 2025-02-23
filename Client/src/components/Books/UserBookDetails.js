@@ -4,7 +4,8 @@ import { MyContext } from "../../MyContext";
 import defaultbookimage from "../../assets/defaultbookimage.jpg";
 import { NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
 import BookshelvesCard from "../Bookshelves/BookshelvesCard";
-import Footer from "../Footer"
+import Footer from "../Footer";
+import library from "../../assets/library.jpg";
 
 function UserBookDetails() {
   const { bookId } = useParams();
@@ -14,7 +15,6 @@ function UserBookDetails() {
   const navigate = useNavigate();
   const location = useLocation();
 
- 
   useEffect(() => {
     if (!user) {
       setIsLoading(true); 
@@ -42,7 +42,6 @@ function UserBookDetails() {
   }
 
   const book = books.find((book) => book.id === Number(bookId));
- 
 
   if (!book) {
     return <div>Book not found</div>;
@@ -50,14 +49,34 @@ function UserBookDetails() {
 
   const { title, author, synopsis, cover_image, published_date } = book;
 
+  // Background Style
+  const backgroundStyle = {
+    backgroundImage: `url(${library})`,
+    backgroundSize: "cover",  
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",  
+    minHeight: "100vh",  
+    position: "absolute",  
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: -1,  
+  };
+
   return (
-    <div>
-      <div className="top-0 z-10">
+    <div className="relative min-h-screen">
+      {/* Apply Background Image */}
+      <div style={backgroundStyle}></div>
+
+      <div className="absolute inset-0 bg-black opacity-50"></div> {/* Overlay for better readability */}
+
+      <div className="relative z-10">
         <Header />
       </div>
 
-      <div className="p-4">
-        <div className="card bg-secondary shadow-xl p-6 rounded-lg">
+      <div className="p-4 relative z-10">
+        <div className="card  shadow-xl p-6 rounded-lg">
           <h2 className="text-3xl font-bold text-center mb-4">{title}</h2>
 
           <figure className="flex justify-center mb-6">
@@ -125,7 +144,7 @@ function UserBookDetails() {
         </div>
       </div>
 
-     <Footer/>
+      <Footer />
     </div>
   );
 }

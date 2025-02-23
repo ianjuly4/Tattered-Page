@@ -390,6 +390,15 @@ class BookshelvesById(Resource):
         db.session.commit()
 
         return make_response(bookshelf.to_dict(), 200)
+    
+    def delete(self, id):
+        shelf = BookShelf.query.filter(BookShelf.id == id).first()
+        if not shelf:
+            return make_response({"error": "Bookshelf not found"}, 404)
+        
+        db.session.delete(shelf)
+        db.session.commit()
+        return make_response({"message": "Bookshelf successfully deleted"}, 200)
 
 api.add_resource(BookshelvesById, "/bookshelves/<int:id>")
 

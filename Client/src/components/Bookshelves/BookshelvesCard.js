@@ -1,11 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import defaultbookimage from "../../assets/defaultbookimage.jpg";
 import { MyContext } from "../../MyContext";
 
-function BookshelvesCard({ shelf, book, bookId }) {
+function BookshelvesCard({ shelf = {}, book, bookId }) {
     const { updateBookshelf } = useContext(MyContext);
 
-const getBookshelfCoverImage = (shelf) => {
+    const getBookshelfCoverImage = (shelf) => {
         if (shelf.books && shelf.books.length > 0) {
             const firstBook = shelf.books[0];
             return firstBook.cover_image || defaultbookimage;
@@ -13,15 +13,16 @@ const getBookshelfCoverImage = (shelf) => {
             return defaultbookimage;
         }
     };
-  
+    
     console.log(bookId)
+    console.log(shelf?.id); // This will log undefined if shelf is not defined
 
     // Initially check if the book is already in the shelf
     const isBookInShelf = shelf.books.some((shelfBook) => shelfBook.id === bookId);
    
-    const onAddToLibrary = () => {
+    const onAddToLibrary = (shelfId, bookId) => {
         if (!isBookInShelf) {
-            updateBookshelf(shelf.id, bookId); 
+            updateBookshelf(shelfId, bookId); 
         }
     };
 
@@ -58,7 +59,7 @@ const getBookshelfCoverImage = (shelf) => {
                         </button>
                     ) : (
                         <button
-                            onClick={onAddToLibrary}
+                            onClick={()=>onAddToLibrary(shelf.id, bookId)}
                             className="btn btn-primary btn-xs w-full text-sm mt-2"
                         >
                             Add to Shelf

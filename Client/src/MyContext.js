@@ -278,43 +278,75 @@ function MyContextProvider({ children }) {
   
 
   //Patch/Update Bookshelf
-  const updateBookshelf = (shelf, bookId) => {
-    if (!bookId || !shelf.id) {
-        setError("Invalid shelf or book ID");
-        return;
+  const updateBookshelf = (shelfId, bookId) => {
+    if (!bookId || !shelfId) {
+      setError("Invalid shelf or book ID");
+      return;
     }
     setLoading(true);
     setError(null);
-
-    fetch(`/bookshelves/${shelf.id}`, {
-        method: "PATCH",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ book_id: bookId }),
+  
+    // Assuming you have the correct shelfId and bookId to update
+    fetch(`/bookshelves/${shelfId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ book_id: bookId }),
     })
-        .then((response) => response.json())
-        .then((shelfData) => {
-    
-            if (shelfData.books) {
-                setUser((prevUser) => ({
-                    ...prevUser,
-                    bookshelves: prevUser.bookshelves.map((existingShelf) =>
-                        existingShelf.id === shelf.id
-                            ? { ...existingShelf, books: [...existingShelf.books, { id: bookId }] }
-                            : existingShelf
-                    ),
-                }));
-            }
-        })
-        .catch((error) => {
-            setError("Error adding book to bookshelf: " + error.message);
-        })
-        .finally(() => {
-            setLoading(false);
-        });
-};
+      .then((response) => response.json())
+      .then((shelfData) => {
+        if (shelfData.books) {
+          setUser((prevUser) => ({
+            ...prevUser,
+            bookshelves: prevUser.bookshelves.map((existingShelf) =>
+              existingShelf.id === shelfId // Ensure shelfId matches
+                ? { 
+                    ...existingShelf, 
+                    books: [...existingShelf.books, { id: bookId }] // Add bookId to the books array
+                  }
+                : existingShelf
+            ),
+          }));
+        }
+      })
+      .catch((error) => {
+        setError("Error adding book to bookshelf: " + error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  
 
+//Delete bookshelf
+const deleteShelf = (shelfId) => {
+  setLoading(true);
+  setError(null);
+
+  fetch(`/bookshelves/${shelfId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to delete bookshelf.");
+      }
+      setUser((prevUser) => ({
+        ...prevUser,
+        bookshelves: prevUser.bookshelves.filter((shelf) => shelf.id !== shelfId),
+      }));
+      setError(error || "Bookshelf deleted successfully!");
+    })
+    .catch((error) => {
+      setError(error.message + "Error deleting bookshelf. Please try again.");
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+};
 
   //Delete/Delete Book function 
   const deleteBook = (bookId) => {
@@ -659,7 +691,8 @@ function MyContextProvider({ children }) {
         deleteBookclub,
         sendInvite,
         invites,
-        patchInvite
+        patchInvite,
+        deleteShelf
       }}
     >
       {children}
