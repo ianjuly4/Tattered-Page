@@ -24,18 +24,18 @@ def handle_connect():
 @socketio.on('join_room')
 def handle_join_room(data):
     bookclub_id = data.get('bookclub_id')
-    user_id = data.get('user_id')
+    username = data.get('username')
 
     if bookclub_id not in room_users:
         room_users[bookclub_id] = []
 
-    room_users[bookclub_id].append(user_id)  # Add user to the room's list
+    room_users[bookclub_id].append(username)  # Add user to the room's list
     join_room(bookclub_id)
 
     # Emit updated user list to all users in the room
     emit('room_users', {'bookclub_id': bookclub_id, 'users': room_users[bookclub_id]}, room=bookclub_id)
 
-    print(f"User {user_id} joining room {bookclub_id}. Current users: {room_users[bookclub_id]}")
+    print(f"User {username} joining room {bookclub_id}. Current users: {room_users[bookclub_id]}")
 
 # Handle user disconnection
 @socketio.on('disconnect')

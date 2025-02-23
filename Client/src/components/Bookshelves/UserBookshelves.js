@@ -6,7 +6,7 @@ import library from "../../assets/library.jpg";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import UserBookCard from "../Books/UserBookCard";
-import Footer from "../Footer"
+import Footer from "../Footer";
 
 function UserBookshelves() {
   const { user, isLoggedIn, createBookshelf, deleteBook } = useContext(MyContext);
@@ -29,7 +29,6 @@ function UserBookshelves() {
     },
   });
 
-  
   useEffect(() => {
     if (!user && !isLoggedIn) {
       navigate("/bookshelves");
@@ -46,31 +45,26 @@ function UserBookshelves() {
   }
 
   const handleDeleteBook = (bookId) => {
-    deleteBook(bookId); 
+    deleteBook(bookId);
   };
 
-  
   const backgroundStyle = {
     backgroundImage: `url(${library})`,
-    backgroundSize: "150%",
-    backgroundPosition: "center",
-    minHeight: "100vh",
-    filter: "blur(6px)",
-    opacity: 0.6,
-    backgroundRepeat: "no-repeat",
-    position: "absolute",
+    backgroundSize: "cover",  // Cover the entire screen
+    backgroundPosition: "center", // Center the image
+    backgroundRepeat: "no-repeat",  // Prevent repetition of the image
+    minHeight: "100vh",  // Ensure it takes up full height of the viewport
+    position: "absolute",  // Absolute positioning so it sits behind content
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: -1,
+    zIndex: -1,  // Make sure the background is behind other content
   };
 
   return (
-    <div>
-      <div>
-        <Header />
-      </div>
+    <div style={{ position: "relative", minHeight: "100vh" }}>
+      <Header />
       {/* Background */}
       <div style={backgroundStyle}></div>
 
@@ -78,11 +72,12 @@ function UserBookshelves() {
         <div className="hero-content flex-col lg:flex-row">
           <div className="text-left lg:text-left">
             <h1 className="text-5xl font-bold">Your Bookshelves</h1>
+
             {/* Bookshelves Section */}
             <div className="space-y-8 mt-6">
               {bookshelves && bookshelves.length > 0 ? (
                 bookshelves.map((shelf) => (
-                  <div key={shelf.id} className="p-4 bg-secondary rounded-lg shadow-lg max-w-4xl mx-auto">
+                  <div key={shelf.id} className="p-4 rounded-lg shadow-lg max-w-4xl mx-auto">
                     <h2 className="text-3xl font-semibold">{shelf.name}</h2>
 
                     {/* Carousel for Books inside the Bookshelf */}
@@ -109,8 +104,8 @@ function UserBookshelves() {
                         <div>No books available for this bookshelf.</div>
                       )}
                     </div>
-                      <NavLink to={`/users/${user.id}/bookshelves/${shelf.id}`}>
-                    <button className="btn btn-primary btn-sm mt-4">View Shelf</button>
+                    <NavLink to={`/users/${user.id}/bookshelves/${shelf.id}`}>
+                      <button className="btn btn-primary btn-sm mt-4">View Shelf</button>
                     </NavLink>
                   </div>
                 ))
@@ -119,41 +114,46 @@ function UserBookshelves() {
               )}
             </div>
 
-           {/* All Books Added */}
-              <h2 className="text-5xl mt-12 font-semibold text-left mb-6">All Books You've Added</h2>
-              <div className="py-8 p-8 container ">
-                <div className="max-h-96 overflow-y-auto px-4 ">
-                  {/* Check if there are books, otherwise show a placeholder */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {books.length > 0 ? (
-                      books.map((book) => (
-                        <div key={book.id} className="p-4">
-                          {/* Book card wrapped with NavLink */}
-                          <NavLink to={`/users/${user.id}/books/${book.id}`} className="card bg-gray-200 rounded-lg shadow-lg w-full">
-                            <UserBookCard book={book} />
-                          </NavLink>
-                          <button
-                            onClick={() => handleDeleteBook(book.id)}
-                            type="button"
-                            className="btn w-full mt-2"
-                          >
-                            Delete Book
-                          </button>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="col-span-4 p-8">
-                        <p className="text-xl font-semibold text-left mb-4">
-                          No books have been added yet. Please add some books to your bookshelves!
-                        </p>
+            {/* All Books Added */}
+            <h2 className="text-5xl mt-12 font-semibold text-left mb-6">All Books You've Added</h2>
+            <div className="py-8 p-8 container ">
+              <div className="max-h-96 overflow-y-auto px-4 ">
+                {/* Check if there are books, otherwise show a placeholder */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {books.length > 0 ? (
+                    books.map((book) => (
+                      <div key={book.id} className="p-4">
+                        {/* Book card wrapped with NavLink */}
+                        <NavLink
+                          to={`/users/${user.id}/books/${book.id}`}
+                          className="card bg-gray-200 rounded-lg shadow-lg w-full"
+                        >
+                          <UserBookCard book={book} />
+                        </NavLink>
+                        <button
+                          onClick={() => handleDeleteBook(book.id)}
+                          type="button"
+                          className="btn w-full mt-2"
+                        >
+                          Delete Book
+                        </button>
                       </div>
-                    )}
-                  </div>
+                    ))
+                  ) : (
+                    <div className="col-span-4 p-8">
+                      <p className="text-xl font-semibold text-left mb-4">
+                        No books have been added yet. Please add some books to your bookshelves!
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
+            </div>
 
             {/* Create Bookshelf Form */}
-            <h2 className="text-3xl justify-center flex items-center font-bold mt-24 text-left">Create A Bookshelf</h2>
+            <h2 className="text-3xl justify-center flex items-center font-bold mt-24 text-left">
+              Create A Bookshelf
+            </h2>
             <form onSubmit={formik.handleSubmit}>
               <label className="input bg-secondary input-bordered flex items-center gap-2">
                 <input
@@ -201,7 +201,7 @@ function UserBookshelves() {
         </div>
       </div>
 
-     <Footer/>
+      <Footer />
     </div>
   );
 }

@@ -7,42 +7,49 @@ const BookclubChat = ({ bookclub }) => {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
   const [usersInRoom, setUsersInRoom] = useState([]); // State for users in the room
-  const usersInChat = user?.chatUsers || [];
   const chatlogs = bookclub.chatlogs || [];
 
   useEffect(() => {
     // Ensure socket is connected when the component loads
     connectSocket();
-
+  
     // Join the room when the component loads
     const joinRoom = () => {
       if (user?.id && bookclub?.id) {
-        socket.emit('join_room', { bookclub_id: bookclub.id, user_id: user.id });
+        socket.emit('join_room', { bookclub_id: bookclub.id, username: user.username });
       }
     };
     joinRoom();
-
+  
     // Listen for incoming messages
     const handleMessage = (data) => {
       console.log("Received message:", data);
       setChat((prevChat) => [...prevChat, data]);
     };
-
+  
     // Listen for room user list updates
     const handleRoomUsers = (data) => {
       if (data.bookclub_id === bookclub.id) {
-        setUsersInRoom(data.users); // Update users in room state
+        // Ensure users list is unique by using a Set
+        const uniqueUsers = Array.from(new Set(data.users));
+        setUsersInRoom(uniqueUsers); // Update users in room state
       }
     };
-
+  
+    // Listen for chat messages once
     listenForMessages(handleMessage);
+  
+    // Listen for room users (unique list)
     socket.on('room_users', handleRoomUsers);
-
+  
+    // Cleanup on unmount
     return () => {
-      socket.off('room_users', handleRoomUsers); // Cleanup listener
-      socket.emit('leave_room', { bookclub_id: bookclub.id, user_id: user.id });
+      socket.off('room_users', handleRoomUsers); // Cleanup listener for room users
+      socket.emit('leave_room', { bookclub_id: bookclub.id, username: user.username });
+      socket.off("chat_message", handleMessage); // Clean up message listener
     };
   }, [bookclub.id, user.id]);
+  
 
   const handleSendMessage = () => {
     if (message.trim() !== "") {
@@ -96,9 +103,9 @@ const BookclubChat = ({ bookclub }) => {
           <div className="users-in-room mt-4">
             <h2 className="text-xl font-semibold">Users in this Room:</h2>
             <ul className="space-y-2">
-              {usersInRoom.map((userId, idx) => (
+              {usersInRoom.map((user, idx) => (
                 <li key={idx} className="p-2 bg-lightgray rounded-lg">
-                  User {userId} {/* Replace this with user data if needed */}
+                {user} {/* Replace this with user data if needed */}
                 </li>
               ))}
             </ul>
