@@ -1,69 +1,67 @@
-// services/SocketService.js
 import { io } from "socket.io-client";
 
+// Establish socket connection with default configurations
 const socket = io("http://localhost:5555", {
+  withCredentials: true, 
   transports: ["websocket"],
   cors: {
-    origin: "http://localhost:3000",  // Ensure this matches your React app URL
-    methods: ["GET", "POST"]
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
   },
   query: {
-    userId: localStorage.getItem("user_id") || "",  // User data (if needed)
-  }
+    userId: localStorage.getItem("user_id") || "",
+    bookclubId: localStorage.getItem("bookclub_id") || "",
+  },
 });
 
+// Function to handle connection, including joining a room (bookclub chat)
 const connectSocket = () => {
-  socket.on('connect', () => {
-    console.log("Connected to WebSocket server with ID:", socket.id);
-  });
+  return new Promise((resolve, reject) => {
+    socket.on("connect", () => {
+      console.log("Connected to WebSocket server with ID:", socket.id);
+      
+      const bookclubId = localStorage.getItem("bookclub_id");
+      const userId = localStorage.getItem("user_id");
 
-  socket.on('connect_error', (err) => {
-    console.error("Connection failed:", err.message);
-  });
+      if (bookclubId && userId) {
+        socket.emit("join_room", { bookclub_id: bookclubId, user_id: userId });
+        resolve(); // Resolve the connection promise
+      } else {
+        console.warn("No bookclub or user ID found.");
+        reject(new Error("Missing user or bookclub ID"));
+      }
+    });
 
-  socket.on('disconnect', (reason) => {
-    console.log("Disconnected from WebSocket server:", reason);
-  });
-
-  socket.on('reconnect', (attemptNumber) => {
-    console.log(`Reconnected to the server on attempt ${attemptNumber}`);
-  });
-
-  socket.on('reconnect_error', (error) => {
-    console.error("Reconnection failed:", error);
+    socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+      reject(error); // Reject promise if connection fails
+    });
   });
 };
 
-const sendMessage = (chatlogId, message) => {
+// Function to send a message (only works if socket is connected)
+const sendMessage = (bookclubId, user, message) => {
   if (socket.connected) {
-    socket.emit('chat_message', { chatlogId, message });
+    console.log("Sending message to server:", { bookclub_id: bookclubId, user, message });
+    socket.emit("chat_message", { bookclub_id: bookclubId, user, message });
   } else {
-    console.warn("Socket is not connected, message not sent.");
+    console.warn("Socket not connected, message not sent");
   }
 };
 
 
+// Function to listen for incoming messages
 const listenForMessages = (callback) => {
-  const handleMessage = (data) => {
-    callback(data);
-  };
-
-  // Listen for messages from the server
-  socket.on('chat_message', handleMessage);
-
-  // Return an unsubscribe function
-  return () => {
-    socket.off('chat_message', handleMessage);  // Remove the event listener when called
-  };
+  console.log(callback)
+  socket.on("chat_message", callback);
+  return () => socket.off("chat_message", callback); // Unsubscribe function
 };
 
-const disconnectSocket = () => {
-  if (socket.connected) {
-    socket.disconnect();
-    console.log("Disconnected from WebSocket server");
-  } else {
-    console.warn("Socket is not connected.");
-  }
+// Function to disconnect from chat room
+const disconnectChat = (bookclubId, userId) => {
+  socket.emit("leave_room", { bookclub_id: bookclubId, user_id: userId });
+  socket.disconnect();
+  console.log(`User ${userId} left the room ${bookclubId}`);
 };
 
-export { connectSocket, sendMessage, listenForMessages, disconnectSocket, socket };
+export { connectSocket, sendMessage, listenForMessages, disconnectChat, socket};

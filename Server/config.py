@@ -8,7 +8,7 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy.ext.associationproxy import association_proxy
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit, join_room, send, disconnect, leave_room
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -44,4 +44,4 @@ api = Api(app)
 db.init_app(app)
 
 
-__all__ = ["app", "db", "bcrypt", "migrate", "api", "os", "socketio"]
+__all__ = ["app", "db", "bcrypt", "migrate", "api", "os", "socketio", "emit", "join_room", "send", "disconnect", "leave_room"]

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, make_response, session, send_from_directory, jsonify
 from flask_restful import Api, Resource
-from config import app, db, bcrypt, migrate, api, os, socketio
+from config import app, db, bcrypt, migrate, api, os, socketio, emit, join_room, send, leave_room, disconnect
 from models import User, BookShelf, Bookclub, Book, bookclub_users, Chatlog
 from datetime import datetime
 
@@ -10,63 +10,55 @@ from datetime import datetime
 def index(path=None):
     return send_from_directory(os.path.join(app.static_folder), 'index.html')
 
+user_sessions = {}  # Track user sessions by socket ID
+room_users = {}  # Track users in each room
 
 # Handle socket connection
 @socketio.on('connect')
 def handle_connect():
-    print("A client has connected.")
-    # Send a confirmation message to the client
-    socketio.emit('response', {'data': 'Connected successfully!'})
-
+    user_id = session.get('user_id')  # Get user_id from session
+    user_sessions[request.sid] = user_id
+    print(f"User {user_id} connected with socket ID {request.sid}")
 
 # Handle joining a room (bookclub)
 @socketio.on('join_room')
 def handle_join_room(data):
     bookclub_id = data.get('bookclub_id')
-    user_id = request.sid  # We will use the socket ID as the user identifier for now
-    print(f"User {user_id} joining room {bookclub_id}")
-    join_room(bookclub_id)  # Join the room associated with the bookclub
-    socketio.emit('response', {'data': f'User {user_id} joined bookclub {bookclub_id}'}, room=bookclub_id)
+    user_id = data.get('user_id')
 
+    if bookclub_id not in room_users:
+        room_users[bookclub_id] = []
 
-# Handle receiving chat messages
-@socketio.on('chat_message')
-def handle_chat_message(data):
-    print(f"Received message: {data}")
-    bookclub_id = data.get('bookclub_id')  # Get the bookclub ID from the message
-    message = data.get('message')  # The actual message
+    room_users[bookclub_id].append(user_id)  # Add user to the room's list
+    join_room(bookclub_id)
 
-    # Emit the message to all users in the room (bookclub)
-    socketio.emit('chat_message', {
-        'user': data.get('user'),
-        'message': message,
-        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }, room=bookclub_id)  # This sends the message to the specific bookclub's room
+    # Emit updated user list to all users in the room
+    emit('room_users', {'bookclub_id': bookclub_id, 'users': room_users[bookclub_id]}, room=bookclub_id)
 
-    # Optionally, store the message in your database (you can later implement this)
-    # chatlog = Chatlog(bookclub_id=bookclub_id, user_id=data.get('user_id'), message=message)
-    # db.session.add(chatlog)
-    # db.session.commit()
-
+    print(f"User {user_id} joining room {bookclub_id}. Current users: {room_users[bookclub_id]}")
 
 # Handle user disconnection
 @socketio.on('disconnect')
 def handle_disconnect():
-    user_id = request.sid  # Get the socket ID (user identifier for now)
-    print(f"User {user_id} disconnected")
+    user_id = user_sessions.get(request.sid)
+    if user_id:
+        # Remove user from all rooms they're in
+        for bookclub_id in room_users:
+            if user_id in room_users[bookclub_id]:
+                room_users[bookclub_id].remove(user_id)
+                # Emit updated user list to everyone in the room
+                emit('room_users', {'bookclub_id': bookclub_id, 'users': room_users[bookclub_id]}, room=bookclub_id)
+        
+        print(f"User {user_id} disconnected with socket ID {request.sid}")
+        del user_sessions[request.sid]  # Clean up user session
+    else:
+        print(f"Socket ID {request.sid} disconnected without a valid user.")
 
-    # You can emit an event to notify others that the user has left
-    # Also, we can add logic here to remove the user from the bookclub room if needed
-    socketio.emit('user_left', {'user_id': user_id}, room=user_id)  # This is just a placeholder; adjust as necessary
-
-
-# Handle sent messages from the client (chat messages)
-@socketio.on('message')
-def handle_message(message):
-    print(f"Received message: {message}")
-    # Emit the message with a custom event
-    socketio.emit('message', {'data': message})  # Broadcast the message to all connected users
-
+# Handle receiving chat messages and broadcasting them to the room
+@socketio.on("chat_message")
+def handle_message(data):
+    print("Received message:", data)
+    emit("chat_message", data, room=data["bookclub_id"])
 
 
 class UserInvites(Resource):
@@ -537,7 +529,7 @@ api.add_resource(Users, '/users')
 class CheckSession(Resource):
     def get(self):
         print(f"Session contents: {session}")
-        user_id = session.get('user_id')
+        user_id = session["user_id"]
         if not user_id:
             return make_response({"message": "No user currently logged in"}, 401)
 

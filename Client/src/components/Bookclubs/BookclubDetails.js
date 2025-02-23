@@ -7,6 +7,7 @@ import BookclubChat from "../Bookclubs/BookclubChat";
 import BookclubMembers from "./BookclubMembers";
 import Footer from "../Footer";
 
+
 function BookclubDetails() {
   const { user, isLoggedIn, setError } = useContext(MyContext);
   const { clubId, userId } = useParams();

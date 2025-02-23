@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-
+import { connectSocket, sendMessage, listenForMessages, disconnectSocket, socket } from "./services/SocketService";
 
 const API_KEY = "AIzaSyBf_grAHTnhr09zZ0oZI_NQ8AlSyBeXS_s";
 const MyContext = createContext();
@@ -575,8 +575,8 @@ function MyContextProvider({ children }) {
       });
   };
 
-  //Logout Delete Function 
   const logout = () => {
+    // Send the logout request to the backend
     fetch("/logout", {
       method: "DELETE",
       headers: {
@@ -584,14 +584,27 @@ function MyContextProvider({ children }) {
       },
     })
       .then(() => {
+        // Clear user data from context or state
         setUser(null);
         setIsLoggedIn(false);
+  
+        // Clear session or local storage data
+        localStorage.removeItem("user_id");
+        localStorage.removeItem("bookclub_id");
+  
+        // Disconnect WebSocket connection
+        //socket.disconnect();  // Disconnect from WebSocket server
+  
+        // Optional: Redirect to login or homepage after logout
+        window.location.href = '/login';  // Or any other page you want to redirect to
       })
       .catch((error) => {
         setError("Logout Error: " + error.message);
       });
   };
-
+  
+  
+  
   //Check Session Get Function 
   useEffect(() => {
     const storedBooks = sessionStorage.getItem("books");
