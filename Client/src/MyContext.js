@@ -286,7 +286,7 @@ function MyContextProvider({ children }) {
     setLoading(true);
     setError(null);
   
-    // Assuming you have the correct shelfId and bookId to update
+    
     fetch(`/bookshelves/${shelfId}`, {
       method: "PATCH",
       headers: {
@@ -300,10 +300,10 @@ function MyContextProvider({ children }) {
           setUser((prevUser) => ({
             ...prevUser,
             bookshelves: prevUser.bookshelves.map((existingShelf) =>
-              existingShelf.id === shelfId // Ensure shelfId matches
+              existingShelf.id === shelfId 
                 ? { 
                     ...existingShelf, 
-                    books: [...existingShelf.books, { id: bookId }] // Add bookId to the books array
+                    books: [...existingShelf.books, { id: bookId }] 
                   }
                 : existingShelf
             ),
@@ -348,6 +348,8 @@ const deleteShelf = (shelfId) => {
     });
 };
 
+
+
   //Delete/Delete Book function 
   const deleteBook = (bookId) => {
     setLoading(true);
@@ -377,15 +379,48 @@ const deleteShelf = (shelfId) => {
       });
   };
 
+  //update book progress
+  const updateBookProgress = (bookId, progress) => {
+    // Call the API to update progress on the backend
+    fetch(`/books/${bookId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ bookProgress: progress }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then(response => response.json())
+      .then(updatedBook => {
+        // Once the backend updates the book, update the frontend state
+        setUser((prevUser) => {
+          // Find the book that was updated in the user's books
+          const updatedBooks = prevUser.books.map((book) =>
+            book.id === bookId
+              ? { ...book, progress: updatedBook.progress }  
+              : book
+          );
+  
+       
+          return {
+            ...prevUser,
+            books: updatedBooks, 
+          };
+        });
+      })
+      .catch((error) => {
+        console.error("Error updating progress:", error);
+      });
+  };
+  
+
+  
+  
+
   //Create Post Book 
   const createBook = (title, authors, description, coverImageUrl, publishedDate, bookId) => {
-    // Check if all required fields are provided
     if (!title || !authors || !description || !coverImageUrl || !publishedDate || !bookId) {
       setError("Missing required fields for book creation");
       return;
     }
   
-    // Validate the published date format
     const isValidDate = (dateString) => {
       const date = new Date(dateString);
       return !isNaN(date.getTime());
@@ -393,17 +428,15 @@ const deleteShelf = (shelfId) => {
   
     if (!isValidDate(publishedDate)) {
       setError("Invalid date format for publishedDate. Using null.");
-      publishedDate = null;  // Use null if the date is invalid
+      publishedDate = null;  
     }
   
-    // Prepare the author string in case it's an array
+   
     const authorString = Array.isArray(authors) ? authors.join(", ") : authors;
   
-    // Set loading state
     setLoading(true);
     setError(null);
   
-    // Prepare the request body
     const requestBody = {
       title,
       author: authorString,
@@ -414,7 +447,6 @@ const deleteShelf = (shelfId) => {
       google_key: bookId
     };
   
-    // Send the POST request to create the book
     fetch("/books", {
       method: "POST",
       headers: {
@@ -423,16 +455,15 @@ const deleteShelf = (shelfId) => {
       body: JSON.stringify(requestBody),
     })
       .then((response) => {
-        // Check if the response is successful
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
         return response.json();
       })
       .then((data) => {
-        // Check if the returned data contains an ID
+   
         if (data.id) {
-          // Update the user state with the new book
+    
           setUser((prevUser) => ({
             ...prevUser,
             books: Array.isArray(prevUser.books) ? [...prevUser.books, data] : [data],
@@ -607,8 +638,8 @@ const deleteShelf = (shelfId) => {
       });
   };
 
+  //logout
   const logout = () => {
-    // Send the logout request to the backend
     fetch("/logout", {
       method: "DELETE",
       headers: {
@@ -616,19 +647,15 @@ const deleteShelf = (shelfId) => {
       },
     })
       .then(() => {
-        // Clear user data from context or state
+     
         setUser(null);
         setIsLoggedIn(false);
   
-        // Clear session or local storage data
         localStorage.removeItem("user_id");
         localStorage.removeItem("bookclub_id");
   
-        // Disconnect WebSocket connection
-        //socket.disconnect();  // Disconnect from WebSocket server
-  
-        // Optional: Redirect to login or homepage after logout
-        window.location.href = '/login';  // Or any other page you want to redirect to
+       
+        window.location.href = '/dashboard'; 
       })
       .catch((error) => {
         setError("Logout Error: " + error.message);
@@ -692,7 +719,8 @@ const deleteShelf = (shelfId) => {
         sendInvite,
         invites,
         patchInvite,
-        deleteShelf
+        deleteShelf,
+        updateBookProgress
       }}
     >
       {children}

@@ -4,36 +4,34 @@ import { MyContext } from "../../MyContext";
 import defaultbookimage from "../../assets/defaultbookimage.jpg";
 import { NavLink, useParams, useLocation, useNavigate } from "react-router-dom";
 import BookshelvesCard from "../Bookshelves/BookshelvesCard";
-import Footer from "../Footer"
+import Footer from "../Footer";
+import library from "../../assets/library.jpg"; // Add the image here
 
 function BookDetails() {
   const { bookId } = useParams();
   const { books, user, isLoggedIn, createBook, error, setError } = useContext(MyContext);
   const { bookshelves } = user || {};
 
-  const location = useLocation()
-  const navigate = useNavigate()
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const book = books.find((book) => book.id === bookId);
 
   useEffect(() => {
-    setError(null); 
+    setError(null);
   }, [location]);
 
   useEffect(() => {
     if (user && user.books && bookId) {
       const userBook = user.books.find((book) => book.google_key === bookId);
       if (userBook) {
-        //console.log('Book is in the library:', bookId);
         navigate(`/users/${user.id}/books/${userBook.id}`);
       }
     }
   }, [user, bookId, navigate]);
-  
-  
 
   if (!book) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
 
   const { volumeInfo } = book || {};
@@ -41,20 +39,39 @@ function BookDetails() {
 
   const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
 
- 
   const handleAddtoLibrary = () => {
     createBook(title, authors, description, coverImageUrl, publishedDate, bookId);
   };
- 
+
+  // Background Style
+  const backgroundStyle = {
+    backgroundImage: `url(${library})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    minHeight: "100vh",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: -1,
+  };
 
   return (
-    <div>
-      <div className="top-0 z-10">
+    <div className="relative min-h-screen">
+    
+      <div style={backgroundStyle}></div>
+
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 bg-black opacity-50"></div>
+
+      <div className="relative z-10">
         <Header />
       </div>
 
-      <div className="p-4">
-        <div className="card bg-secondary shadow-xl p-6 rounded-lg">
+      <div className="p-4 relative z-10">
+        <div className="card shadow-xl p-6 rounded-lg">
           <h2 className="text-3xl font-bold text-center mb-4">{title}</h2>
 
           <figure className="flex justify-center mb-6">
@@ -83,62 +100,31 @@ function BookDetails() {
             <p className="text-center mb-4 text-lg">By {authors.join(", ")}</p>
           )}
 
-          {/*{categories && (
-            <p className="text-center mb-4 text-lg">Categories: {categories.join(", ")}</p>
-          )}*/}
-
-          {/*{pageCount && (
-            <p className="text-center mb-4 text-lg">Page Count: {pageCount}</p>
-          )}*/}
-
           {publishedDate && (
             <p className="text-center mb-4 text-lg">Published Date: {publishedDate}</p>
           )}
 
           {isLoggedIn && (
-            <div className="flex justify-between items-center">
-              <h1 className="text-3xl flex text-right font-bold">Your Bookshelves</h1>
+            <div className="flex items-center justify-center">
               <div className="flex space-x-4">
                 <NavLink to={`/users/${user.id}/bookshelves`}>
                   <button className="btn btn-primary btn-sm">Go To Your Bookshelves</button>
                 </NavLink>
-                <button 
-                  onClick={handleAddtoLibrary} 
+                <button
+                  onClick={handleAddtoLibrary}
                   className="btn btn-primary btn-sm"
                 >
                   Add to Your Library
                 </button>
               </div>
             </div>
-            )}
+          )}
+
           {error && <div className="text-white text-right text-sm mb-4">{error}</div>}
-          <div className="mt-6 p-4 border border-black rounded-lg shadow-lg">
-            {isLoggedIn ? (
-              <>
-                <div className="flex overflow-x-auto space-x-4">
-                  {bookshelves && bookshelves.length > 0 ? (
-                    bookshelves.map((shelf) => (
-                      <div className="w-60 p-4 flex-none" key={shelf.id}>
-                        <BookshelvesCard shelf={shelf} book={book}  bookId={book.id} />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="col-span-3 text-center">
-                      <p>No Bookshelves Found, Please Go To Bookshelves To Create A Bookshelf.</p>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <div className="text-center">
-                <p>You need to be logged in to view your bookshelves and bookclubs.</p>
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
-     <Footer/>
+      <Footer />
     </div>
   );
 }

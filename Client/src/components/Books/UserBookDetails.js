@@ -9,15 +9,16 @@ import library from "../../assets/library.jpg";
 
 function UserBookDetails() {
   const { bookId } = useParams();
-  const { user, isLoggedIn, setError } = useContext(MyContext);
-  const { bookshelves, books } = user || {};  
+  const { user, isLoggedIn, setError, updateBookProgress } = useContext(MyContext);
+  const { bookshelves, books, bookclubs } = user || {};
   const [isLoading, setIsLoading] = useState(true);
+  const [bookProgress, setBookProgress] = useState(0); 
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     if (!user) {
-      setIsLoading(true); 
+      setIsLoading(true);
     } else {
       setIsLoading(false);
     }
@@ -25,16 +26,27 @@ function UserBookDetails() {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      navigate("/bookshelves"); 
+      navigate("/bookshelves");
     }
   }, [isLoggedIn, navigate]);
 
   useEffect(() => {
-    setError(null); 
+    setError(null);
   }, [location]);
 
+  // Set initial book progress whenever the book is loaded or changes
+  useEffect(() => {
+    if (user && books) {
+      const book = books.find((book) => book.id === Number(bookId));
+      if (book) {
+        setBookProgress(book.progress || 0); // Set the initial progress value
+      }
+    }
+  }, [books, bookId, user]);
+
+  // Early return if loading
   if (isLoading) {
-    return <div>Loading....</div>; 
+    return <div>Loading....</div>;
   }
 
   if (!books || !Array.isArray(books)) {
@@ -47,36 +59,45 @@ function UserBookDetails() {
     return <div>Book not found</div>;
   }
 
-  const { title, author, synopsis, cover_image, published_date } = book;
+  const { title, author, synopsis, cover_image, published_date, progress } = book;
 
-  // Background Style
   const backgroundStyle = {
     backgroundImage: `url(${library})`,
-    backgroundSize: "cover",  
+    backgroundSize: "cover",
     backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",  
-    minHeight: "100vh",  
-    position: "absolute",  
+    backgroundRepeat: "no-repeat",
+    minHeight: "100vh",
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: -1,  
+    zIndex: -1,
+  };
+
+  const handleProgressChange = (e) => {
+    const value = e.target.value;
+
+    if (value >= 0 && value <= 100) {
+      setBookProgress(value);
+    }
+  };
+
+  const handleProgressUpdate = () => {
+    console.log(bookProgress);
+    updateBookProgress(bookId, bookProgress); 
   };
 
   return (
     <div className="relative min-h-screen">
-      {/* Apply Background Image */}
       <div style={backgroundStyle}></div>
-
-      <div className="absolute inset-0 bg-black opacity-50"></div> {/* Overlay for better readability */}
-
+      <div className="absolute inset-0 bg-black opacity-50"></div>
       <div className="relative z-10">
         <Header />
       </div>
 
       <div className="p-4 relative z-10">
-        <div className="card  shadow-xl p-6 rounded-lg">
+        <div className="card shadow-xl p-6 rounded-lg">
           <h2 className="text-3xl font-bold text-center mb-4">{title}</h2>
 
           <figure className="flex justify-center mb-6">
@@ -107,6 +128,35 @@ function UserBookDetails() {
             <p className="text-center mb-4 text-lg">Published Date: {published_date}</p>
           )}
 
+          <div className="mt-4 text-center flex flex-col items-center space-y-4">
+            {/* Progress Bar */}
+            <div className="w-48 bg-gray-200 rounded-full h-2 mb-4">
+              <div
+                className="h-2 rounded-full"
+                style={{
+                  width: `${bookProgress}%`,  
+                  backgroundColor: bookProgress === 100 ? 'grey' : 'blue',  
+                }}
+              ></div>
+            </div>
+
+            {/* Input and Button */}
+            <div className="flex items-center space-x-4">
+              <input
+                type="number"
+                id="progress"
+                min="0"
+                max="100"
+                value={bookProgress}
+                onChange={handleProgressChange}
+                className="w-20 p-2 text-center border border-gray-300 rounded-md"
+              />
+              <button onClick={handleProgressUpdate} className="btn btn-primary btn-sm">
+                Update Book Progress
+              </button>
+            </div>
+          </div>
+
           {isLoggedIn && (
             <div className="flex justify-between items-center">
               <h1 className="text-3xl flex text-right font-bold">Your Bookshelves</h1>
@@ -118,7 +168,7 @@ function UserBookDetails() {
             </div>
           )}
 
-          <div className="mt-6 p-4 border border-black rounded-lg shadow-lg">
+          <div className="mt-6 p-4 border-4 border-black rounded-lg shadow-lg">
             {isLoggedIn ? (
               <>
                 <div className="flex overflow-x-auto space-x-4">
@@ -134,6 +184,30 @@ function UserBookDetails() {
                     </div>
                   )}
                 </div>
+
+                {/* Conditionally render bookclubs section */}
+                <div className="mt-6">
+                  {bookclubs && bookclubs.length > 0 ? (
+                    <>
+                      <h2 className="text-2xl font-semibold text-center mb-4">Your Book Clubs</h2>
+                      <div className="flex overflow-x-auto space-x-4">
+                        {bookclubs.map((bookclub) => (
+                          <div className="w-60 p-4 flex-none" key={bookclub.id}>
+                            {/* You can create a BookClubCard component here, similar to BookshelvesCard */}
+                            <div className="bg-white p-4 rounded-lg shadow-md">
+                              <h3 className="text-xl font-bold">{bookclub.name}</h3>
+                              
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="col-span-3 text-center">
+                      <p>No Book Clubs Found, Please Join A Book Club to See Your Book Clubs.</p>
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <div className="text-center">
@@ -141,10 +215,10 @@ function UserBookDetails() {
               </div>
             )}
           </div>
+
+          <Footer />
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }

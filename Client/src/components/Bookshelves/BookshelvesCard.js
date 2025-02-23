@@ -14,10 +14,7 @@ function BookshelvesCard({ shelf = {}, book, bookId }) {
         }
     };
     
-    console.log(bookId)
-    console.log(shelf?.id); // This will log undefined if shelf is not defined
-
-    // Initially check if the book is already in the shelf
+    
     const isBookInShelf = shelf.books.some((shelfBook) => shelfBook.id === bookId);
    
     const onAddToLibrary = (shelfId, bookId) => {

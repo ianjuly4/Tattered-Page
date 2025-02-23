@@ -403,14 +403,29 @@ class BookshelvesById(Resource):
 api.add_resource(BookshelvesById, "/bookshelves/<int:id>")
 
 class BooksById(Resource):
-    def delete(self, id):
+    def get(self, id):
         book = Book.query.filter(Book.id == id).first()
         if not book:
-            return make_response({"error": "Book not found"}, 404)
+            return make_response({"error":"Book not found"}, 404)
+        return make_response(book.to_dict(), 200)
+    
+    def patch(self, id):
+        data = request.get_json()
+        book = Book.query.get(id)
         
-        db.session.delete(book)
+        if not book:
+            return {"error": "Book not found"}, 404
+
+        # Update the progress
+        progress = data.get('bookProgress')
+        if progress is not None:
+            book.progress = progress
+            book.last_read_at = datetime.utcnow()  # Update the last read timestamp
+
         db.session.commit()
-        return make_response({"message": "Book successfully deleted"}, 200)
+
+        # Return the updated book
+        return make_response(book.to_dict(), 200)
     
 api.add_resource(BooksById, "/books/<int:id>")
 
