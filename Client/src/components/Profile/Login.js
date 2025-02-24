@@ -23,25 +23,16 @@ function Login() {
       username: "",
       password: "",
     },
-    validationSchema: formSchema,
-    onSubmit: async (values) => {
-      try {
-        const success = await login(values.username, values.password);
-        if (success) {
-          if (user && user.id) {
-            //navigate(`/users/${user.id}`);
-          } else {
-            //console.log("User data not available for navigation");
-          }
-          loginFormik.resetForm(); 
-        } else {
-          console.log("Login failed");
-        }
-      } catch (error) {
-        console.log("Error during login:", error.message);
+      validationSchema: formSchema,
+      onSubmit: (values) => {
+    
+        login(values.username, values.password);
+      },
+      else:{
+       
       }
-    },
-  });
+    });
+    
   
   useEffect(()=>{
     if (user && isLoggedIn){

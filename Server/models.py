@@ -4,15 +4,21 @@ from sqlalchemy_serializer import SerializerMixin
 from config import db, bcrypt, association_proxy
 from datetime import datetime
 
+
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
     serialize_rules = (
-        "-bookshelves.user", 
-        "-bookclubs.users", 
-        "-books.users", 
-        "-bookclubs.books", 
-        "-books.bookshelves"
+    "-bookshelves.user",  
+    "-books.users",       
+    "-books.bookclubs",   
+    "-bookshelves.books",  
+    "-bookclubs.books",   
+    "-bookclubs.users",    
+    "-bookshelves.user_id", 
+    "-user.bookshelves",   
+    "-user.bookclubs",     
+    "-user.books",          
     )
 
     id = db.Column(db.Integer, primary_key=True)
@@ -24,11 +30,9 @@ class User(db.Model, SerializerMixin):
     streak = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    books=db.relationship('Book', back_populates='user', cascade='all, delete-orphan')
+    books = db.relationship('Book', back_populates='user', cascade='all, delete-orphan')
     bookshelves = db.relationship('BookShelf', back_populates='user', cascade='all, delete-orphan')
     bookclubs = db.relationship('Bookclub', secondary='bookclub_users', back_populates='users')
-
-
     
     @hybrid_property
     def password_hash(self):
@@ -36,8 +40,7 @@ class User(db.Model, SerializerMixin):
 
     @password_hash.setter
     def password_hash(self, password):
-        password_hash = bcrypt.generate_password_hash(
-            password.encode('utf-8'))
+        password_hash = bcrypt.generate_password_hash(password.encode('utf-8'))
         self._password_hash = password_hash.decode('utf-8')
 
     def authenticate(self, password):
@@ -56,14 +59,19 @@ class User(db.Model, SerializerMixin):
         if not password_hash:
             raise ValueError("Password hash cannot be empty")
         return password_hash
-    
-    
 
-# One to Many
+
 class BookShelf(db.Model, SerializerMixin):
     __tablename__ = "bookshelves"
 
-    serialize_rules = ('-user.bookshelves', '-books.bookshelves', "-books.bookshelves")
+    serialize_rules = (
+        "-books.bookshelves",  
+        "-user.bookshelves",   
+        "-bookclubs.books",
+        "-bookclubs.user",
+        '-user.books',
+        '-books.user',    
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -76,7 +84,7 @@ class BookShelf(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='bookshelves')
     books = db.relationship('Book', secondary='bookshelf_books', back_populates='bookshelves')
 
-    @validates('name')
+
     def validate_name(self, key, name):
         if not name:
             raise ValueError("Bookshelf name cannot be empty")
@@ -97,17 +105,15 @@ bookshelf_books = db.Table('bookshelf_books',
     db.Column('book_id', db.Integer, db.ForeignKey('books.id'), primary_key=True)
 )
 
+
 class Book(db.Model, SerializerMixin):
     __tablename__ = "books"
 
     serialize_rules = (
-        
-        '-bookshelves.books', 
-        '-bookclubs.books', 
-        '-user.books', 
-        '-user.bookshelves', 
-        '-user.bookclubs',
-        '-books.bookshelves',  
+        "-user.books",           
+        "-bookshelves.books",   
+        "-bookclubs.books",
+        '-bookclubs.users',  
     )
 
     id = db.Column(db.Integer, primary_key=True)
@@ -116,11 +122,11 @@ class Book(db.Model, SerializerMixin):
     synopsis = db.Column(db.String, nullable=False)
     cover_image = db.Column(db.String, nullable=False)
     progress = db.Column(db.Integer, nullable=True)
-    google_key=db.Column(db.String, nullable=False)
-    review=db.Column(db.Integer, nullable=True)
-    comment=db.Column(db.String, nullable=True)
-    published_date=db.Column(db.Date, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False) 
+    google_key = db.Column(db.String, nullable=False)
+    review = db.Column(db.Integer, nullable=True)
+    comment = db.Column(db.String, nullable=True)
+    published_date = db.Column(db.Date, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     last_read_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
 
     user = db.relationship('User', back_populates='books')
@@ -146,7 +152,7 @@ class Book(db.Model, SerializerMixin):
         if not cover_image:
             raise ValueError("Cover image URL cannot be empty")
         return cover_image
-    
+
     @validates('synopsis')
     def validate_synopsis(self, key, synopsis):
         if not synopsis:
@@ -160,10 +166,15 @@ bookclub_books = db.Table('bookclub_books',
     db.Column('book_id', db.Integer, db.ForeignKey('books.id'), primary_key=True)
 )
 
-class Bookclub(db.Model, SerializerMixin):
-    __tablename__= "bookclubs"
 
-    serialize_rules = ("-chatlogs.bookclub", "-users.bookclubs", "-books.bookclubs")    
+class Bookclub(db.Model, SerializerMixin):
+    __tablename__ = "bookclubs"
+
+    serialize_rules = (
+        "-chatlog.bookclubs",    # Exclude chatlog of bookclubs
+        "-users.bookclubs",      # Exclude users on bookclubs
+        "-books.bookclubs",      # Exclude books on bookclubs
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -173,7 +184,9 @@ class Bookclub(db.Model, SerializerMixin):
 
     books = db.relationship('Book', secondary='bookclub_books', back_populates='bookclubs')
     users = db.relationship('User', secondary='bookclub_users', back_populates='bookclubs')
-    chatlogs = db.relationship('Chatlog', back_populates='bookclub', cascade='all, delete-orphan', uselist=False)
+
+    # One-to-One relationship with Chatlog
+    chatlog = db.relationship('Chatlog', uselist=False, back_populates='bookclub', cascade='all, delete-orphan')
 
     @validates('name')
     def validate_name(self, key, name):
@@ -187,10 +200,14 @@ class Bookclub(db.Model, SerializerMixin):
             raise ValueError("Description cannot be empty")
         return description
 
+
 class Chatlog(db.Model, SerializerMixin):
     __tablename__ = "chatlogs"
 
-    serialize_rules = ("-bookclub.chatlogs", '-users.chatlogs', '-books.chatlogs')  
+    serialize_rules = (
+        "-bookclub.chatlog",  # Exclude chatlog of bookclub
+        "-books.chatlogs",    # Exclude chatlogs of books
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
@@ -198,7 +215,7 @@ class Chatlog(db.Model, SerializerMixin):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     bookclub_id = db.Column(db.Integer, db.ForeignKey('bookclubs.id'))
-    bookclub = db.relationship('Bookclub', back_populates='chatlogs')
+    bookclub = db.relationship('Bookclub', back_populates='chatlog')
 
     @validates('content')
     def validate_content(self, key, content):
@@ -217,4 +234,3 @@ bookclub_users = db.Table('bookclub_users',
     db.Column('invited_at', db.DateTime, default=datetime.utcnow, nullable=False),
     db.Column('responded_at', db.DateTime, nullable=True)
 )
-

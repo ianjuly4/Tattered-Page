@@ -6,13 +6,14 @@ import { NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
 import BookshelvesCard from "../Bookshelves/BookshelvesCard";
 import Footer from "../Footer";
 import library from "../../assets/library.jpg";
+import UsersBookclubCard from "../Bookclubs/UsersBookclubCard";
 
 function UserBookDetails() {
   const { bookId } = useParams();
-  const { user, isLoggedIn, setError, updateBookProgress } = useContext(MyContext);
+  const { user, isLoggedIn, setError, updateBookProgress, error } = useContext(MyContext);
   const { bookshelves, books, bookclubs } = user || {};
   const [isLoading, setIsLoading] = useState(true);
-  const [bookProgress, setBookProgress] = useState(0); 
+  const [bookProgress, setBookProgress] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -34,17 +35,15 @@ function UserBookDetails() {
     setError(null);
   }, [location]);
 
-  // Set initial book progress whenever the book is loaded or changes
   useEffect(() => {
     if (user && books) {
       const book = books.find((book) => book.id === Number(bookId));
       if (book) {
-        setBookProgress(book.progress || 0); // Set the initial progress value
+        setBookProgress(book.progress || 0);
       }
     }
   }, [books, bookId, user]);
 
-  // Early return if loading
   if (isLoading) {
     return <div>Loading....</div>;
   }
@@ -59,7 +58,8 @@ function UserBookDetails() {
     return <div>Book not found</div>;
   }
 
-  const { title, author, synopsis, cover_image, published_date, progress } = book;
+
+  const { title, author, synopsis, cover_image, published_date } = book;
 
   const backgroundStyle = {
     backgroundImage: `url(${library})`,
@@ -77,7 +77,6 @@ function UserBookDetails() {
 
   const handleProgressChange = (e) => {
     const value = e.target.value;
-
     if (value >= 0 && value <= 100) {
       setBookProgress(value);
     }
@@ -85,18 +84,18 @@ function UserBookDetails() {
 
   const handleProgressUpdate = () => {
     console.log(bookProgress);
-    updateBookProgress(bookId, bookProgress); 
+    updateBookProgress(bookId, bookProgress);
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen flex flex-col">
       <div style={backgroundStyle}></div>
       <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative z-10">
+      <div className="relative z-10 flex-grow">
         <Header />
       </div>
 
-      <div className="p-4 relative z-10">
+      <div className="p-4 relative z-10 flex-grow">
         <div className="card shadow-xl p-6 rounded-lg">
           <h2 className="text-3xl font-bold text-center mb-4">{title}</h2>
 
@@ -134,8 +133,8 @@ function UserBookDetails() {
               <div
                 className="h-2 rounded-full"
                 style={{
-                  width: `${bookProgress}%`,  
-                  backgroundColor: bookProgress === 100 ? 'grey' : 'blue',  
+                  width: `${bookProgress}%`,
+                  backgroundColor: bookProgress === 100 ? "grey" : "blue",
                 }}
               ></div>
             </div>
@@ -156,69 +155,74 @@ function UserBookDetails() {
               </button>
             </div>
           </div>
-
-          {isLoggedIn && (
-            <div className="flex justify-between items-center">
-              <h1 className="text-3xl flex text-right font-bold">Your Bookshelves</h1>
-              <div className="flex space-x-4">
+          {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+          <div className="border-4 mt-6 border-gray-300 p-4 mb-6 rounded-lg">
+          {isLoggedIn ? (
+            <>
+              <div className="flex justify-between items-start mb-4">
+                <h2 className="text-2xl font-bold text-center">Your Bookshelves</h2>
                 <NavLink to={`/users/${user.id}/bookshelves`}>
                   <button className="btn btn-primary btn-sm">Go To Your Bookshelves</button>
                 </NavLink>
               </div>
+
+              <div className="flex overflow-x-auto space-x-4">
+                {bookshelves && bookshelves.length > 0 ? (
+                  bookshelves.map((shelf) => (
+                    <div className="w-60 p-4 flex-none" key={shelf.id}>
+                      <BookshelvesCard shelf={shelf} bookId={book.id} user={user} />
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-3 text-center">
+                    <p>No Bookshelves Found, Please Go To Bookshelves To Create A Bookshelf.</p>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="text-center">
+              <p>You need to be logged in to view your bookshelves.</p>
             </div>
           )}
+        </div>
 
-          <div className="mt-6 p-4 border-4 border-black rounded-lg shadow-lg">
-            {isLoggedIn ? (
-              <>
-                <div className="flex overflow-x-auto space-x-4">
-                  {bookshelves && bookshelves.length > 0 ? (
-                    bookshelves.map((shelf) => (
-                      <div className="w-60 p-4 flex-none" key={shelf.id}>
-                        <BookshelvesCard shelf={shelf} bookId={book.id} />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="col-span-3 text-center">
-                      <p>No Bookshelves Found, Please Go To Bookshelves To Create A Bookshelf.</p>
-                    </div>
-                  )}
-                </div>
 
-                {/* Conditionally render bookclubs section */}
-                <div className="mt-6">
-                  {bookclubs && bookclubs.length > 0 ? (
-                    <>
-                      <h2 className="text-2xl font-semibold text-center mb-4">Your Book Clubs</h2>
-                      <div className="flex overflow-x-auto space-x-4">
-                        {bookclubs.map((bookclub) => (
-                          <div className="w-60 p-4 flex-none" key={bookclub.id}>
-                            {/* You can create a BookClubCard component here, similar to BookshelvesCard */}
-                            <div className="bg-white p-4 rounded-lg shadow-md">
-                              <h3 className="text-xl font-bold">{bookclub.name}</h3>
-                              
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="col-span-3 text-center">
-                      <p>No Book Clubs Found, Please Join A Book Club to See Your Book Clubs.</p>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <div className="text-center">
-                <p>You need to be logged in to view your bookshelves and bookclubs.</p>
+            {/* Bookclubs Section with Border */}
+            <div className="border-4 border-gray-300 p-4 rounded-lg">
+          {isLoggedIn ? (
+            <>
+              <div className="flex justify-between items-start mb-4">
+                <h2 className="text-2xl font-semibold text-center">Your Book Clubs</h2>
+                <NavLink to={`/users/${user.id}/bookclubs`}>
+                  <button className="btn btn-primary btn-sm">Go To Your Book Clubs</button>
+                </NavLink>
               </div>
-            )}
-          </div>
 
-          <Footer />
+              <div className="flex overflow-x-auto space-x-4">
+                {bookclubs && bookclubs.length > 0 ? (
+                  bookclubs.map((club) => (
+                    <div className="w-60 p-4 flex-none" key={club.id}>
+                      <UsersBookclubCard club={club} user={user} book={book} bookId={book.id} />
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-3 text-center">
+                    <p>No Book Clubs Found, Please Join A Book Club to See Your Book Clubs.</p>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="text-center">
+              <p>You need to be logged in to view your book clubs.</p>
+            </div>
+          )}
+        </div>
         </div>
       </div>
+
+      <Footer className="mt-auto" />
     </div>
   );
 }

@@ -1,9 +1,11 @@
 import React, { useContext } from "react";
 import defaultbookimage from "../../assets/defaultbookimage.jpg";
 import { MyContext } from "../../MyContext";
+import { useNavigate } from "react-router-dom";
 
-function BookshelvesCard({ shelf = {}, book, bookId }) {
+function BookshelvesCard({ shelf = {}, book, bookId, user }) {
     const { updateBookshelf } = useContext(MyContext);
+    const navigate = useNavigate();
 
     const getBookshelfCoverImage = (shelf) => {
         if (shelf.books && shelf.books.length > 0) {
@@ -13,13 +15,16 @@ function BookshelvesCard({ shelf = {}, book, bookId }) {
             return defaultbookimage;
         }
     };
+
     
-    
-    const isBookInShelf = shelf.books.some((shelfBook) => shelfBook.id === bookId);
-   
+    const isBookInShelf = shelf.books && Array.isArray(shelf.books) 
+        ? shelf.books.some((shelfBook) => shelfBook.id === bookId)
+        : false;
+
     const onAddToLibrary = (shelfId, bookId) => {
         if (!isBookInShelf) {
-            updateBookshelf(shelfId, bookId); 
+            console.log(shelfId, bookId)
+            updateBookshelf(shelfId, bookId);
         }
     };
 
@@ -47,16 +52,17 @@ function BookshelvesCard({ shelf = {}, book, bookId }) {
 
                 {/* Conditionally render button */}
                 <div className="card-actions mt-3">
+                    <button onClick={() => navigate(`/users/${user.id}/bookshelves/${shelf.id}`)} className="btn btn-primary btn-xs w-full text-sm mt-2">Go To Shelf</button>
                     {isBookInShelf ? (
                         <button
                             disabled
-                            className="btn btn-secondary btn-xs w-full text-sm mt-2"
+                            className="btn btn-primary btn-xs w-full text-sm mt-2"
                         >
                             On Shelf
                         </button>
                     ) : (
                         <button
-                            onClick={()=>onAddToLibrary(shelf.id, bookId)}
+                            onClick={() => onAddToLibrary(shelf.id, bookId)}
                             className="btn btn-primary btn-xs w-full text-sm mt-2"
                         >
                             Add to Shelf

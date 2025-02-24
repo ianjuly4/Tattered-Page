@@ -3,6 +3,7 @@ from flask_restful import Api, Resource
 from config import app, db, bcrypt, migrate, api, os, socketio, emit, join_room, send, leave_room, disconnect
 from models import User, BookShelf, Bookclub, Book, bookclub_users, Chatlog
 from datetime import datetime
+import ipdb
 
 
 @app.route('/')
@@ -100,7 +101,7 @@ class BookclubUsersById(Resource):
         data = request.get_json()
 
         bookclub_id = data.get('bookclub_id')
-        response = data.get('response')  # 'accepted' or 'rejected'
+        response = data.get('response') 
 
         user_id = session.get("user_id")
 
@@ -120,8 +121,8 @@ class BookclubUsersById(Resource):
         if not invite:
             return make_response({"error": "Invite not found"}), 404
 
-        # Update the status and responded_at fields
-        invite.status = response  # 'accepted' or 'rejected'
+       
+        invite.status = response  
         invite.responded_at = datetime.utcnow()
 
         db.session.commit()
@@ -187,20 +188,20 @@ class Chatlogs(Resource):
         data = request.get_json()
         bookclub_id = data.get('bookclub_id')
 
-        # Ensure user is logged in (check session or authorization header)
+        
         user_id = session.get('user_id')
         if not user_id:
             return make_response({"error": "Unauthorized, Please Login to Continue"}, 401)
 
-        # Create a new chatlog
+     
         new_chatlog = Chatlog(
-            content="Chat started",  # Placeholder content, can be updated by users
+            content="Chat started", 
             bookclub_id=bookclub_id
         )
         db.session.add(new_chatlog)
         db.session.commit()
 
-        # Emit event for new chatlog creation to notify connected users
+        
         socketio.emit('new_chatlog_created', {'chatlog_id': new_chatlog.id}, room=bookclub_id)
 
         return make_response(new_chatlog.to_dict(), 201)
@@ -212,18 +213,17 @@ class ChatlogsById(Resource):
     def patch(self):
         data = request.get_json()
         chatlog_id = data.get('chatlog_id')
-        content = data.get('content')  # New content (message)
-        user_ids_to_invite = data.get('user_ids')  # List of users to invite
+        content = data.get('content') 
+        user_ids_to_invite = data.get('user_ids') 
 
-        # Update content of the chatlog
         chatlog = Chatlog.query.get(chatlog_id)
         if chatlog:
-            chatlog.content += f"\n{content}"  # Appending new content (message)
+            chatlog.content += f"\n{content}" 
             db.session.commit()
 
-        # Invite new users to the bookclub
+      
         for user_id in user_ids_to_invite:
-            # Add each user to the bookclub_users table
+            
             new_member = bookclub_users.insert().values(
                 bookclub_id=chatlog.bookclub_id,
                 user_id=user_id,
@@ -233,7 +233,7 @@ class ChatlogsById(Resource):
             db.session.execute(new_member)
             db.session.commit()
 
-        # Emit the updated chatlog (new message) to all connected users
+        
         socketio.emit('chatlog_updated', {'chatlog_id': chatlog.id, 'content': chatlog.content}, room=chatlog.bookclub_id)
 
         return make_response({'message': 'Chatlog updated successfully', 'chatlog_id': chatlog.id}), 200
@@ -310,6 +310,25 @@ class Bookclubs(Resource):
 api.add_resource(Bookclubs, "/bookclubs")
 
 class BookclubsById(Resource):
+    def patch(self, id):
+        data = request.get_json()
+
+        bookclub = Bookclub.query.filter(Bookclub.id == id).first()
+
+        book_id = data.get("book_id")
+        book = Book.query.filter(Book.id == book_id).first()
+
+        if not bookclub or not book:
+            return make_response({"error": "Bookclub or Book not found."}, 404)
+
+        if book in bookclub.books:
+            return make_response({"error": "This book is already in the bookclub."}, 400)
+        
+        bookclub.books.append(book)
+        db.session.commit()
+
+        return make_response(bookclub.to_dict(), 200)
+    
     def delete(self, id):
         bookclub = Bookclub.query.filter(Bookclub.id == id).first()
         if not bookclub:
@@ -407,7 +426,7 @@ class BooksById(Resource):
         book = Book.query.filter(Book.id == id).first()
         if not book:
             return make_response({"error":"Book not found"}, 404)
-        return make_response(book.to_dict(), 200)
+        return make_response(book.to_dict(rules=('-bookshelves.user','-user.bookshelves','-user.bookclubs','-books.user',)), 200)
     
     def patch(self, id):
         data = request.get_json()
@@ -416,16 +435,25 @@ class BooksById(Resource):
         if not book:
             return {"error": "Book not found"}, 404
 
-        # Update the progress
+        
         progress = data.get('bookProgress')
         if progress is not None:
             book.progress = progress
-            book.last_read_at = datetime.utcnow()  # Update the last read timestamp
+            book.last_read_at = datetime.utcnow()  
 
         db.session.commit()
 
-        # Return the updated book
         return make_response(book.to_dict(), 200)
+    
+    def delete(self, id):
+        book = Book.query.filter(Book.id == id).first()
+        if not book:
+            return make_response({"message": "Book not found"}, 404)
+        
+        db.session.delete(book)
+        db.session.commit()
+        return make_response({"message": "Book successfully deleted"}, 200)
+    
     
 api.add_resource(BooksById, "/books/<int:id>")
 
@@ -482,7 +510,7 @@ class UsersById(Resource):
     def get(self, id):
         user = User.query.filter(User.id == id).first()
         if user:
-            return make_response(user.to_dict(rules=('-_password_hash', "-books.user", '-bookshelves.user', '-bookclubs.users')), 200)
+            return make_response(user.to_dict(rules=('-_password_hash', "-books.user", '-books.bookshelves','-bookshelves.user', '-bookclubs.users', '-books.bookclubs',)), 200)
         return make_response({"error": "User not found"}, 404)
 
     
@@ -512,12 +540,36 @@ api.add_resource(UsersById, '/users/<int:id>')
 
 
 class Users(Resource):
-    def get(self):
-        user_dict_list = [user.to_dict() for user in User.query.all()]
-        if user_dict_list:
-            return user_dict_list, 200
+    def get(self, user_id=None):
+        if user_id:
+            user = User.query.get(user_id)
+            if user:
+               
+                return make_response(user.to_dict(rules=(
+                    '-_password_hash',
+                    '-books.bookshelves', 
+                    '-bookclubs.users',     
+                    '-books.bookclubs',    
+                )), 200)
+            else:
+                return {"error": "User not found"}, 404
         else:
-            return {"error": "No Users Found"}, 404
+           
+            user_dict_list = [
+                user.to_dict(rules=(
+                    '-_password_hash',
+                    '-books.bookshelves',  
+                    '-bookclubs.users',     
+                    '-books.bookclubs',     
+                ))
+                for user in User.query.all()
+            ]
+            
+            if user_dict_list:
+                return make_response(user_dict_list, 200)
+            else:
+                return {"error": "No Users Found"}, 404
+
     
     def post(self):
         data = request.get_json()
@@ -560,7 +612,7 @@ class CheckSession(Resource):
         user = User.query.filter(User.id == user_id).first()
 
         if user:
-            return make_response(user.to_dict(rules=('-_password_hash',)), 200)
+            return make_response(user.to_dict(rules=('-_password_hash', "-books.user", '-bookshelves.user', '-bookclubs.users')), 200)
         else:
             return make_response({"message": "User not found"}, 404)
         
@@ -568,6 +620,7 @@ api.add_resource(CheckSession, "/check_session")
 
 
 class Login(Resource):
+   
     def post(self):
         data = request.get_json()
         username = data.get('username')
@@ -585,12 +638,15 @@ class Login(Resource):
 
         if user.authenticate(password):
             session['user_id'] = user.id
-            print("/login",session)
-            return make_response({'message': 'Login successful', 'user': user.to_dict(rules=('-_password_hash',))}, 200)
+            print("/login", session)
+            ##ipdb.set_trace()
+            return make_response(user.to_dict(rules=('-_password_hash', "-books.user", '-books.bookshelves','-bookshelves.user', '-bookclubs.users', '-books.bookclubs',)), 200)
+
         else:
             print(f"Password mismatch for user {username}")
-    
-api.add_resource(Login, '/login')   
+            return make_response({'error': 'Incorrect password'}, 401)
+
+api.add_resource(Login, '/login')
 
 class Logout(Resource):
     def delete(self):

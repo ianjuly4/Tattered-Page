@@ -17,7 +17,7 @@ function BookclubCard({ club, user }) {
 
     }
     return (
-        <div className="card bg-secondary w-32 shadow-md p-2">
+        <div className="card bg-base-100 w-32 shadow-md p-2">
             <div className="card-body p-2">
                 <h2 className="bookclub-title text-sm font-semibold">{club.name}</h2>
                 <p className="text-xs">

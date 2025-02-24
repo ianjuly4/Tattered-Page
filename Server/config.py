@@ -44,4 +44,4 @@ api = Api(app)
 db.init_app(app)
 
 
-__all__ = ["app", "db", "bcrypt", "migrate", "api", "os", "socketio", "emit", "join_room", "send", "disconnect", "leave_room"]
+__all__ = ["app", "db", "bcrypt", "migrate", "api", "os", "socketio", "emit", "join_room", "send", "disconnect", "leave_room", "Flask"]

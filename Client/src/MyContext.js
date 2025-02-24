@@ -12,7 +12,7 @@ function MyContextProvider({ children }) {
   const [user, setUser] = useState(null);
   const [invites, setInvites] = useState([])
 
-  // Assume you've added functionality for invites in the backend already, like fetching from /invites endpoint
+ 
   useEffect(() => {
     if (user && user.id) {
       fetch(`/users/${user.id}/invites`)
@@ -138,7 +138,7 @@ function MyContextProvider({ children }) {
   const createChatlog = (bookclubId) => {
     setError(null);
   
-    // Send the request to the backend to create a chatlog
+    
     fetch('/chatlogs', {
       method: 'POST',
       headers: {
@@ -152,27 +152,27 @@ function MyContextProvider({ children }) {
         if (!response.ok) {
           throw new Error("Failed to create chatlog");
         }
-        return response.json(); // Parse the response as JSON
+        return response.json(); 
       })
       .then((data) => {
-        // Successfully created the chatlog, now update the state
+       
         setUser((prevUser) => ({
           ...prevUser,
           bookclubs: prevUser.bookclubs.map((bookclub) => {
             if (bookclub.id === bookclubId) {
-              // Add the new chatlog to the bookclub's chatlogs
+             
               const updatedChatlogs = bookclub.chatlogs
-                ? [...bookclub.chatlogs, data] // Add the chatlog data received from backend
-                : [data]; // Initialize if there were no chatlogs before
+                ? [...bookclub.chatlogs, data] 
+                : [data];
               return {
                 ...bookclub,
-                chatlogs: updatedChatlogs, // Update chatlogs in state
+                chatlogs: updatedChatlogs, 
               };
             }
-            return bookclub; // No change if it's a different bookclub
+            return bookclub; 
           }),
         }));
-        console.log('Chatlog created successfully:', data); // Log successful creation
+        console.log('Chatlog created successfully:', data); 
       })
       .catch((error) => {
         console.error('Error:', error.message);
@@ -206,6 +206,46 @@ function MyContextProvider({ children }) {
       })
       .catch((error) => {
         setError(error.message + "Error deleting bookclub. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  //Update bookclub/Patch
+  const updateBookclub = (clubId, bookId) => {
+    if (!bookId || !clubId) {
+      setError("Invalid club or book ID");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+  
+    
+    fetch(`/bookclubs/${clubId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ book_id: bookId }),
+    })
+      .then((response) => response.json())
+      .then((clubData) => {
+        if (clubData.books) {
+          setUser((prevUser) => ({
+            ...prevUser,
+            bookclubs: prevUser.bookclubs.map((existingClub) =>
+              existingClub.id === clubId 
+                ? { 
+                    ...existingClub, 
+                    books: [...existingClub.books, { id: bookId }] 
+                  }
+                : existingClub
+            ),
+          }));
+        }
+      })
+      .catch((error) => {
+        setError("Error adding book to bookclub: " + error.message);
       })
       .finally(() => {
         setLoading(false);
@@ -280,43 +320,44 @@ function MyContextProvider({ children }) {
   //Patch/Update Bookshelf
   const updateBookshelf = (shelfId, bookId) => {
     if (!bookId || !shelfId) {
-      setError("Invalid shelf or book ID");
-      return;
+        setError("Invalid shelf or book ID");
+        return;
     }
     setLoading(true);
     setError(null);
-  
-    
+
     fetch(`/bookshelves/${shelfId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ book_id: bookId }),
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ book_id: bookId }),
     })
-      .then((response) => response.json())
-      .then((shelfData) => {
-        if (shelfData.books) {
-          setUser((prevUser) => ({
-            ...prevUser,
-            bookshelves: prevUser.bookshelves.map((existingShelf) =>
-              existingShelf.id === shelfId 
-                ? { 
-                    ...existingShelf, 
-                    books: [...existingShelf.books, { id: bookId }] 
-                  }
-                : existingShelf
-            ),
-          }));
-        }
-      })
-      .catch((error) => {
-        setError("Error adding book to bookshelf: " + error.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+        .then((response) => response.json())
+        .then((shelfData) => {
+            
+            if (shelfData.books) {
+                setUser((prevUser) => ({
+                    ...prevUser,
+                    bookshelves: prevUser.bookshelves.map((existingShelf) =>
+                        existingShelf.id === shelfId
+                            ? {
+                                  ...existingShelf,
+                                  books: shelfData.books,  
+                              }
+                            : existingShelf
+                    ),
+                }));
+            }
+        })
+        .catch((error) => {
+            setError("Error adding book to bookshelf: " + error.message);
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+};
+
   
 
 //Delete bookshelf
@@ -381,7 +422,7 @@ const deleteShelf = (shelfId) => {
 
   //update book progress
   const updateBookProgress = (bookId, progress) => {
-    // Call the API to update progress on the backend
+    
     fetch(`/books/${bookId}`, {
       method: 'PATCH',
       body: JSON.stringify({ bookProgress: progress }),
@@ -389,9 +430,9 @@ const deleteShelf = (shelfId) => {
     })
       .then(response => response.json())
       .then(updatedBook => {
-        // Once the backend updates the book, update the frontend state
+        
         setUser((prevUser) => {
-          // Find the book that was updated in the user's books
+        
           const updatedBooks = prevUser.books.map((book) =>
             book.id === bookId
               ? { ...book, progress: updatedBook.progress }  
@@ -569,7 +610,8 @@ const deleteShelf = (shelfId) => {
 
   
   //Login Post Function 
-  const login = async (username, password) => {
+  
+  const login =(username, password) => {
     setLoading(true);
     setError(null);
   
@@ -588,11 +630,13 @@ const deleteShelf = (shelfId) => {
           setIsLoggedIn(true);
           return true;
         } else {
+
           setError("An error occurred. Please try again.");  
           return false;
         }
       })
       .catch((error) => {
+        console.log(error.message)
         setError(error.message || "An error occurred. Please try again later.");
         return false;
       })
@@ -720,7 +764,8 @@ const deleteShelf = (shelfId) => {
         invites,
         patchInvite,
         deleteShelf,
-        updateBookProgress
+        updateBookProgress,
+        updateBookclub
       }}
     >
       {children}

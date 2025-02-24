@@ -3,12 +3,14 @@ import Header from "../Header.js";
 import { MyContext } from "../../MyContext.js";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import bookNook from "../../assets/bookNook.jpg"; // Add your background image here
+import bookNook from "../../assets/bookNook.jpg"; 
 import AvatarDropdown from "./AvatarDropdown.js";
 
 function Account() {
     const { user, loading, error, setError, deleteAccount } = useContext(MyContext);
     const { bookclubs, bookshelves, accolades, goals, avatar, books } = user || {};
+
+    console.log(user)
 
     const [streak, setStreak] = useState(0);
 
@@ -76,7 +78,7 @@ function Account() {
 
     return (
         <div>
-            <div className="sticky top-0 z-10">
+            <div className=" top-0 z-10">
                 <Header />
             </div>
 
