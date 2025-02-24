@@ -610,8 +610,7 @@ const deleteShelf = (shelfId) => {
 
   
   //Login Post Function 
-  
-  const login =(username, password) => {
+  const login = (username, password) => {
     setLoading(true);
     setError(null);
   
@@ -624,19 +623,21 @@ const deleteShelf = (shelfId) => {
     })
       .then((response) => response.json())
       .then((data) => {
+        
         if (data.user && data.user.id) {
           setUser(data.user);
-          console.log("Login successful", data.user);
           setIsLoggedIn(true);
+          console.log("Login successful", data.user);
           return true;
-        } else {
-
-          setError("An error occurred. Please try again.");  
+        } else if (data.error) {
+         
+          console.log(data.error);
+          setError(data.error + " An error occurred. Please try again.");
           return false;
         }
       })
       .catch((error) => {
-        console.log(error.message)
+        console.log(error.message);
         setError(error.message || "An error occurred. Please try again later.");
         return false;
       })
@@ -644,6 +645,9 @@ const deleteShelf = (shelfId) => {
         setLoading(false);
       });
   };
+  
+  
+  
   
   
   

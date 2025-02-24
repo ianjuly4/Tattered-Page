@@ -29,6 +29,7 @@ function UserBookshelves() {
     },
   });
 
+  console.log(user)
   useEffect(() => {
     if (!user && !isLoggedIn) {
       navigate("/bookshelves");
@@ -53,16 +54,16 @@ function UserBookshelves() {
 
   const backgroundStyle = {
     backgroundImage: `url(${library})`,
-    backgroundSize: "cover",  // Cover the entire screen
-    backgroundPosition: "center", // Center the image
-    backgroundRepeat: "no-repeat",  // Prevent repetition of the image
-    minHeight: "100vh",  // Ensure it takes up full height of the viewport
-    position: "absolute",  // Absolute positioning so it sits behind content
+    backgroundSize: "cover",  
+    backgroundPosition: "center", 
+    backgroundRepeat: "no-repeat",  
+    minHeight: "100vh",  
+    position: "absolute",  
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: -1,  // Make sure the background is behind other content
+    zIndex: -1,  
   };
 
   return (
@@ -108,9 +109,9 @@ function UserBookshelves() {
                       )}
                     </div>
                     <NavLink to={`/users/${user.id}/bookshelves/${shelf.id}`}>
-                      <button className="btn btn-primary btn-sm mt-4">View Shelf</button>
+                      <button className="btn btn-primary btn-sm mt-8">View Shelf</button>
                     </NavLink>
-                    <button onClick={()=>handleDeleteShelf(shelf.id)}className="btn btn-primary btn-sm mt-4">Delete Shelf</button>
+                    <button onClick={()=>handleDeleteShelf(shelf.id)}className="btn btn-primary btn-sm mt-8">Delete Shelf</button>
                   </div>
                 ))
               ) : (

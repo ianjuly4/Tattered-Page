@@ -1,4 +1,3 @@
-// Login Component
 import React, { useContext, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -8,10 +7,8 @@ import Header from "../Header";
 
 function Login() {
   const { login, user, error, setError, isLoggedIn } = useContext(MyContext);
-  
   const navigate = useNavigate();
   const location = useLocation();
- 
 
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter a username.").max(25),
@@ -23,26 +20,21 @@ function Login() {
       username: "",
       password: "",
     },
-      validationSchema: formSchema,
-      onSubmit: (values) => {
-    
-        login(values.username, values.password);
-      },
-      else:{
-       
-      }
-    });
-    
-  
-  useEffect(()=>{
-    if (user && isLoggedIn){
-      navigate(`/users/${user.id}`)
-    }
-  })
-  
+    validationSchema: formSchema,
+    onSubmit: (values) => {
+      login(values.username, values.password);
+    },
+  });
+
   useEffect(() => {
-    setError(null); 
-  }, [location]);
+    if (user && isLoggedIn) {
+      navigate(`/users/${user.id}`);  // Redirect to user's profile when logged in
+    }
+  }, [user, isLoggedIn, navigate]);
+
+  useEffect(() => {
+    setError(null);  // Clear error on route change
+  }, [location, error]);
 
   return (
     <div>
@@ -105,7 +97,7 @@ function Login() {
                 <button type="submit" className="btn btn-primary">
                   Login
                 </button>
-                   {/* Error Message (if login fails) */}
+                {/* Error Message (if login fails) */}
                 {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
               </div>
             </form>

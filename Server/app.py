@@ -605,7 +605,7 @@ api.add_resource(Users, '/users')
 class CheckSession(Resource):
     def get(self):
         print(f"Session contents: {session}")
-        user_id = session["user_id"]
+        user_id = session.get("user_id")
         if not user_id:
             return make_response({"message": "No user currently logged in"}, 401)
 
@@ -620,7 +620,6 @@ api.add_resource(CheckSession, "/check_session")
 
 
 class Login(Resource):
-   
     def post(self):
         data = request.get_json()
         username = data.get('username')
@@ -629,7 +628,7 @@ class Login(Resource):
         print(f"Login attempt for username: {username}")
 
         user = User.query.filter(User.username == username).first()
-        
+
         if not user:
             print(f"User not found: {username}")
             return make_response({'error': 'Username Not Found'}, 401)
@@ -638,15 +637,13 @@ class Login(Resource):
 
         if user.authenticate(password):
             session['user_id'] = user.id
-            print("/login", session)
-            ##ipdb.set_trace()
-            return make_response(user.to_dict(rules=('-_password_hash', "-books.user", '-books.bookshelves','-bookshelves.user', '-bookclubs.users', '-books.bookclubs',)), 200)
-
+            # Always return the same structure (user or error)
+            return make_response({'user': user.to_dict(rules=('-_password_hash',))}, 200)
         else:
             print(f"Password mismatch for user {username}")
             return make_response({'error': 'Incorrect password'}, 401)
 
-api.add_resource(Login, '/login')
+api.add_resource(Login, "/login")
 
 class Logout(Resource):
     def delete(self):
