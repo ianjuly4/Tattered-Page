@@ -257,7 +257,7 @@ api.add_resource(ChatlogsById, "/chatlogs/<int:id>")
 class Bookclubs(Resource):
     def get(self):
     
-        bookclub_dict_list = [bookclub.to_dict(rules=('-bookclubs.users', '-bookclubs.books', '-books.bookclubs', '-users.bookclubs',)) for bookclub in Bookclub.query.all()]
+        bookclub_dict_list = [bookclub.to_dict() for bookclub in Bookclub.query.all()]
         if bookclub_dict_list:
             return bookclub_dict_list, 200
         else:
@@ -310,6 +310,7 @@ class Bookclubs(Resource):
 api.add_resource(Bookclubs, "/bookclubs")
 
 class BookclubsById(Resource):
+    
     def patch(self, id):
         data = request.get_json()
 

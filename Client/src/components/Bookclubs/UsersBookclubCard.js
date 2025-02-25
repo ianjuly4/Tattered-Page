@@ -8,7 +8,7 @@ function UsersBookclubCard({ club = {}, user, book, bookId }) {
 
     const navigate = useNavigate()
 
-  
+    console.log(club)
     const getBookshelfCoverImage = (shelf) => {
         if (shelf.books && shelf.books.length > 0) {
         const firstBook = shelf.books[0];

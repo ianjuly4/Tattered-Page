@@ -20,7 +20,7 @@ function UsersBookclubs() {
     description: yup.string().required("Must Enter A Bookclub Description ").max(1000),
   });
 
-
+  console.log(bookclubs)
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -44,7 +44,6 @@ function UsersBookclubs() {
   useEffect(() => {
       setError(null); 
   }, [location]);
-
 
   if (isLoading) {
     return <div>Loading...</div>;
