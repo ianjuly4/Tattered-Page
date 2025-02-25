@@ -30,7 +30,7 @@ function MyContextProvider({ children }) {
   //create invite for chatlog
   const sendInvite = (userId, bookclubId) => {
     console.log(userId, bookclubId);
-    setError(null);  // Clear any previous error
+    setError(null); 
     
     fetch('/bookclubs_users', {
       method: 'POST',
@@ -44,18 +44,17 @@ function MyContextProvider({ children }) {
     })
       .then((response) => {
         if (!response.ok) {
-          // Check for specific error message in response
+          
           return response.json().then((errorData) => {
             const errorMessage = errorData.error || "Failed to send invite";
             setError(errorMessage);
-            throw new Error(errorMessage);  // Throw an error to stop further execution
+            throw new Error(errorMessage);  
           });
         }
         return response.json();
       })
       .then((data) => {
         console.log('Invite sent successfully:', data);
-        // Update the user state with the new invite
         setUser((prevUser) => ({
           ...prevUser,
           bookclubs: prevUser.bookclubs.map((bookclub) => {
@@ -75,7 +74,6 @@ function MyContextProvider({ children }) {
       });
   };
 
-  // Patch/Accept or Reject Invite function
 
 
   // Send the request to the backend to update the invite status
@@ -98,12 +96,12 @@ function MyContextProvider({ children }) {
         return response.json(); // Parse the response as JSON
       })
       .then((data) => {
-        // Successfully updated the invite status, now update the state
+      
         setUser((prevUser) => ({
           ...prevUser,
           bookclubs: prevUser.bookclubs.map((bookclub) => {
             if (bookclub.id === bookclubId) {
-              // Update the invite status in the specific bookclub
+            
               const updatedInvites = bookclub.invites
                 ? bookclub.invites.map((invite) => {
                     if (invite.user_id === userId) {
@@ -111,24 +109,24 @@ function MyContextProvider({ children }) {
                     }
                     return invite;
                   })
-                : []; // Initialize if there were no invites before
+                : []; 
 
               return {
                 ...bookclub,
-                invites: updatedInvites, // Update the invites in state
+                invites: updatedInvites, 
               };
             }
-            return bookclub; // No change if it's a different bookclub
+            return bookclub; 
           }),
         }));
-        console.log(`Invite ${response} successfully:`, data); // Log successful response
+        console.log(`Invite ${response} successfully:`, data); 
       })
       .catch((error) => {
         console.error('Error:', error.message);
         setError(error.message || "Failed to update invite status.");
       })
       .finally(() => {
-        setLoading(false); // Set loading state back to false
+        setLoading(false); 
       });
   };
 
@@ -211,8 +209,9 @@ function MyContextProvider({ children }) {
         setLoading(false);
       });
   };
+
   //Update bookclub/Patch
-  const updateBookclub = (clubId, bookId) => {
+  const addBookToBookclub = (clubId, bookId, action = "add") => {
     if (!bookId || !clubId) {
       setError("Invalid club or book ID");
       return;
@@ -220,24 +219,27 @@ function MyContextProvider({ children }) {
     setLoading(true);
     setError(null);
   
-    
     fetch(`/bookclubs/${clubId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ book_id: bookId }),
+      body: JSON.stringify({
+        book_id: bookId,
+        action: action,  
+      }),
     })
       .then((response) => response.json())
       .then((clubData) => {
         if (clubData.books) {
+
           setUser((prevUser) => ({
             ...prevUser,
             bookclubs: prevUser.bookclubs.map((existingClub) =>
-              existingClub.id === clubId 
-                ? { 
-                    ...existingClub, 
-                    books: [...existingClub.books, { id: bookId }] 
+              existingClub.id === clubId
+                ? {
+                    ...existingClub,
+                    books: clubData.books, 
                   }
                 : existingClub
             ),
@@ -245,12 +247,13 @@ function MyContextProvider({ children }) {
         }
       })
       .catch((error) => {
-        setError("Error adding book to bookclub: " + error.message);
+        setError("Error updating bookclub: " + error.message);
       })
       .finally(() => {
         setLoading(false);
       });
   };
+  
   
   
   //Create/Post Bookclub 
@@ -505,37 +508,36 @@ const deleteShelf = (shelfId) => {
 
   //Create Post Book 
   const createBook = (title, authors, description, coverImageUrl, publishedDate, bookId) => {
-    if (!title || !authors || !description || !coverImageUrl || !publishedDate || !bookId) {
+    if (!title || !authors || !description || !coverImageUrl || !bookId) {
       setError("Missing required fields for book creation");
       return;
     }
-  
+
     const isValidDate = (dateString) => {
-      const date = new Date(dateString);
-      return !isNaN(date.getTime());
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      return regex.test(dateString);
     };
-  
-    if (!isValidDate(publishedDate)) {
-      setError("Invalid date format for publishedDate. Using null.");
-      publishedDate = null;  
+    const formattedDate = isValidDate(publishedDate) ? publishedDate : 'NA';
+    if (formattedDate === 'NA') {
+      setError("Invalid date format. Please use YYYY-DD-MM.");
+      return;
     }
-  
-   
+
     const authorString = Array.isArray(authors) ? authors.join(", ") : authors;
-  
+
     setLoading(true);
     setError(null);
-  
+
     const requestBody = {
       title,
       author: authorString,
       synopsis: description,
       cover_image: coverImageUrl,
       progress: 0,
-      published_date: publishedDate,
+      published_date: formattedDate,
       google_key: bookId
     };
-  
+
     fetch("/books", {
       method: "POST",
       headers: {
@@ -550,25 +552,27 @@ const deleteShelf = (shelfId) => {
         return response.json();
       })
       .then((data) => {
-   
         if (data.id) {
-    
           setUser((prevUser) => ({
             ...prevUser,
             books: Array.isArray(prevUser.books) ? [...prevUser.books, data] : [data],
           }));
           return data;
         } else {
-          throw new Error(error.message + "Failed to create book. Please try again.");
+          throw new Error("Failed to create book. Please try again.");
         }
       })
       .catch((error) => {
-        setError('Error creating book'+ error.message);
+        setError('Error creating book: ' + error.message);
       })
       .finally(() => {
         setLoading(false);
       });
-  };
+};
+
+
+  
+  
   
   
   //Fetch Books
@@ -812,7 +816,7 @@ const deleteShelf = (shelfId) => {
         patchInvite,
         deleteShelf,
         updateBookProgress,
-        updateBookclub,
+        addBookToBookclub,
         removeBookFromBookshelf
       }}
     >

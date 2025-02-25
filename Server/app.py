@@ -30,7 +30,7 @@ def handle_join_room(data):
     if bookclub_id not in room_users:
         room_users[bookclub_id] = []
 
-    room_users[bookclub_id].append(username)  # Add user to the room's list
+    room_users[bookclub_id].append(username) 
     join_room(bookclub_id)
 
     # Emit updated user list to all users in the room
@@ -257,7 +257,7 @@ api.add_resource(ChatlogsById, "/chatlogs/<int:id>")
 class Bookclubs(Resource):
     def get(self):
     
-        bookclub_dict_list = [bookclub.to_dict() for bookclub in Bookclub.query.all()]
+        bookclub_dict_list = [bookclub.to_dict(rules=('-bookclubs.users', '-bookclubs.books', '-books.bookclubs', '-users.bookclubs',)) for bookclub in Bookclub.query.all()]
         if bookclub_dict_list:
             return bookclub_dict_list, 200
         else:
@@ -277,7 +277,7 @@ class Bookclubs(Resource):
         if not name or not description:
             return make_response({"error": "All bookclub fields are required"}, 400)
 
-        # Create the new bookclub
+        
         new_bookclub = Bookclub(
             name=name,
             description=description
@@ -288,19 +288,19 @@ class Bookclubs(Resource):
         if not user:
             return make_response({"error": "User not found"}, 404)
 
-        # Add the user as a 'creator' in the bookclub_users table
-        db.session.add(new_bookclub)  # Add the new bookclub to the session first
-        db.session.commit()  # Commit the session to generate the `bookclub_id`
+        
+        db.session.add(new_bookclub) 
+        db.session.commit() 
 
-        # Now that `bookclub_id` is set, add the user to the `bookclub_users` table with 'creator' status
+    
         bookclub_user = bookclub_users.insert().values(
-            bookclub_id=new_bookclub.id,  # Now we can use the generated `bookclub_id`
+            bookclub_id=new_bookclub.id,  
             user_id=user.id,
-            status='creator',  # Set the status to 'creator'
+            status='creator',  
             invited_at=datetime.utcnow()
         )
         
-        # Execute the insert statement for the user
+       
         db.session.execute(bookclub_user)
         db.session.commit()
 
@@ -315,19 +315,31 @@ class BookclubsById(Resource):
 
         bookclub = Bookclub.query.filter(Bookclub.id == id).first()
 
+        if not bookclub:
+            return make_response({"error": "Bookclub not found."}, 404)
+
         book_id = data.get("book_id")
         book = Book.query.filter(Book.id == book_id).first()
 
-        if not bookclub or not book:
-            return make_response({"error": "Bookclub or Book not found."}, 404)
+        if not book:
+            return make_response({"error": "Book not found."}, 404)
 
-        if book in bookclub.books:
-            return make_response({"error": "This book is already in the bookclub."}, 400)
-        
-        bookclub.books.append(book)
-        db.session.commit()
+        action = data.get("action") 
+        if action == "add":
+            if book in bookclub.books:
+                return make_response({"error": "This book is already in the bookclub."}, 400)
+            bookclub.books.append(book)
+            db.session.commit()
+            return make_response(bookclub.to_dict(), 200)
 
-        return make_response(bookclub.to_dict(), 200)
+        elif action == "remove":
+            if book not in bookclub.books:
+                return make_response({"error": "This book is not in the bookclub."}, 400)
+            bookclub.books.remove(book)
+            db.session.commit()
+            return make_response(bookclub.to_dict(), 200)
+
+        return make_response({"error": "Invalid action. Must be 'add' or 'remove'."}, 400)
     
     def delete(self, id):
         bookclub = Bookclub.query.filter(Bookclub.id == id).first()
@@ -393,7 +405,7 @@ class BookshelvesById(Resource):
 
     def patch(self, id):
         data = request.get_json()
-        
+
         bookshelf = BookShelf.query.filter(BookShelf.id == id).first()
         if not bookshelf:
             return make_response({"error": "Bookshelf not found."}, 404)
@@ -465,7 +477,6 @@ class Books(Resource):
         data = request.get_json()
 
         user_id = session.get('user_id')
-        print(user_id)
         if not user_id:
             return make_response({"error": "Unauthorized, Please Login to Continue"}, 401)
 
@@ -473,22 +484,31 @@ class Books(Resource):
         author = data.get("author")
         synopsis = data.get("synopsis")
         cover_image = data.get("cover_image")
-        progress = data.get("progress", 0)  
+        progress = data.get("progress", 0)
         published_date = data.get("published_date")
         google_key = data.get("google_key")
-        
-        ##print(title, author, synopsis, cover_image, progress, published_date, google_key)
 
         if not title or not author or not synopsis or not cover_image or not google_key:
             return make_response({"error": "All book fields are required."}, 400)
-        
+
+       
+        if published_date:
+            try:
+               
+                formatted_date = datetime.strptime(published_date, "%Y-%d-%m").date()
+            except ValueError:
+                return make_response({"error": "Invalid date format for published_date. Please use YYYY-DD-MM format."}, 400)
+        else:
+            formatted_date = None
+
+      
         new_book = Book(
             title=title,
             author=author,
             synopsis=synopsis,
             cover_image=cover_image,
             progress=progress,
-            published_date=published_date,
+            published_date=formatted_date,
             user_id=user_id,
             google_key=google_key
         )
@@ -499,6 +519,7 @@ class Books(Resource):
         return make_response(new_book.to_dict(), 201)
 
 api.add_resource(Books, "/books")
+
        
 
 
@@ -506,7 +527,7 @@ class UsersById(Resource):
     def get(self, id):
         user = User.query.filter(User.id == id).first()
         if user:
-            return make_response(user.to_dict(rules=('-_password_hash', "-books.user", '-books.bookshelves','-bookshelves.user', '-bookclubs.users', '-books.bookclubs',)), 200)
+            return make_response(user.to_dict(rules=('-_password_hash', )), 200)
         return make_response({"error": "User not found"}, 404)
 
     
@@ -608,7 +629,7 @@ class CheckSession(Resource):
         user = User.query.filter(User.id == user_id).first()
 
         if user:
-            return make_response(user.to_dict(rules=('-_password_hash', "-books.user", '-bookshelves.user', '-bookclubs.users')), 200)
+            return make_response(user.to_dict(rules=('-_password_hash',)), 200)
         else:
             return make_response({"message": "User not found"}, 404)
         
@@ -633,7 +654,6 @@ class Login(Resource):
 
         if user.authenticate(password):
             session['user_id'] = user.id
-            # Always return the same structure (user or error)
             return make_response({'user': user.to_dict(rules=('-_password_hash',))}, 200)
         else:
             print(f"Password mismatch for user {username}")

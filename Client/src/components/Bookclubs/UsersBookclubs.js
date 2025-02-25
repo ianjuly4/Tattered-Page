@@ -55,7 +55,6 @@ function UsersBookclubs() {
   }
 
 
-
   const backgroundStyle = {
     backgroundImage: `url(${animecoffeeshop})`,
     backgroundSize: "150%",

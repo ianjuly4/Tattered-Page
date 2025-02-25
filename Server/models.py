@@ -161,7 +161,7 @@ class Book(db.Model, SerializerMixin):
             raise ValueError("Synopsis cannot be empty")
         return synopsis
 
-
+  
 # BookClub-Book (many-to-many relationship between book and bookclub through the 'bookclub_books' table)
 bookclub_books = db.Table('bookclub_books',
     db.Column('bookclub_id', db.Integer, db.ForeignKey('bookclubs.id'), primary_key=True),
@@ -173,9 +173,9 @@ class Bookclub(db.Model, SerializerMixin):
     __tablename__ = "bookclubs"
 
     serialize_rules = (
-        "-chatlog.bookclubs",    # Exclude chatlog of bookclubs
-        "-users.bookclubs",      # Exclude users on bookclubs
-        "-books.bookclubs",      # Exclude books on bookclubs
+        "-chatlog.bookclubs",    
+        "-users.bookclubs",      
+        "-books.bookclubs",      
     )
 
     id = db.Column(db.Integer, primary_key=True)

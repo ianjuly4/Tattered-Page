@@ -90,7 +90,7 @@ function UserBookshelves() {
                     <h2 className="text-3xl font-semibold">{shelf.name}</h2>
 
                     {/* Carousel for Books inside the Bookshelf */}
-                    <div className="carousel mt-4 w-full overflow-x-auto flex gap-6 py-4  p-4"> 
+                    <div className="carousel mt-4 w-full overflow-x-auto flex gap-6 py-4 p-4"> 
                       {shelf.books && shelf.books.length > 0 ? (
                         shelf.books.map((book) => (
                           <div
@@ -130,7 +130,7 @@ function UserBookshelves() {
 
             {/* All Books Added */}
             <h2 className="text-5xl mt-12 font-semibold text-left mb-6">All Books You've Added</h2>
-            <div className="py-8 p-8 container">
+            <div className="py-8 p-8 container border-4 border-black rounded-lg">
               <div className="max-h-96 overflow-y-auto px-4">
                 {/* Check if there are books, otherwise show a placeholder */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -164,53 +164,55 @@ function UserBookshelves() {
               </div>
             </div>
 
-            {/* Create Bookshelf Form */}
-            <h2 className="text-3xl justify-center flex items-center font-bold mt-24 text-left">
-              Create A Bookshelf
-            </h2>
-            <form onSubmit={formik.handleSubmit}>
-              <label className="input bg-secondary input-bordered flex items-center gap-2">
-                <input
-                  type="text"
-                  className="grow"
-                  placeholder="Bookshelf Name"
-                  {...formik.getFieldProps("name")}
-                />
-              </label>
-              {formik.touched.name && formik.errors.name && (
-                <div className="text-red-500">{formik.errors.name}</div>
-              )}
+            {/* Create Bookshelf Form Section */}
+            <div className="mt-24 p-6 border-4 border-black rounded-lg">
+              <h2 className="text-3xl justify-center flex items-center font-bold mt-24 text-left">
+                Create A Bookshelf
+              </h2>
+              <form onSubmit={formik.handleSubmit}>
+                <label className="input bg-secondary input-bordered flex items-center gap-2">
+                  <input
+                    type="text"
+                    className="grow"
+                    placeholder="Bookshelf Name"
+                    {...formik.getFieldProps("name")}
+                  />
+                </label>
+                {formik.touched.name && formik.errors.name && (
+                  <div className="text-red-500">{formik.errors.name}</div>
+                )}
 
-              <label className="input bg-secondary input-bordered flex items-center gap-2 mt-4">
-                <input
-                  type="text"
-                  className="grow"
-                  placeholder="Bookshelf Description"
-                  {...formik.getFieldProps("description")}
-                />
-              </label>
-              {formik.touched.description && formik.errors.description && (
-                <div className="text-red-500">{formik.errors.description}</div>
-              )}
+                <label className="input bg-secondary input-bordered flex items-center gap-2 mt-4">
+                  <input
+                    type="text"
+                    className="grow"
+                    placeholder="Bookshelf Description"
+                    {...formik.getFieldProps("description")}
+                  />
+                </label>
+                {formik.touched.description && formik.errors.description && (
+                  <div className="text-red-500">{formik.errors.description}</div>
+                )}
 
-              <label className="input bg-secondary input-bordered flex items-center gap-2 mt-4">
-                <input
-                  type="text"
-                  className="grow"
-                  placeholder="Bookshelf Genre"
-                  {...formik.getFieldProps("genre")}
-                />
-              </label>
-              {formik.touched.genre && formik.errors.genre && (
-                <div className="text-red-500">{formik.errors.genre}</div>
-              )}
+                <label className="input bg-secondary input-bordered flex items-center gap-2 mt-4">
+                  <input
+                    type="text"
+                    className="grow"
+                    placeholder="Bookshelf Genre"
+                    {...formik.getFieldProps("genre")}
+                  />
+                </label>
+                {formik.touched.genre && formik.errors.genre && (
+                  <div className="text-red-500">{formik.errors.genre}</div>
+                )}
 
-              <div className="form-control mt-6">
-                <button type="submit" className="btn btn-secondary">
-                  Create Bookshelf
-                </button>
-              </div>
-            </form>
+                <div className="form-control mt-6">
+                  <button type="submit" className="btn btn-secondary">
+                    Create Bookshelf
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>

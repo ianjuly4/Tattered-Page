@@ -4,10 +4,11 @@ import { MyContext } from "../../MyContext";
 import { useNavigate } from "react-router-dom";
 
 function UsersBookclubCard({ club = {}, user, book, bookId }) {
-    const { updateBookclub } = useContext(MyContext);
+    const { addBookToBookclub } = useContext(MyContext);
 
     const navigate = useNavigate()
 
+  
     const getBookshelfCoverImage = (shelf) => {
         if (shelf.books && shelf.books.length > 0) {
         const firstBook = shelf.books[0];
@@ -19,9 +20,9 @@ function UsersBookclubCard({ club = {}, user, book, bookId }) {
 
     const isBookInClub = Array.isArray(club.books) && club.books.some((clubBook) => clubBook.id === bookId);
     
-    const onAddToClub = (shelfId, bookId) => {
+    const onAddToClub = (clubId, bookId) => {
         if (!isBookInClub) {
-            updateBookclub(shelfId, bookId); 
+            addBookToBookclub(clubId, bookId); 
         }
     };
 

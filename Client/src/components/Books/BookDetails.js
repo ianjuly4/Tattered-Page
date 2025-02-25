@@ -5,7 +5,7 @@ import defaultbookimage from "../../assets/defaultbookimage.jpg";
 import { NavLink, useParams, useLocation, useNavigate } from "react-router-dom";
 import BookshelvesCard from "../Bookshelves/BookshelvesCard";
 import Footer from "../Footer";
-import library from "../../assets/library.jpg"; // Add the image here
+import library from "../../assets/library.jpg"; 
 
 function BookDetails() {
   const { bookId } = useParams();
@@ -27,11 +27,18 @@ function BookDetails() {
       if (userBook) {
         navigate(`/users/${user.id}/books/${userBook.id}`);
       }
+    } else if (!user) {
+      navigate("/books");
     }
   }, [user, bookId, navigate]);
 
   if (!book) {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        <Header />
+        Loading...
+      </div>
+    );
   }
 
   const { volumeInfo } = book || {};
@@ -39,9 +46,41 @@ function BookDetails() {
 
   const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
 
-  const handleAddtoLibrary = () => {
-    createBook(title, authors, description, coverImageUrl, publishedDate, bookId);
+  const formatDate = (date) => {
+    if (!date) return 'NA'; 
+  
+   
+    if (date.length === 4 && !date.includes('-')) {
+      return date; 
+    }
+  
+   
+    if (date.length === 7 && date.includes('-')) {
+      const [year, month] = date.split('-');
+      return `${year}-01-${month}`;
+    }
+  
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      return 'NA'; 
+    }
+  
+   
+    const year = dateObj.getFullYear();
+    const day = String(dateObj.getDate()).padStart(2, '0');  
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');  
+    
+   
+    return `${year}-${day}-${month}`;
   };
+  
+  const correctedPublishedDate = formatDate(publishedDate);
+
+  const handleAddtoLibrary = () => {
+    createBook(title, authors, description, coverImageUrl, correctedPublishedDate, bookId);
+  };
+
+  console.log(correctedPublishedDate);
 
   // Background Style
   const backgroundStyle = {
@@ -60,7 +99,6 @@ function BookDetails() {
 
   return (
     <div className="relative min-h-screen">
-    
       <div style={backgroundStyle}></div>
 
       {/* Overlay for better readability */}
@@ -100,8 +138,8 @@ function BookDetails() {
             <p className="text-center mb-4 text-lg">By {authors.join(", ")}</p>
           )}
 
-          {publishedDate && (
-            <p className="text-center mb-4 text-lg">Published Date: {publishedDate}</p>
+          {correctedPublishedDate && (
+            <p className="text-center mb-4 text-lg">Published Date: {correctedPublishedDate}</p>
           )}
 
           {isLoggedIn && (

@@ -66,9 +66,9 @@ function BookshelfDetail() {
                                 <div
                                     className="flex flex-col justify-between"
                                     style={{ height: "350px", width: "100%" }} 
-                                >
-                                    <UserBookCard book={book} /> 
-
+                                >   <NavLink to={`/users/${user.id}/books/${book.id}`}>
+                                        <UserBookCard book={book} /> 
+                                    </NavLink>
                                     {/* Remove Book Button */}
                                     <button
                                         onClick={() => handleRemoveBook(bookshelf.id, book.id)}

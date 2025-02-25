@@ -17,6 +17,9 @@ function UserBookDetails() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  
+  console.log(user)
+  
   useEffect(() => {
     if (!user) {
       setIsLoading(true);
@@ -58,8 +61,6 @@ function UserBookDetails() {
     return <div>Book not found</div>;
   }
 
-  console.log(user)
-
   const { title, author, synopsis, cover_image, published_date } = book;
 
   const backgroundStyle = {
@@ -84,15 +85,18 @@ function UserBookDetails() {
   };
 
   const handleProgressUpdate = () => {
-    console.log(bookProgress);
     updateBookProgress(bookId, bookProgress);
   };
 
   return (
     <div className="relative min-h-screen flex flex-col">
+      {/* Background */}
       <div style={backgroundStyle}></div>
-      <div className="absolute inset-0 bg-black opacity-50"></div>
+      {/* Overlay to darken background for readability */}
+      <div className="absolute inset-0 opacity-50"></div>
+
       <div className="relative z-10 flex-grow">
+        {/* Header */}
         <Header />
       </div>
 
@@ -104,8 +108,7 @@ function UserBookDetails() {
             <img
               src={cover_image || defaultbookimage}
               alt={title}
-              className="w-full sm:w-48 md:w-64 lg:w-80 h-auto object-cover rounded shadow-lg border-4 border-gray-300"
-            />
+              className="w-full sm:w-48 md:w-64 lg:w-80 h-auto object-cover rounded-lg shadow-lg border-4 border-black"/>
           </figure>
 
           <div className="text-center mb-4">
@@ -157,71 +160,74 @@ function UserBookDetails() {
             </div>
           </div>
           {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+
+          {/* Bookshelves Section with Border */}
           <div className="border-4 mt-6 border-gray-300 p-4 mb-6 rounded-lg">
-          {isLoggedIn ? (
-            <>
-              <div className="flex justify-between items-start mb-4">
-                <h2 className="text-2xl font-bold text-center">Your Bookshelves</h2>
-                <NavLink to={`/users/${user.id}/bookshelves`}>
-                  <button className="btn btn-primary btn-sm">Go To Your Bookshelves</button>
-                </NavLink>
-              </div>
+            {isLoggedIn ? (
+              <>
+                <div className="flex justify-between items-start mb-4">
+                  <h2 className="text-2xl font-bold text-center">Your Bookshelves</h2>
+                  <NavLink to={`/users/${user.id}/bookshelves`}>
+                    <button className="btn btn-primary btn-sm">Go To Your Bookshelves</button>
+                  </NavLink>
+                </div>
 
-              <div className="flex overflow-x-auto space-x-4">
-                {bookshelves && bookshelves.length > 0 ? (
-                  bookshelves.map((shelf) => (
-                    <div className="w-60 p-4 flex-none" key={shelf.id}>
-                      <BookshelvesCard shelf={shelf} bookId={book.id} user={user} />
+                <div className="flex overflow-x-auto space-x-4">
+                  {bookshelves && bookshelves.length > 0 ? (
+                    bookshelves.map((shelf) => (
+                      <div className="w-60 p-4 flex-none" key={shelf.id}>
+                        <BookshelvesCard shelf={shelf} bookId={book.id} user={user} />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-3 text-center">
+                      <p>No Bookshelves Found, Please Go To Bookshelves To Create A Bookshelf.</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="col-span-3 text-center">
-                    <p>No Bookshelves Found, Please Go To Bookshelves To Create A Bookshelf.</p>
-                  </div>
-                )}
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="text-center">
+                <p>You need to be logged in to view your bookshelves.</p>
               </div>
-            </>
-          ) : (
-            <div className="text-center">
-              <p>You need to be logged in to view your bookshelves.</p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
+          {/* Bookclubs Section with Border */}
+          <div className="border-4 border-gray-300 p-4 rounded-lg">
+            {isLoggedIn ? (
+              <>
+                <div className="flex justify-between items-start mb-4">
+                  <h2 className="text-2xl font-semibold text-center">Your Book Clubs</h2>
+                  <NavLink to={`/users/${user.id}/bookclubs`}>
+                    <button className="btn btn-primary btn-sm">Go To Your Book Clubs</button>
+                  </NavLink>
+                </div>
 
-            {/* Bookclubs Section with Border */}
-            <div className="border-4 border-gray-300 p-4 rounded-lg">
-          {isLoggedIn ? (
-            <>
-              <div className="flex justify-between items-start mb-4">
-                <h2 className="text-2xl font-semibold text-center">Your Book Clubs</h2>
-                <NavLink to={`/users/${user.id}/bookclubs`}>
-                  <button className="btn btn-primary btn-sm">Go To Your Book Clubs</button>
-                </NavLink>
-              </div>
-
-              <div className="flex overflow-x-auto space-x-4">
-                {bookclubs && bookclubs.length > 0 ? (
-                  bookclubs.map((club) => (
-                    <div className="w-60 p-4 flex-none" key={club.id}>
-                      <UsersBookclubCard club={club} user={user} book={book} bookId={book.id} />
+                <div className="flex overflow-x-auto space-x-4">
+                  {bookclubs && bookclubs.length > 0 ? (
+                    bookclubs.map((club) => (
+                      <div className="w-60 p-4 flex-none" key={club.id}>
+                        <UsersBookclubCard club={club} user={user} book={book} bookId={book.id} />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-3 text-center">
+                      <p>No Book Clubs Found, Please Join A Book Club to See Your Book Clubs.</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="col-span-3 text-center">
-                    <p>No Book Clubs Found, Please Join A Book Club to See Your Book Clubs.</p>
-                  </div>
-                )}
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="text-center">
+                <p>You need to be logged in to view your book clubs.</p>
               </div>
-            </>
-          ) : (
-            <div className="text-center">
-              <p>You need to be logged in to view your book clubs.</p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Footer */}
       <Footer className="mt-auto" />
     </div>
   );
