@@ -4,7 +4,7 @@ import { MyContext } from "../../MyContext";
 import { useNavigate } from "react-router-dom";
 
 function BookshelvesCard({ shelf = {}, book, bookId, user }) {
-    const { updateBookshelf } = useContext(MyContext);
+    const {addToBookshelf} = useContext(MyContext);
     const navigate = useNavigate();
 
     const getBookshelfCoverImage = (shelf) => {
@@ -21,10 +21,10 @@ function BookshelvesCard({ shelf = {}, book, bookId, user }) {
         ? shelf.books.some((shelfBook) => shelfBook.id === bookId)
         : false;
 
-    const onAddToLibrary = (shelfId, bookId) => {
+    const onAddToBookshelf = (shelfId, bookId) => {
         if (!isBookInShelf) {
             console.log(shelfId, bookId)
-            updateBookshelf(shelfId, bookId);
+            addToBookshelf(shelfId, bookId);
         }
     };
 
@@ -62,7 +62,7 @@ function BookshelvesCard({ shelf = {}, book, bookId, user }) {
                         </button>
                     ) : (
                         <button
-                            onClick={() => onAddToLibrary(shelf.id, bookId)}
+                            onClick={() =>onAddToBookshelf(shelf.id, bookId)}
                             className="btn btn-primary btn-xs w-full text-sm mt-2"
                         >
                             Add to Shelf

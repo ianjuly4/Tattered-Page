@@ -315,10 +315,66 @@ function MyContextProvider({ children }) {
       });
   };
 
-  
+  //Remove Book from Bookshelf
+  const removeBookFromBookshelf = (bookshelfId, bookId, action = "remove") => {
+    if (!bookId || !bookshelfId) {
+        setError("Invalid shelf or book ID");
+        return;
+    }
 
-  //Patch/Update Bookshelf
-  const updateBookshelf = (shelfId, bookId) => {
+    setLoading(true);
+    setError(null);
+
+
+    fetch(`/bookshelves/${bookshelfId}`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            book_id: bookId,
+            action: action,
+        }),
+    })
+        .then((response) => {
+            if (!response.ok) {
+             
+                throw new Error("Failed to remove book from bookshelf.");
+            }
+            return response.json();
+        })
+        .then((shelfData) => {
+            if (shelfData.books) {
+               
+                setUser((prevUser) => ({
+                    ...prevUser,
+                    bookshelves: prevUser.bookshelves.map((existingShelf) =>
+                        existingShelf.id === bookshelfId
+                            ? {
+                                  ...existingShelf,
+                                  books: shelfData.books, 
+                              }
+                            : existingShelf
+                    ),
+                }));
+            } else {
+                
+                throw new Error("No books found in the response.");
+            }
+        })
+        .catch((error) => {
+            
+            setError("Error removing book from bookshelf: " + error.message);
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+};
+
+
+
+  //Add Book to Bookshelf
+  const addToBookshelf = (shelfId, bookId, action = "add") => {
     if (!bookId || !shelfId) {
         setError("Invalid shelf or book ID");
         return;
@@ -331,11 +387,13 @@ function MyContextProvider({ children }) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ book_id: bookId }),
+        body: JSON.stringify({ 
+            book_id: bookId, 
+            action: action
+        }),
     })
         .then((response) => response.json())
         .then((shelfData) => {
-            
             if (shelfData.books) {
                 setUser((prevUser) => ({
                     ...prevUser,
@@ -351,14 +409,13 @@ function MyContextProvider({ children }) {
             }
         })
         .catch((error) => {
-            setError("Error adding book to bookshelf: " + error.message);
+            setError("Error updating bookshelf: " + error.message);
         })
         .finally(() => {
             setLoading(false);
         });
 };
 
-  
 
 //Delete bookshelf
 const deleteShelf = (shelfId) => {
@@ -388,7 +445,6 @@ const deleteShelf = (shelfId) => {
       setLoading(false);
     });
 };
-
 
 
   //Delete/Delete Book function 
@@ -422,7 +478,6 @@ const deleteShelf = (shelfId) => {
 
   //update book progress
   const updateBookProgress = (bookId, progress) => {
-    
     fetch(`/books/${bookId}`, {
       method: 'PATCH',
       body: JSON.stringify({ bookProgress: progress }),
@@ -430,18 +485,14 @@ const deleteShelf = (shelfId) => {
     })
       .then(response => response.json())
       .then(updatedBook => {
-        
         setUser((prevUser) => {
-        
           const updatedBooks = prevUser.books.map((book) =>
             book.id === bookId
-              ? { ...book, progress: updatedBook.progress }  
+              ? { ...book, progress: updatedBook.progress } 
               : book
           );
-  
-       
           return {
-            ...prevUser,
+            ...prevUser, 
             books: updatedBooks, 
           };
         });
@@ -450,10 +501,7 @@ const deleteShelf = (shelfId) => {
         console.error("Error updating progress:", error);
       });
   };
-  
 
-  
-  
 
   //Create Post Book 
   const createBook = (title, authors, description, coverImageUrl, publishedDate, bookId) => {
@@ -645,12 +693,7 @@ const deleteShelf = (shelfId) => {
         setLoading(false);
       });
   };
-  
-  
-  
-  
-  
-  
+
 
   ///Signup Post Function
   const signup = async(username, password) => {
@@ -758,7 +801,7 @@ const deleteShelf = (shelfId) => {
         createBookclub,
         createBookshelf,
         createBook,
-        updateBookshelf,
+        addToBookshelf,
         deleteBook,
         deleteAccount,
         updateUserAttribute,
@@ -769,7 +812,8 @@ const deleteShelf = (shelfId) => {
         patchInvite,
         deleteShelf,
         updateBookProgress,
-        updateBookclub
+        updateBookclub,
+        removeBookFromBookshelf
       }}
     >
       {children}

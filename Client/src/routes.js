@@ -47,7 +47,7 @@ const routes = [
   },
  
   {
-    path: "/users/:userId/bookshelves/:bookshelfId",
+    path: "/users/:userId/bookshelves/:shelfId",
     element: <BookshelfDetails/>
   },
   {

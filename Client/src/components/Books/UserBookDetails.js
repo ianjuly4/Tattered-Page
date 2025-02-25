@@ -58,6 +58,7 @@ function UserBookDetails() {
     return <div>Book not found</div>;
   }
 
+  console.log(user)
 
   const { title, author, synopsis, cover_image, published_date } = book;
 
@@ -221,7 +222,6 @@ function UserBookDetails() {
         </div>
         </div>
       </div>
-
       <Footer className="mt-auto" />
     </div>
   );

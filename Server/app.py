@@ -393,22 +393,35 @@ class BookshelvesById(Resource):
 
     def patch(self, id):
         data = request.get_json()
-
+        
         bookshelf = BookShelf.query.filter(BookShelf.id == id).first()
+        if not bookshelf:
+            return make_response({"error": "Bookshelf not found."}, 404)
 
         book_id = data.get("book_id")
         book = Book.query.filter(Book.id == book_id).first()
 
-        if not bookshelf or not book:
-            return make_response({"error": "Bookshelf or Book not found."}, 404)
+        if not book:
+            return make_response({"error": "Book not found."}, 404)
 
-        if book in bookshelf.books:
-            return make_response({"error": "This book is already in the bookshelf."}, 400)
-        
-        bookshelf.books.append(book)
-        db.session.commit()
+        action = data.get("action")  
 
-        return make_response(bookshelf.to_dict(), 200)
+        if action == "add":
+            if book in bookshelf.books:
+                return make_response({"error": "This book is already in the bookshelf."}, 400)
+            bookshelf.books.append(book)
+            db.session.commit()
+            return make_response(bookshelf.to_dict(), 200)
+
+        elif action == "remove":
+            if book not in bookshelf.books:
+                return make_response({"error": "This book is not in the bookshelf."}, 400)
+            bookshelf.books.remove(book)
+            db.session.commit()
+            return make_response(bookshelf.to_dict(), 200)
+
+        return make_response({"error": "Invalid action. Must be 'add' or 'remove'."}, 400)
+    
     
     def delete(self, id):
         shelf = BookShelf.query.filter(BookShelf.id == id).first()
@@ -427,23 +440,6 @@ class BooksById(Resource):
         if not book:
             return make_response({"error":"Book not found"}, 404)
         return make_response(book.to_dict(rules=('-bookshelves.user','-user.bookshelves','-user.bookclubs','-books.user',)), 200)
-    
-    def patch(self, id):
-        data = request.get_json()
-        book = Book.query.get(id)
-        
-        if not book:
-            return {"error": "Book not found"}, 404
-
-        
-        progress = data.get('bookProgress')
-        if progress is not None:
-            book.progress = progress
-            book.last_read_at = datetime.utcnow()  
-
-        db.session.commit()
-
-        return make_response(book.to_dict(), 200)
     
     def delete(self, id):
         book = Book.query.filter(Book.id == id).first()
