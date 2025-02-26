@@ -9,8 +9,13 @@ class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
     serialize_rules = (
-        "-books.user",  
-        "-bookshelves.user",  
+        "-books.user",
+        "-user.books",
+        "-user.bookshelves",
+        "-books.bookshelves",
+        "-user.bookclubs",  
+        "-bookshelves.user",
+        "-books.bookclubs",  
         "-bookclubs.users",
         "-chatlogs.users",  
     
@@ -62,7 +67,9 @@ class BookShelf(db.Model, SerializerMixin):
     serialize_rules = (
        "-books.bookshelves",  
         "-user.bookshelves", 
-        "-bookclubs.books",  
+        "-bookclubs.books",
+        "-user.books",
+        "-books.user",  
     
     )
 
@@ -105,7 +112,10 @@ class Book(db.Model, SerializerMixin):
     serialize_rules = (
         "-user.books", 
         "-bookshelves.books",  
-        "-bookclubs.books",  
+        "-bookclubs.books",
+        "-books.user",
+        "-books.bookshelves",
+        "-books.bookclubs",  
     )
 
     id = db.Column(db.Integer, primary_key=True)
