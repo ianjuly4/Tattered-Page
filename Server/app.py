@@ -539,7 +539,7 @@ class UsersById(Resource):
             setattr(user, attr, value)
 
         db.session.commit()
-        return make_response(user.to_dict(), 200)
+        return make_response(user.to_dict(rules=("-")), 200)
 
     
     def delete(self, id):

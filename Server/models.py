@@ -9,17 +9,11 @@ class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
     serialize_rules = (
+        "-books.user",  
         "-bookshelves.user",  
-        "-books.users",       
-        "-bookclubs.books",   
-        "-bookclubs.users",    
-        "-bookshelves.user_id", 
-        "-user.bookshelves",   
-        "-user.bookclubs",     
-        "-user.books",
-        "-books.bookclubs",  
-        "-books.bookshelves", 
-        "-books.user",       
+        "-bookclubs.users",
+        "-chatlogs.users",  
+    
     )
 
     id = db.Column(db.Integer, primary_key=True)
@@ -66,13 +60,9 @@ class BookShelf(db.Model, SerializerMixin):
     __tablename__ = "bookshelves"
 
     serialize_rules = (
-        "-books.bookshelves",  
-        "-user.bookshelves",   
-        "-bookclubs.books",
-        "-bookclubs.user",
-        '-user.books',
-        '-books.user',
-        '-bookshelves.user', 
+       "-books.bookshelves",  
+        "-user.bookshelves", 
+        "-bookclubs.books",  
     
     )
 
@@ -113,12 +103,9 @@ class Book(db.Model, SerializerMixin):
     __tablename__ = "books"
 
     serialize_rules = (
-        "-user.books",           
-        "-bookshelves.books",   
-        "-bookclubs.books",
-        '-bookclubs.users',
-        '-books.bookshelves',
-        '-books.user',
+        "-user.books", 
+        "-bookshelves.books",  
+        "-bookclubs.books",  
     )
 
     id = db.Column(db.Integer, primary_key=True)
@@ -176,10 +163,10 @@ class Bookclub(db.Model, SerializerMixin):
     __tablename__ = "bookclubs"
 
     serialize_rules = (
-        "-chatlog.bookclubs",    
-        "-users.bookclubs",
-        "-users.books", 
-        "-users.bookshelves",     
+       "-chatlogs.bookclub", 
+        "-users.bookclubs",  
+        "-users.books",  
+        "-bookclub.chatlogs",  
     )
 
     id = db.Column(db.Integer, primary_key=True)
@@ -211,9 +198,10 @@ class Chatlog(db.Model, SerializerMixin):
     __tablename__ = "chatlogs"
 
     serialize_rules = (
-        "-bookclub.chatlog",  
-        "-books.chatlogs", 
-        "-users.chatlogs"  
+        "-bookclub.chatlogs", 
+        "-books.chatlogs",  
+        "-users.chatlogs",
+        "-chatlog.bookclub",  
     )
 
     id = db.Column(db.Integer, primary_key=True)
