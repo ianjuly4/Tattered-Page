@@ -11,9 +11,8 @@ import ipdb
 def index(path=None):
     return send_from_directory(os.path.join(app.static_folder), 'index.html')
 
-user_sessions = {}  # Track user sessions by socket ID
-room_users = {}  # Track users in each room
-
+user_sessions = {} 
+room_users = {}  
 # Handle socket connection
 @socketio.on('connect')
 def handle_connect():
@@ -259,15 +258,15 @@ class Bookclubs(Resource):
             return bookclub_dict_list, 200
         else:
             return {"error": "No Bookclubs Found"}, 404
-    
+   
     def post(self):
         data = request.get_json()
-        
+
         user_id = session.get('user_id')
-        
+
         if not user_id:
             return make_response({"error": "Unauthorized, Please Login to Continue"}, 401)
-        
+
         name = data.get('name')
         description = data.get('description')
 
@@ -280,26 +279,18 @@ class Bookclubs(Resource):
             description=description
         )
 
+       
         user = User.query.get(user_id)
-        
+
         if not user:
             return make_response({"error": "User not found"}, 404)
 
         
-        db.session.add(new_bookclub) 
-        db.session.commit() 
+        new_bookclub.users.append(user)  
 
-    
-        bookclub_user = bookclub_users.insert().values(
-            bookclub_id=new_bookclub.id,  
-            user_id=user.id,
-            status='creator',  
-            invited_at=datetime.utcnow()
-        )
-        
        
-        db.session.execute(bookclub_user)
-        db.session.commit()
+        db.session.add(new_bookclub)
+        db.session.commit()  
 
         return make_response(new_bookclub.to_dict(), 201)
 
@@ -322,22 +313,27 @@ class BookclubsById(Resource):
         if not book:
             return make_response({"error": "Book not found."}, 404)
 
-        action = data.get("action") 
+        action = data.get("action")
+        
+        # Constants for action types
+        ACTIONS = {"add", "remove"}
+
+        if action not in ACTIONS:
+            return make_response({"error": "Invalid action. Must be 'add' or 'remove'."}, 400)
+
         if action == "add":
             if book in bookclub.books:
                 return make_response({"error": "This book is already in the bookclub."}, 400)
             bookclub.books.append(book)
             db.session.commit()
-            return make_response(bookclub.to_dict(), 200)
+            return make_response({"message": "Book added to bookclub.", "bookclub": bookclub.to_dict()}, 200)
 
         elif action == "remove":
             if book not in bookclub.books:
                 return make_response({"error": "This book is not in the bookclub."}, 400)
             bookclub.books.remove(book)
             db.session.commit()
-            return make_response(bookclub.to_dict(), 200)
-
-        return make_response({"error": "Invalid action. Must be 'add' or 'remove'."}, 400)
+            return make_response({"message": "Book removed from bookclub.", "bookclub": bookclub.to_dict()}, 200)
     
     def delete(self, id):
         bookclub = Bookclub.query.filter(Bookclub.id == id).first()
@@ -449,7 +445,7 @@ class BooksById(Resource):
         book = Book.query.filter(Book.id == id).first()
         if not book:
             return make_response({"error":"Book not found"}, 404)
-        return make_response(book.to_dict(rules=('-bookshelves.user','-user.bookshelves','-user.bookclubs','-books.user',)), 200)
+        return make_response(book.to_dict(), 200)
     
     def delete(self, id):
         book = Book.query.filter(Book.id == id).first()

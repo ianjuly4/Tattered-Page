@@ -10,14 +10,11 @@ class User(db.Model, SerializerMixin):
 
     serialize_rules = (
         "-books.user",
-        "-user.books",
-        "-user.bookshelves",
-        "-books.bookshelves",
-        "-user.bookclubs",  
-        "-bookshelves.user",
-        "-books.bookclubs",  
+        "-bookshelves.user",  
         "-bookclubs.users",
-        "-chatlogs.users",  
+        "-chatlogs.users",
+        "-books.bookshelves",
+        "-books.bookclubs",
     
     )
 
@@ -66,10 +63,9 @@ class BookShelf(db.Model, SerializerMixin):
 
     serialize_rules = (
        "-books.bookshelves",  
-        "-user.bookshelves", 
-        "-bookclubs.books",
-        "-user.books",
-        "-books.user",  
+        "-user.bookshelves",
+        "-books.user",
+        "-books.bookclubs", 
     
     )
 
@@ -113,9 +109,7 @@ class Book(db.Model, SerializerMixin):
         "-user.books", 
         "-bookshelves.books",  
         "-bookclubs.books",
-        "-books.user",
-        "-books.bookshelves",
-        "-books.bookclubs",  
+
     )
 
     id = db.Column(db.Integer, primary_key=True)
@@ -175,8 +169,10 @@ class Bookclub(db.Model, SerializerMixin):
     serialize_rules = (
        "-chatlogs.bookclub", 
         "-users.bookclubs",  
-        "-users.books",  
-        "-bookclub.chatlogs",  
+       "-books.bookclubs",
+       "-books.bookshelves",
+       "-books.user",
+        
     )
 
     id = db.Column(db.Integer, primary_key=True)
@@ -210,8 +206,7 @@ class Chatlog(db.Model, SerializerMixin):
     serialize_rules = (
         "-bookclub.chatlogs", 
         "-books.chatlogs",  
-        "-users.chatlogs",
-        "-chatlog.bookclub",  
+        "-users.chatlogs", 
     )
 
     id = db.Column(db.Integer, primary_key=True)

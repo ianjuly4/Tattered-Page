@@ -226,33 +226,36 @@ function MyContextProvider({ children }) {
       },
       body: JSON.stringify({
         book_id: bookId,
-        action: action,  
+        action: action,
       }),
     })
       .then((response) => response.json())
       .then((clubData) => {
-        if (clubData.books) {
-
+        if (Array.isArray(clubData.books)) {
           setUser((prevUser) => ({
             ...prevUser,
             bookclubs: prevUser.bookclubs.map((existingClub) =>
               existingClub.id === clubId
                 ? {
                     ...existingClub,
-                    books: clubData.books, 
+                    books: clubData.books,
                   }
                 : existingClub
             ),
           }));
+        } else {
+          setError("Unexpected response format.");
         }
       })
       .catch((error) => {
         setError("Error updating bookclub: " + error.message);
+        console.error(error); // Optional: log the full error object for debugging
       })
       .finally(() => {
         setLoading(false);
       });
   };
+  
   
   
   
