@@ -51,9 +51,6 @@ const LandingPage = () => {
           <div className="flex gap-4">
             <NavLink to={'/dashboard'} className="btn btn-ghost">Home</NavLink>
           </div>
-          <div className="flex gap-4">
-            <NavLink to={'/account'} className="btn btn-ghost">Account</NavLink>
-          </div>
 
         </div>
       </div>
@@ -100,23 +97,6 @@ const LandingPage = () => {
           <NavLink to={"/bookshelves"} className="btn btn-secondary mt-6">Go to Bookshelf</NavLink>
         </div>
       </section>
-
-      {/* Section 3: Community Discussion */}
-      <section className="bg-accent text-black py-12">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-semibold">Join the Discussion</h2>
-          <p className="mt-4 text-lg">
-            Engage in live, real-time conversations with your fellow readers. Whether it’s for a group discussion or a one-on-one chat, the app keeps your conversations flowing smoothly. So, grab your coffee and chat about your favorite chapters!
-          </p>
-          <div className="flex-shrink-0">
-            <Lottie options={chatbubble} height={150} width={150} />
-          </div>
-          <NavLink to={'/bookclubs'}>
-          <button className="btn btn-secondary mt-6">Join Now</button>
-          </NavLink>
-        </div>
-      </section>
-
     
       <Footer/>
     </div>

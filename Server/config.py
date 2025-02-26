@@ -8,7 +8,6 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy.ext.associationproxy import association_proxy
-from flask_socketio import SocketIO, emit, join_room, send, disconnect, leave_room
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -37,11 +36,10 @@ db = SQLAlchemy(metadata=metadata)
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 CORS(app, cors_allowed_origins=['http://localhost:3000'], supports_credentials=True)
-socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000"])
 api = Api(app)
 
 
 db.init_app(app)
 
 
-__all__ = ["app", "db", "bcrypt", "migrate", "api", "os", "socketio", "emit", "join_room", "send", "disconnect", "leave_room", "Flask"]
+__all__ = ["app", "db", "bcrypt", "migrate", "api", "os", "Flask"]

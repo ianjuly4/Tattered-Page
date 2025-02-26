@@ -1,132 +1,14 @@
 from flask import Flask, render_template, request, make_response, session, send_from_directory, jsonify
 from flask_restful import Api, Resource
-from config import app, db, bcrypt, migrate, api, os, socketio, emit, join_room, send, leave_room, disconnect
-from models import User, BookShelf, Bookclub, Book, bookclub_users, Chatlog
+from config import app, db, bcrypt, migrate, api, os
+from models import User, BookShelf, Bookclub, Book, Chatlog
 from datetime import datetime
 import ipdb
-
 
 @app.route('/')
 @app.route('/<path:path>')
 def index(path=None):
     return send_from_directory(os.path.join(app.static_folder), 'index.html')
-
-
-room_users = {}  # Dictionary to track users in each bookclub room
-
-# Handle user connection
-@socketio.on('connect')
-def handle_connect():
-    print("User connected with socket ID:", request.sid)
-
-# Handle joining a room (bookclub)
-@socketio.on('join_room')
-def handle_join_room(data):
-    bookclub_id = data.get('bookclub_id')
-    user_id = data.get('user_id')
-
-    if bookclub_id not in room_users:
-        room_users[bookclub_id] = []
-
-    room_users[bookclub_id].append(user_id)  # Add user to room
-    join_room(bookclub_id)
-
-    # Emit updated user list to all users in the room
-    emit('room_users', {'bookclub_id': bookclub_id, 'users': room_users[bookclub_id]}, room=bookclub_id)
-    print(f"User {user_id} joined room {bookclub_id}. Current users: {room_users[bookclub_id]}")
-
-# Handle receiving chat messages and broadcasting them to the room
-@socketio.on('chat_message')
-def handle_chat_message(data):
-    print("Received message:", data)
-    emit('chat_message', data, room=data['bookclub_id'])  # Broadcast message to the room
-
-# Handle user disconnection
-@socketio.on('disconnect')
-def handle_disconnect():
-    for bookclub_id in room_users:
-        if request.sid in room_users[bookclub_id]:
-            room_users[bookclub_id].remove(request.sid)
-            emit('room_users', {'bookclub_id': bookclub_id, 'users': room_users[bookclub_id]}, room=bookclub_id)
-            print(f"User disconnected, left room {bookclub_id}")
-
-
-
-
-class Chatlogs(Resource):
-    def get(self):
-        chatlog_dict_list = [chatlog.to_dict() for chatlog in Chatlog.query.all()]
-        if chatlog_dict_list:
-            return chatlog_dict_list, 200
-        else:
-            return {"error": "No Chatlogs Found"}, 404
-        
-    def post(self):
-        data = request.get_json()
-        bookclub_id = data.get('bookclub_id')
-
-        user_id = session.get('user_id')
-        if not user_id:
-            return make_response({"error": "Unauthorized, Please Login to Continue"}, 401)
-
-        new_chatlog = Chatlog(
-            content="Chat started", 
-            bookclub_id=bookclub_id
-        )
-        db.session.add(new_chatlog)
-        db.session.commit()
-
-        
-        socketio.emit('new_chatlog_created', {'chatlog_id': new_chatlog.id}, room=bookclub_id)
-
-        return make_response(new_chatlog.to_dict(), 201)
-
-    
-api.add_resource(Chatlogs, "/chatlogs")
-
-class ChatlogsById(Resource):
-    def patch(self):
-        data = request.get_json()
-        chatlog_id = data.get('chatlog_id')
-        content = data.get('content') 
-        user_ids_to_invite = data.get('user_ids') 
-
-        chatlog = Chatlog.query.get(chatlog_id)
-        if chatlog:
-            chatlog.content += f"\n{content}" 
-            db.session.commit()
-
-      
-        for user_id in user_ids_to_invite:
-            
-            new_member = bookclub_users.insert().values(
-                bookclub_id=chatlog.bookclub_id,
-                user_id=user_id,
-                status="invited",
-                invited_at=datetime.utcnow()
-            )
-            db.session.execute(new_member)
-            db.session.commit()
-
-        
-        socketio.emit('chatlog_updated', {'chatlog_id': chatlog.id, 'content': chatlog.content}, room=chatlog.bookclub_id)
-
-        return make_response({'message': 'Chatlog updated successfully', 'chatlog_id': chatlog.id}), 200
-
-    def delete(self):
-        data = request.get_json()
-        user_id = data.get('user_id')
-        bookclub_id = data.get('bookclub_id')
-
-        db.session.query(bookclub_users).filter_by(bookclub_id=bookclub_id, user_id=user_id).delete()
-        db.session.commit()
-
-    
-        socketio.emit('user_left', {'user_id': user_id}, room=bookclub_id)
-
-        return make_response({'message': 'User left the chat successfully'}), 200
-    
-api.add_resource(ChatlogsById, "/chatlogs/<int:id>")
 
 class Bookclubs(Resource):
     def get(self):
@@ -521,6 +403,6 @@ api.add_resource(Logout, '/logout')
 
 
 if __name__ == '__main__':
-    socketio.run(app, port=8000, debug=True)
+    app.run(port=5555, debug=True)
 
 

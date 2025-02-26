@@ -3,8 +3,6 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { MyContext } from "../../MyContext";
 import Header from "../Header";
 import BookclubBookCarousel from "./BookclubBookCarousel";
-import BookclubChat from "../Bookclubs/BookclubChat"; 
-import BookclubMembers from "./BookclubMembers";
 import Footer from "../Footer";
 import animecoffeeshop from "../../assets/animecoffeeshop.jpg"
 
@@ -65,9 +63,6 @@ function BookclubDetails() {
 
   return (
     <div >
-
-     
-
       {/* Header */}
       <Header />
       <div style={backgroundStyle}></div>
@@ -84,26 +79,12 @@ function BookclubDetails() {
             <BookclubBookCarousel user={user} bookclub={bookclub} bookclubId={bookclub.id} />
           </div>
 
-          {/* Chatbox and Members section - Side by Side with Equal Sizes */}
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-8">
-            {/* Chatbox */}
-            <div className="col-span-1 flex flex-col h-full">
-              <div className="">
-                <BookclubChat bookclub={bookclub} />
-              </div>
-            </div>
-            
-            {/* Invite Members */}
-            <div className="col-span-1 flex flex-col h-full">
-              <div className="">
-                <BookclubMembers bookclub={bookclub} />
-              </div>
-            </div>
-          </div>
+         
         </div>
       </div>
-
-     <Footer/>
+      <div>
+      <Footer/>
+     </div>
     </div>
   );
 }

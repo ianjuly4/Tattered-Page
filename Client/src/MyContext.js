@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from "react";
-import { connectSocket, sendMessage, listenForMessages, disconnectSocket, socket } from "./services/SocketService";
 
 const API_KEY = "AIzaSyBf_grAHTnhr09zZ0oZI_NQ8AlSyBeXS_s";
 const MyContext = createContext();
@@ -10,173 +9,6 @@ function MyContextProvider({ children }) {
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [invites, setInvites] = useState([])
-
- 
-  useEffect(() => {
-    if (user && user.id) {
-      fetch(`/users/${user.id}/invites`)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data)
-          setInvites(data);
-        })
-        .catch((error) => {
-          setError('Error fetching invites: ' + error.message);
-        });
-    }
-  }, [user]);
-
-  //create invite for chatlog
-  const sendInvite = (userId, bookclubId) => {
-    console.log(userId, bookclubId);
-    setError(null); 
-    
-    fetch('/bookclubs_users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        bookclub_id: bookclubId,
-        user_id: userId,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          
-          return response.json().then((errorData) => {
-            const errorMessage = errorData.error || "Failed to send invite";
-            setError(errorMessage);
-            throw new Error(errorMessage);  
-          });
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log('Invite sent successfully:', data);
-        setUser((prevUser) => ({
-          ...prevUser,
-          bookclubs: prevUser.bookclubs.map((bookclub) => {
-            if (bookclub.id === bookclubId) {
-              return {
-                ...bookclub,
-                invites: [...(bookclub.invites || []), data],
-              };
-            }
-            return bookclub;
-          }),
-        }));
-      })
-      .catch((error) => {
-        console.error('Error:', error.message);
-        setError(error.message || 'Failed to send invite.');
-      });
-  };
-
-
-
-  // Send the request to the backend to update the invite status
-  const patchInvite = (userId,bookclubId, response)=>{
-    fetch(`/bookclubs_users`, {
-      method: 'PATCH',
-      headers: {  
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        user_id: userId,
-        bookclub_id: bookclubId,
-        response: response,  // 'accepted' or 'rejected'
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to update invite status");
-        }
-        return response.json(); // Parse the response as JSON
-      })
-      .then((data) => {
-      
-        setUser((prevUser) => ({
-          ...prevUser,
-          bookclubs: prevUser.bookclubs.map((bookclub) => {
-            if (bookclub.id === bookclubId) {
-            
-              const updatedInvites = bookclub.invites
-                ? bookclub.invites.map((invite) => {
-                    if (invite.user_id === userId) {
-                      return { ...invite, status: response, responded_at: data.responded_at };
-                    }
-                    return invite;
-                  })
-                : []; 
-
-              return {
-                ...bookclub,
-                invites: updatedInvites, 
-              };
-            }
-            return bookclub; 
-          }),
-        }));
-        console.log(`Invite ${response} successfully:`, data); 
-      })
-      .catch((error) => {
-        console.error('Error:', error.message);
-        setError(error.message || "Failed to update invite status.");
-      })
-      .finally(() => {
-        setLoading(false); 
-      });
-  };
-
-    
-
-  //Create/Post Chatlog function
-  const createChatlog = (bookclubId) => {
-    setError(null);
-  
-    
-    fetch('/chatlogs', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        bookclub_id: bookclubId,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to create chatlog");
-        }
-        return response.json(); 
-      })
-      .then((data) => {
-       
-        setUser((prevUser) => ({
-          ...prevUser,
-          bookclubs: prevUser.bookclubs.map((bookclub) => {
-            if (bookclub.id === bookclubId) {
-             
-              const updatedChatlogs = bookclub.chatlogs
-                ? [...bookclub.chatlogs, data] 
-                : [data];
-              return {
-                ...bookclub,
-                chatlogs: updatedChatlogs, 
-              };
-            }
-            return bookclub; 
-          }),
-        }));
-        console.log('Chatlog created successfully:', data); 
-      })
-      .catch((error) => {
-        console.error('Error:', error.message);
-        setError(error.message || "Failed to create chatlog.");
-      });
-  };
   
   
   
@@ -812,11 +644,7 @@ const deleteShelf = (shelfId) => {
         deleteBook,
         deleteAccount,
         updateUserAttribute,
-        createChatlog,
         deleteBookclub,
-        sendInvite,
-        invites,
-        patchInvite,
         deleteShelf,
         updateBookProgress,
         addBookToBookclub,
