@@ -7,8 +7,10 @@ const BookclubChat = ({ bookclub }) => {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
   const [usersInRoom, setUsersInRoom] = useState([]);
-  const chatlogs = bookclub.chatlogs || [];
+  const chatlog = bookclub.chatlog || [];
 
+  console.log(bookclub.id)
+  console.log(chatlog)
   // Effect to handle socket connection and room joining
   useEffect(() => {
     connectSocket();
@@ -53,7 +55,7 @@ const BookclubChat = ({ bookclub }) => {
 
   // Check if a chatlog exists, if not, create one
   const handleCreateChatLog = (bookclubId) => {
-    if (chatlogs.length === 0) {
+    if (chatlog.length === 0) {
       createChatlog(bookclubId);
     } else {
       console.log("Chatlog already exists for this bookclub.");
@@ -65,7 +67,7 @@ const BookclubChat = ({ bookclub }) => {
       <h1 className="text-2xl text-center font-semibold mb-6">Chat Room</h1>
       {error && <div className="error-message">{error}</div>}
 
-      {chatlogs.length === 0 ? (
+      {chatlog.length === 0 ? (
         <div className="flex justify-center">
           <button
             onClick={()=>handleCreateChatLog(bookclub.id)} // Calling handleCreateChatLog

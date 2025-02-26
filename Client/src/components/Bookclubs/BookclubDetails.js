@@ -54,7 +54,7 @@ function BookclubDetails() {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        minHeight: "120vh",
+        minHeight: "140vh",
         position: "absolute",
         top: 0,
         left: 0,

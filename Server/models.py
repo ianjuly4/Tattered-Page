@@ -167,7 +167,7 @@ class Bookclub(db.Model, SerializerMixin):
     __tablename__ = "bookclubs"
 
     serialize_rules = (
-       "-chatlogs.bookclub", 
+       "-chatlog.bookclub", 
         "-users.bookclubs",  
        "-books.bookclubs",
        "-books.bookshelves",
@@ -204,9 +204,10 @@ class Chatlog(db.Model, SerializerMixin):
     __tablename__ = "chatlogs"
 
     serialize_rules = (
-        "-bookclub.chatlogs", 
+        "-bookclub.chatlog", 
         "-books.chatlogs",  
-        "-users.chatlogs", 
+        "-users.chatlogs",
+        
     )
 
     id = db.Column(db.Integer, primary_key=True)

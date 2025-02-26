@@ -6,13 +6,15 @@ function BookclubBookCarousel({ user, bookclub }) {
     const { books } = bookclub || {}; 
 
     return (
-        <div className="py-8 p-8 container bg-primary border rounded-lg shadow-lg">
+        <div className="py-8 p-8 container  border rounded-lg shadow-lg">
             <div className="max-h-60 overflow-y-auto px-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1">
                     {books && books.length > 0 ? (
                         books.map((book) => (
-                            <div key={book.id} className="p-2"> 
-                                <UserBookCard book={book} />
+                            <div key={book.id} className="p-2">
+                                <NavLink to={`/users/${user.id}/books/${book.id}`} >
+                                    <UserBookCard book={book} />
+                                </NavLink> 
                             </div>
                         ))
                     ) : (

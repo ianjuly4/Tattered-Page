@@ -551,36 +551,14 @@ api.add_resource(UsersById, '/users/<int:id>')
 
 
 class Users(Resource):
-    def get(self, user_id=None):
-        if user_id:
-            user = User.query.get(user_id)
-            if user:
-               
-                return make_response(user.to_dict(rules=(
-                    '-_password_hash',
-                    '-books.bookshelves', 
-                    '-bookclubs.users',     
-                    '-books.bookclubs',    
-                )), 200)
-            else:
-                return {"error": "User not found"}, 404
+    def get(self):
+        user_dict_list = [user.to_dict() for user in User.query.all()]
+        if user_dict_list:
+            return user_dict_list, 200
         else:
-           
-            user_dict_list = [
-                user.to_dict(rules=(
-                    '-_password_hash',
-                    '-books.bookshelves',  
-                    '-bookclubs.users',     
-                    '-books.bookclubs',     
-                ))
-                for user in User.query.all()
-            ]
-            
-            if user_dict_list:
-                return make_response(user_dict_list, 200)
-            else:
-                return {"error": "No Users Found"}, 404
-
+            return {"message": "No Users Found"}, 404
+               
+               
     
     def post(self):
         data = request.get_json()

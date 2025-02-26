@@ -2,16 +2,17 @@ import React, { useState, useEffect, useContext } from 'react';
 import { MyContext } from '../../MyContext';
 
 const BookclubMembers = ({bookclub, bookclubId}) => {
-  const {sendInvite} = useContext(MyContext); // If you're keeping context logic
+  const {sendInvite} = useContext(MyContext);
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [search, setSearch] = useState('');
-  const [invites, setInvites] = useState([]); // Store invites locally
+  const [invites, setInvites] = useState([]);
 
   useEffect(() => {
     fetch('/users')
       .then((response) => response.json())
       .then((data) => {
+        console.log(data)
         setUsers(data); 
       });
   }, []);

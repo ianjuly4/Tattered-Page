@@ -59,7 +59,7 @@ function UsersBookclubs() {
       backgroundSize: "cover",
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
-      minHeight: "120vh",
+      minHeight: "140vh",
       position: "absolute",
       top: 0,
       left: 0,
@@ -81,15 +81,15 @@ function UsersBookclubs() {
             <h1 className="text-5xl font-bold">{"Bookclub Dashboard"}</h1>
 
             {/* Conditionally render the InviteComponent if there are any invites */}
-            {invites && invites.length > 0 ? (
+           {/* {invites && invites.length > 0 ? (
               <div>
                 <h2 className="text-2xl mt-6 mb-4">You Have Bookclub Invitations!</h2>
                 <InviteComponent invites={invites} /> 
               </div>
             ) : (
               <p className="text-lg mt-4">You have no Bookclub invitations at the moment.</p>
-            )}
-            
+            )} 
+            */}
             <div className="text-2xl mt-6">
               <p className="mt-3">Here are your current book clubs:</p>
 
