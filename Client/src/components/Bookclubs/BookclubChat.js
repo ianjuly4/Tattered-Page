@@ -70,7 +70,7 @@ const BookclubChat = ({ bookclub }) => {
       {chatlog.length === 0 ? (
         <div className="flex justify-center">
           <button
-            onClick={()=>handleCreateChatLog(bookclub.id)} // Calling handleCreateChatLog
+            onClick={()=>handleCreateChatLog(bookclub.id)} 
             className="p-3 bg-accent text-white rounded-lg transition duration-200 hover:bg-primary"
           >
             Create Chat

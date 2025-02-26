@@ -11,166 +11,44 @@ import ipdb
 def index(path=None):
     return send_from_directory(os.path.join(app.static_folder), 'index.html')
 
-user_sessions = {} 
-room_users = {}  
-# Handle socket connection
+
+room_users = {}  # Dictionary to track users in each bookclub room
+
+# Handle user connection
 @socketio.on('connect')
 def handle_connect():
-    user_id = session.get('user_id')  # Get user_id from session
-    user_sessions[request.sid] = user_id
-    print(f"User {user_id} connected with socket ID {request.sid}")
+    print("User connected with socket ID:", request.sid)
 
 # Handle joining a room (bookclub)
 @socketio.on('join_room')
 def handle_join_room(data):
     bookclub_id = data.get('bookclub_id')
-    username = data.get('username')
+    user_id = data.get('user_id')
 
     if bookclub_id not in room_users:
         room_users[bookclub_id] = []
 
-    room_users[bookclub_id].append(username) 
+    room_users[bookclub_id].append(user_id)  # Add user to room
     join_room(bookclub_id)
 
     # Emit updated user list to all users in the room
     emit('room_users', {'bookclub_id': bookclub_id, 'users': room_users[bookclub_id]}, room=bookclub_id)
+    print(f"User {user_id} joined room {bookclub_id}. Current users: {room_users[bookclub_id]}")
 
-    print(f"User {username} joining room {bookclub_id}. Current users: {room_users[bookclub_id]}")
+# Handle receiving chat messages and broadcasting them to the room
+@socketio.on('chat_message')
+def handle_chat_message(data):
+    print("Received message:", data)
+    emit('chat_message', data, room=data['bookclub_id'])  # Broadcast message to the room
 
 # Handle user disconnection
 @socketio.on('disconnect')
 def handle_disconnect():
-    user_id = user_sessions.get(request.sid)
-    if user_id:
-        # Remove user from all rooms they're in
-        for bookclub_id in room_users:
-            if user_id in room_users[bookclub_id]:
-                room_users[bookclub_id].remove(user_id)
-                # Emit updated user list to everyone in the room
-                emit('room_users', {'bookclub_id': bookclub_id, 'users': room_users[bookclub_id]}, room=bookclub_id)
-        
-        print(f"User {user_id} disconnected with socket ID {request.sid}")
-        del user_sessions[request.sid]  # Clean up user session
-    else:
-        print(f"Socket ID {request.sid} disconnected without a valid user.")
-
-# Handle receiving chat messages and broadcasting them to the room
-@socketio.on("chat_message")
-def handle_message(data):
-    print("Received message:", data)
-    emit("chat_message", data, room=data["bookclub_id"])
-
-
-class UserInvites(Resource):
-    def get(self, id):
-      
-        user_id = User.query.filter(User.id == id).first()
-
-        if not user_id:
-            return {"error": "User not found"}, 404
-        
-        invites = db.session.query(bookclub_users).filter_by(user_id = id).all()
-
-        if not invites:
-            return {"error": "No invites found"}, 404
-
-        
-        invites_list = []
-        for invite in invites:
-
-            bookclub = Bookclub.query.filter_by(id=invite.bookclub_id).first()
-            if bookclub:
-                invites_list.append({
-                    'bookclub_id': invite.bookclub_id,
-                    'bookclub_name': bookclub.name,
-                    'status': invite.status,
-                })
-
-
-        response = make_response((invites_list)) 
-        return response
-
-# Define the route to access the user's invites
-api.add_resource(UserInvites, "/users/<int:id>/invites")
-
-
-class BookclubUsersById(Resource):
-
-    def patch(self, id):
-        data = request.get_json()
-
-        bookclub_id = data.get('bookclub_id')
-        response = data.get('response') 
-
-        user_id = session.get("user_id")
-
-        if not user_id or not bookclub_id or not response:
-            return make_response({"error": "user_id, bookclub_id, and response are required"}), 400
-
-        # Ensure user and bookclub exist
-        user = User.query.get(user_id)
-        bookclub = Bookclub.query.get(bookclub_id)
-
-        if not user or not bookclub:
-            return make_response({"error": "User or Bookclub not found"}), 404
-
-        # Ensure the invite exists
-        invite = db.session.query(bookclub_users).filter_by(user_id=user_id, bookclub_id=bookclub_id).first()
-
-        if not invite:
-            return make_response({"error": "Invite not found"}), 404
-
-       
-        invite.status = response  
-        invite.responded_at = datetime.utcnow()
-
-        db.session.commit()
-
-        return make_response({"message": f"Invite {response} successfully"}), 200
-    
-api.add_resource(BookclubUsersById, '/bookclubs_users/<string:id>')
-
-
-class BookclubsUsers(Resource):
-    def post(self):
-        data = request.get_json()
-
-        user_id = data.get('user_id')
-        bookclub_id = data.get('bookclub_id')
-
-        if not user_id or not bookclub_id:
-            return jsonify({"error": "user_id and bookclub_id are required"}), 400
-
-        # Ensure user exists
-        user = User.query.filter(User.id == user_id).first()
-        if not user:
-            return jsonify({"error": "User not found"}), 404
-
-        # Ensure bookclub exists
-        bookclub = Bookclub.query.filter(Bookclub.id == bookclub_id).first()
-        if not bookclub:
-            return jsonify({"error": "Bookclub not found"}), 404
-
-        # Check if the invite already exists (to avoid sending duplicate invites)
-        existing_invite = db.session.query(bookclub_users).filter_by(user_id=user_id, bookclub_id=bookclub_id).first()
-
-        if existing_invite:
-            return jsonify({"error": "Invite already exists"}), 400
-
-        # Insert invite into the 'bookclub_users' table
-        new_invite = bookclub_users.insert().values(
-            user_id=user_id,
-            bookclub_id=bookclub_id,
-            status='invited',
-            invited_at=datetime.utcnow()
-        )
-
-        db.session.execute(new_invite)
-        db.session.commit()
-
-        #return jsonify({"message": "Invite sent successfully"}), 200
-
-api.add_resource(BookclubsUsers, '/bookclubs_users')
+    for bookclub_id in room_users:
+        if request.sid in room_users[bookclub_id]:
+            room_users[bookclub_id].remove(request.sid)
+            emit('room_users', {'bookclub_id': bookclub_id, 'users': room_users[bookclub_id]}, room=bookclub_id)
+            print(f"User disconnected, left room {bookclub_id}")
 
 
 

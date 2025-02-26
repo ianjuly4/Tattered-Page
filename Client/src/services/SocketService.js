@@ -1,20 +1,16 @@
 import { io } from "socket.io-client";
 
-// Establish socket connection with default configurations
+// Establish socket connection with the server
 const socket = io("http://127.0.0.1:8000", {
   withCredentials: true, 
-  transports: ["websocket"],
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
+  transports: ["websocket"],  
   query: {
     userId: localStorage.getItem("user_id") || "",
     bookclubId: localStorage.getItem("bookclub_id") || "",
   },
 });
 
-// Function to handle connection, including joining a room (bookclub chat)
+// Connect to the socket server
 const connectSocket = () => {
   return new Promise((resolve, reject) => {
     socket.on("connect", () => {
@@ -25,7 +21,7 @@ const connectSocket = () => {
 
       if (bookclubId && userId) {
         socket.emit("join_room", { bookclub_id: bookclubId, user_id: userId });
-        resolve(); // Resolve the connection promise
+        resolve(); 
       } else {
         console.warn("No bookclub or user ID found.");
         reject(new Error("Missing user or bookclub ID"));
@@ -34,34 +30,43 @@ const connectSocket = () => {
 
     socket.on("connect_error", (error) => {
       console.error("Socket connection error:", error);
-      reject(error); // Reject promise if connection fails
+      reject(error); 
     });
   });
 };
 
-// Function to send a message (only works if socket is connected)
+// Send a chat message to the server
 const sendMessage = (bookclubId, user, message) => {
   if (socket.connected) {
-    console.log("Sending message to server:", { bookclub_id: bookclubId, user, message });
+    console.log("Sending message:", { bookclub_id: bookclubId, user, message });
     socket.emit("chat_message", { bookclub_id: bookclubId, user, message });
   } else {
     console.warn("Socket not connected, message not sent");
   }
 };
 
-
-// Function to listen for incoming messages
+// Listen for incoming chat messages
 const listenForMessages = (callback) => {
-  console.log(callback)
   socket.on("chat_message", callback);
-  return () => socket.off("chat_message", callback); // Unsubscribe function
+  return () => socket.off("chat_message", callback); 
 };
 
-// Function to disconnect from chat room
+// Function to send an invite
+const sendInvite = (senderId, recipientId, bookclubId) => {
+  socket.emit("send_invite", { senderId, recipientId, bookclubId, timestamp: new Date().toISOString() });
+};
+
+// Function to listen for incoming invites
+const listenForInvites = (callback) => {
+  socket.on("invite_received", callback);
+  return () => socket.off("invite_received", callback); 
+};
+
+// Disconnect from the WebSocket server and leave the room
 const disconnectChat = (bookclubId, userId) => {
   socket.emit("leave_room", { bookclub_id: bookclubId, user_id: userId });
   socket.disconnect();
   console.log(`User ${userId} left the room ${bookclubId}`);
 };
 
-export { connectSocket, sendMessage, listenForMessages, disconnectChat, socket};
+export { connectSocket, sendMessage, listenForMessages, disconnectChat, socket, sendInvite, listenForInvites };
