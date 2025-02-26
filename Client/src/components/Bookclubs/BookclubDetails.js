@@ -17,6 +17,7 @@ function BookclubDetails() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  console.log(user)
   useEffect(() => {
     if (!user) {
       setIsLoading(true);
@@ -63,8 +64,8 @@ function BookclubDetails() {
       };
 
   return (
-    <div className="bg-secondary">
-      {/* Background Image */}
+    <div >
+
      
 
       {/* Header */}
@@ -73,8 +74,8 @@ function BookclubDetails() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12 flex-1">
         <div className="p-8 z-10 relative">
-          <h1 className="text-4xl font-bold text-center text-gray-300 mb-4">{bookclub.name}</h1>
-          <p className="text-lg font-semibold text-gray-300 text-center mb-6">
+          <h1 className="text-4xl font-bold text-center text-black mb-4">{bookclub.name}</h1>
+          <p className="text-lg font-semibold text-black text-center mb-6">
             {bookclub.description || "No description available."}
           </p>
 

@@ -6,55 +6,57 @@ const BookclubChat = ({ bookclub }) => {
   const { user, createChatlog, error } = useContext(MyContext);
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
-  const [usersInRoom, setUsersInRoom] = useState([]); // State for users in the room
+  const [usersInRoom, setUsersInRoom] = useState([]);
   const chatlogs = bookclub.chatlogs || [];
 
+  // Effect to handle socket connection and room joining
   useEffect(() => {
-    // Ensure socket is connected when the component loads
     connectSocket();
-  
-    // Join the room when the component loads
+    
     const joinRoom = () => {
       if (user?.id && bookclub?.id) {
         socket.emit('join_room', { bookclub_id: bookclub.id, username: user.username });
       }
     };
     joinRoom();
-  
-    // Listen for incoming messages
+    
+    // Handle new messages
     const handleMessage = (data) => {
       console.log("Received message:", data);
       setChat((prevChat) => [...prevChat, data]);
     };
-  
-    // Listen for room user list updates
+
+    // Handle room users
     const handleRoomUsers = (data) => {
       if (data.bookclub_id === bookclub.id) {
-        // Ensure users list is unique by using a Set
         const uniqueUsers = Array.from(new Set(data.users));
-        setUsersInRoom(uniqueUsers); // Update users in room state
+        setUsersInRoom(uniqueUsers);
       }
     };
-  
-    // Listen for chat messages once
+
     listenForMessages(handleMessage);
-  
-    // Listen for room users (unique list)
     socket.on('room_users', handleRoomUsers);
-  
-    // Cleanup on unmount
+
     return () => {
-      socket.off('room_users', handleRoomUsers); // Cleanup listener for room users
+      socket.off('room_users', handleRoomUsers);
       socket.emit('leave_room', { bookclub_id: bookclub.id, username: user.username });
-      socket.off("chat_message", handleMessage); // Clean up message listener
+      socket.off("chat_message", handleMessage);
     };
   }, [bookclub.id, user.id]);
-  
 
   const handleSendMessage = () => {
     if (message.trim() !== "") {
-      sendMessage(bookclub.id, user.username, message); // Send the message to the server
-      setMessage(""); // Clear the message input
+      sendMessage(bookclub.id, user.username, message);
+      setMessage("");
+    }
+  };
+
+  // Check if a chatlog exists, if not, create one
+  const handleCreateChatLog = (bookclubId) => {
+    if (chatlogs.length === 0) {
+      createChatlog(bookclubId);
+    } else {
+      console.log("Chatlog already exists for this bookclub.");
     }
   };
 
@@ -66,7 +68,7 @@ const BookclubChat = ({ bookclub }) => {
       {chatlogs.length === 0 ? (
         <div className="flex justify-center">
           <button
-         
+            onClick={()=>handleCreateChatLog(bookclub.id)} // Calling handleCreateChatLog
             className="p-3 bg-accent text-white rounded-lg transition duration-200 hover:bg-primary"
           >
             Create Chat
@@ -105,7 +107,7 @@ const BookclubChat = ({ bookclub }) => {
             <ul className="space-y-2">
               {usersInRoom.map((user, idx) => (
                 <li key={idx} className="p-2 bg-lightgray rounded-lg">
-                {user} {/* Replace this with user data if needed */}
+                  {user}
                 </li>
               ))}
             </ul>

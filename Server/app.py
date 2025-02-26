@@ -188,12 +188,10 @@ class Chatlogs(Resource):
         data = request.get_json()
         bookclub_id = data.get('bookclub_id')
 
-        
         user_id = session.get('user_id')
         if not user_id:
             return make_response({"error": "Unauthorized, Please Login to Continue"}, 401)
 
-     
         new_chatlog = Chatlog(
             content="Chat started", 
             bookclub_id=bookclub_id
@@ -671,6 +669,6 @@ api.add_resource(Logout, '/logout')
 
 
 if __name__ == '__main__':
-    socketio.run(app, port=5555, debug=True)
+    socketio.run(app, port=8000, debug=True)
 
 

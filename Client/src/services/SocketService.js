@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 // Establish socket connection with default configurations
-const socket = io("http://localhost:5555", {
+const socket = io("http://127.0.0.1:8000", {
   withCredentials: true, 
   transports: ["websocket"],
   cors: {
