@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import Header from "../Header.js";
 import { MyContext } from "../../MyContext.js";
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation, NavLink } from "react-router-dom";
 import bookNook from "../../assets/bookNook.jpg"; 
 import AvatarDropdown from "./AvatarDropdown.js";
+import Footer from "../Footer.js";
 
 function Account() {
-    const { user, loading, error, setError, deleteAccount } = useContext(MyContext);
+    const { user, loading, error, setError, deleteAccount, logout } = useContext(MyContext);
     const { bookclubs, bookshelves, accolades, goals, avatar, books } = user || {};
 
     console.log(user)
@@ -27,7 +27,7 @@ function Account() {
         setError(null); 
     }, [location]);
 
-    // Calculate the streak based on the books' lastReadAt dates
+
     useEffect(() => {
         if (books && books.length > 0) {
             const calculateStreak = (books) => {
@@ -39,20 +39,20 @@ function Account() {
                     const book = sortedBooks[i];
                     const bookDate = new Date(book.lastReadAt);
 
-                    // Calculate the difference in days between the current date and the lastReadAt date
+                   
                     const diffInDays = (currentDate - bookDate) / (1000 * 3600 * 24);
                     if (diffInDays <= 1) {
                         streakCount++;
                         currentDate = bookDate;
                     } else {
-                        break; // Stop if there's a gap larger than 1 day
+                        break; 
                     }
                 }
                 return streakCount;
             };
 
             const calculatedStreak = calculateStreak(books);
-            setStreak(calculatedStreak); // Set the calculated streak
+            setStreak(calculatedStreak); 
         }
     }, [books]);
 
@@ -75,6 +75,10 @@ function Account() {
             deleteAccount(user.id);
         }
     };
+
+    const handleLogout = () => {
+        logout()
+    }
 
     return (
         <div>
@@ -113,8 +117,12 @@ function Account() {
                     {/* Avatar Buttons (Edit Avatar + Two More Inline Buttons) */}
                     <div className="flex space-x-4">
                         <AvatarDropdown currentAvatar={user?.avatar} />
-                        <button className="btn btn-secondary btn-sm">Change Username</button>
-                        <button className="btn btn-primary btn-sm">Change Password</button>
+                        <NavLink to={`/users/${user.id}/bookshelves/`}>
+                        <button className="btn btn-secondary btn-sm">Go To Bookshelves</button>
+                        </NavLink>
+                        <NavLink to={`/users/${user.id}/bookclubs`}>
+                        <button className="btn btn-secondary btn-sm">Go To Bookclubs</button>
+                        </NavLink>
                     </div>
 
                     {/* Main Content */}
@@ -181,6 +189,10 @@ function Account() {
                         </h1>
                     </div>
 
+                    <button onClick={handleLogout} className="btn btn-danger btn-secondary btn-sm">
+                        Logout
+                    </button>
+                    
                     {/* Delete Account Button */}
                     <button onClick={handleDeleteAccount} className="btn btn-danger btn-secondary btn-sm">
                         Delete Account
@@ -188,12 +200,7 @@ function Account() {
                 </div>
             </div>
 
-            {/* Footer */}
-            <footer className="bg-white py-6 border-t-4 text-black mt-auto"> 
-                <div className="container mx-auto text-center">
-                    <p>&copy; 2025 The Tattered Page. All rights reserved. Made with ❤️ for book lovers</p>
-                </div>
-            </footer>
+            <Footer/>
         </div>
     );
 }

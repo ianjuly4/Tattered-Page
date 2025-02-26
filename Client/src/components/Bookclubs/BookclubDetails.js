@@ -6,7 +6,7 @@ import BookclubBookCarousel from "./BookclubBookCarousel";
 import BookclubChat from "../Bookclubs/BookclubChat"; 
 import BookclubMembers from "./BookclubMembers";
 import Footer from "../Footer";
-
+import animecoffeeshop from "../../assets/animecoffeeshop.jpg"
 
 function BookclubDetails() {
   const { user, isLoggedIn, setError } = useContext(MyContext);
@@ -48,6 +48,20 @@ function BookclubDetails() {
 
   
 
+  const backgroundStyle = {
+        backgroundImage: `url(${animecoffeeshop})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        minHeight: "120vh",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: -1,
+      };
+
   return (
     <div className="bg-secondary">
       {/* Background Image */}
@@ -55,7 +69,7 @@ function BookclubDetails() {
 
       {/* Header */}
       <Header />
-
+      <div style={backgroundStyle}></div>
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12 flex-1">
         <div className="p-8 z-10 relative">

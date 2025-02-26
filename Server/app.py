@@ -243,11 +243,10 @@ class ChatlogsById(Resource):
         user_id = data.get('user_id')
         bookclub_id = data.get('bookclub_id')
 
-        # Remove the user from the bookclub_users table
         db.session.query(bookclub_users).filter_by(bookclub_id=bookclub_id, user_id=user_id).delete()
         db.session.commit()
 
-        # Optionally, emit a 'user_left' event to notify other users
+    
         socketio.emit('user_left', {'user_id': user_id}, room=bookclub_id)
 
         return make_response({'message': 'User left the chat successfully'}), 200
