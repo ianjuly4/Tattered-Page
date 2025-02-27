@@ -3,35 +3,33 @@ import Header from "../Header";
 import { MyContext } from "../../MyContext";
 import defaultbookimage from "../../assets/defaultbookimage.jpg";
 import { NavLink, useParams, useLocation, useNavigate } from "react-router-dom";
-import BookshelvesCard from "../Bookshelves/BookshelvesCard";
 import Footer from "../Footer";
-import library from "../../assets/library.jpg"; 
+import library from "../../assets/library.jpg";
 
 function BookDetails() {
   const { bookId } = useParams();
   const { books, user, isLoggedIn, createBook, error, setError } = useContext(MyContext);
-  const { bookshelves } = user || {};
-
+  
   const location = useLocation();
   const navigate = useNavigate();
 
   const book = books.find((book) => book.id === bookId);
 
   useEffect(() => {
-    setError(null);
+    setError(null);  // Reset error when location changes (when user navigates)
   }, [location]);
 
   useEffect(() => {
+    // If the user is logged in and tries to view a book they've added to their collection, navigate to the user's library.
     if (user && user.books && bookId) {
       const userBook = user.books.find((book) => book.google_key === bookId);
       if (userBook) {
         navigate(`/users/${user.id}/books/${userBook.id}`);
       }
-    } else if (!user) {
-      navigate("/books");
     }
   }, [user, bookId, navigate]);
 
+  // If no book is found, show loading message
   if (!book) {
     return (
       <div>
@@ -42,47 +40,13 @@ function BookDetails() {
   }
 
   const { volumeInfo } = book || {};
-  const { title, authors, description, imageLinks, categories, pageCount, publishedDate } = volumeInfo || {};
-
+  const { title, authors, description, imageLinks, publishedDate } = volumeInfo || {};
   const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
 
-  const formatDate = (date) => {
-    if (!date) return 'NA'; 
-  
-   
-    if (date.length === 4 && !date.includes('-')) {
-      return date; 
-    }
-  
-   
-    if (date.length === 7 && date.includes('-')) {
-      const [year, month] = date.split('-');
-      return `${year}-01-${month}`;
-    }
-  
-    const dateObj = new Date(date);
-    if (isNaN(dateObj.getTime())) {
-      return 'NA'; 
-    }
-  
-   
-    const year = dateObj.getFullYear();
-    const day = String(dateObj.getDate()).padStart(2, '0');  
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');  
-    
-   
-    return `${year}-${day}-${month}`;
-  };
-  
-  const correctedPublishedDate = formatDate(publishedDate);
-
   const handleAddtoLibrary = () => {
-    createBook(title, authors, description, coverImageUrl, correctedPublishedDate, bookId);
+    createBook(title, authors, description, coverImageUrl, publishedDate, bookId);
   };
 
-  console.log(correctedPublishedDate);
-
-  // Background Style
   const backgroundStyle = {
     backgroundImage: `url(${library})`,
     backgroundSize: "cover",
@@ -138,10 +102,13 @@ function BookDetails() {
             <p className="text-center mb-4 text-lg">By {authors.join(", ")}</p>
           )}
 
-          {correctedPublishedDate && (
-            <p className="text-center mb-4 text-lg">Published Date: {correctedPublishedDate}</p>
+          {publishedDate ? (
+            <p className="text-center mb-4 text-lg">Published Date: {publishedDate}</p>
+          ) : (
+            <p className="text-center mb-4 text-lg">Published Date: NA</p>
           )}
 
+          {/* Show Add to Library button only if user is logged in */}
           {isLoggedIn && (
             <div className="flex items-center justify-center">
               <div className="flex space-x-4">
@@ -155,6 +122,13 @@ function BookDetails() {
                   Add to Your Library
                 </button>
               </div>
+            </div>
+          )}
+
+          {/* Display message if the user is not logged in */}
+          {!isLoggedIn && (
+            <div className="text-center mt-4 text-sm text-white">
+              <p>You must be logged in to add this book to your library.</p>
             </div>
           )}
 

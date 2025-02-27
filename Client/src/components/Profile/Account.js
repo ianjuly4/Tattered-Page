@@ -7,10 +7,8 @@ import AvatarDropdown from "./AvatarDropdown.js";
 import Footer from "../Footer.js";
 
 function Account() {
-    const { user, loading, error, setError, deleteAccount, logout } = useContext(MyContext);
-    const { bookclubs, bookshelves, accolades, goals, avatar, books } = user || {};
-
-    console.log(user)
+    const { user, loading, error, setError, deleteAccount, logout, setLoading, isLoggedIn,  } = useContext(MyContext);
+    const { accolades, goals, books } = user || {};
 
     const [streak, setStreak] = useState(0);
 
@@ -18,10 +16,12 @@ function Account() {
     const location = useLocation();
 
     useEffect(() => {
-        if (!user && !loading) {
-            navigate('/login');
+        if (!user && !isLoggedIn) {
+          navigate("/login");
         }
-    }, [user, loading, navigate]);
+        setLoading(false);
+      }, [user, isLoggedIn, navigate]);
+    
 
     useEffect(() => {
         setError(null); 
@@ -69,6 +69,15 @@ function Account() {
         bottom: 0,
         zIndex: -1,
       };
+
+    if (loading) {
+        return <div>
+            <div><Header/></div>Loading...</div>;
+    }
+    
+    if (!user) {
+        return <div><div><Header/></div>You need to log in to view this page.</div>;
+    }
 
     const handleDeleteAccount = () => {
         if (window.confirm("Are you sure you want to delete your account?")) {

@@ -25,13 +25,13 @@ function Signup() {
     onSubmit: async (values) => {
       const success = await signup(values.username, values.password);
       if (success) {
-        console.log();
-        //setUser(user)
+
+        setUser(user)
         //navigate(`/users/${user.id}`);
         console.log("Signup successful");
       } else {
         console.log(error);
-        //setError("Invalid username or password.");
+        setError("Invalid username or password.");
       }
     },
   });

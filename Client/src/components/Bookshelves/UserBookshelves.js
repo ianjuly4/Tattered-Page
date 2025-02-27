@@ -29,8 +29,6 @@ function UserBookshelves() {
     },
   });
 
-  console.log(user);
-  console.log(bookshelves);
 
   useEffect(() => {
     if (!user && !isLoggedIn) {

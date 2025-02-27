@@ -1,9 +1,17 @@
-import React from "react";
+import React, {useContext} from "react";
 import UserBookCard from "../Books/UserBookCard";
 import { NavLink } from "react-router-dom";
+import { MyContext } from "../../MyContext";
 
 function BookclubBookCarousel({ user, bookclub }) {
+    const { removeBookFromBookclub} = useContext(MyContext)
     const { books } = bookclub || {}; 
+
+  
+    const handleRemoveBook = (bookId) => {
+        console.log(bookId, bookclub.id)
+        removeBookFromBookclub(bookclub.id, bookId);  
+      };
 
     return (
         <div className="py-8 p-8 container  border rounded-lg shadow-lg">
@@ -14,7 +22,8 @@ function BookclubBookCarousel({ user, bookclub }) {
                             <div key={book.id} className="p-2">
                                 <NavLink to={`/users/${user.id}/books/${book.id}`} >
                                     <UserBookCard book={book} />
-                                </NavLink> 
+                                </NavLink>
+                                <button onClick={()=>handleRemoveBook(book.id)}className="border justifty-center rounded bg-primary"> Remove Book</button> 
                             </div>
                         ))
                     ) : (

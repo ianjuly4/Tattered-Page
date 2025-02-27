@@ -14,8 +14,7 @@ function BookclubDetails() {
 
   const location = useLocation();
   const navigate = useNavigate();
-
-  console.log(user)
+  
   useEffect(() => {
     if (!user) {
       setIsLoading(true);

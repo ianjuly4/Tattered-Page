@@ -4,7 +4,7 @@ import Header from "../Header";
 import BookCard from "./BookCard";
 import { NavLink, useLocation } from "react-router-dom";
 import Footer from "../Footer";
-import library from "../../assets/library.jpg"; // Assuming you're using the same background image
+import library from "../../assets/library.jpg";
 
 function SearchResults() {
   const { books, loading, error, setError } = useContext(MyContext);
@@ -35,7 +35,7 @@ function SearchResults() {
     bottom: 0,
     zIndex: -1, 
   };
-
+  console.log(books)
   if (isLoading) {
     return (
       <div>

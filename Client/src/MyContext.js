@@ -10,8 +10,61 @@ function MyContextProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   
+
+
+  // Function to remove a book from a bookclub
+  const removeBookFromBookclub = (clubId, bookId, action="remove") => {
+    if (!bookId || !clubId) {
+      setError("Invalid club or book ID");
+      return;
+    }
   
+    setLoading(true);
+    setError(null);
   
+    fetch(`/bookclubs/${clubId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        book_id: bookId,
+        action: action, 
+      }),
+    })
+      .then((response) => response.json()) 
+      .then((clubData) => {
+        if (Array.isArray(clubData.books)) {
+         
+          setUser((prevUser) => ({
+            ...prevUser,
+            bookclubs: prevUser.bookclubs.map((existingClub) =>
+              existingClub.id === clubId
+                ? {
+                    ...existingClub,
+                    books: existingClub.books.filter((book) => book.id !== bookId), 
+                  }
+                : existingClub
+            ),
+          }));
+        } else {
+        
+          setError("Unexpected response format.");
+        }
+      })
+      .catch((error) => {
+        
+        setError("Error updating bookclub: " + error.message);
+        console.error(error); 
+      })
+      .finally(() => {
+ 
+        setLoading(false);
+      });
+  };
+  
+
+
   //Delete Bookclub  
   const deleteBookclub = (clubId) => {
     setLoading(true);
@@ -81,7 +134,7 @@ function MyContextProvider({ children }) {
       })
       .catch((error) => {
         setError("Error updating bookclub: " + error.message);
-        console.error(error); // Optional: log the full error object for debugging
+        console.error(error); 
       })
       .finally(() => {
         setLoading(false);
@@ -341,51 +394,25 @@ const deleteShelf = (shelfId) => {
 
 
   //Create Post Book 
-  const createBook = (title, authors, description, coverImageUrl, publishedDate, bookId) => {
+  const createBook = (title, authors, description, coverImageUrl, bookId) => {
     if (!title || !authors || !description || !coverImageUrl || !bookId) {
       setError("Missing required fields for book creation");
       return;
     }
-  
-    const isValidDate = (dateString) => {
-      const regex = /^\d{4}-\d{2}-\d{2}$/;
-      return regex.test(dateString);
-    };
-  
-    const formatDate = (dateString) => {
-      const parts = dateString.split("-");
-      if (parts.length === 3) {
-        const [year, day, month] = parts;
-        // Try fixing incorrect date format (if month and day are swapped)
-        if (parseInt(day) > 12) {
-          return `${year}-${day.padStart(2, "0")}-${month.padStart(2, "0")}`;
-        }
-        return dateString; // return original date if it seems valid
-      }
-      return 'NA'; // if the date format is incorrect
-    };
-  
-    const formattedDate = isValidDate(publishedDate) ? publishedDate : formatDate(publishedDate);
-    if (formattedDate === 'NA') {
-      setError("Invalid date format. Please use YYYY-DD-MM.");
-      return;
-    }
-  
-    const authorString = Array.isArray(authors) ? authors.join(", ") : authors;
-  
+
     setLoading(true);
     setError(null);
-  
+
     const requestBody = {
       title,
-      author: authorString,
+      author: authors.join(", "), 
       synopsis: description,
       cover_image: coverImageUrl,
-      progress: 0,
-      published_date: formattedDate,
+      progress: 0, 
       google_key: bookId
+     
     };
-  
+
     fetch("/books", {
       method: "POST",
       headers: {
@@ -393,12 +420,7 @@ const deleteShelf = (shelfId) => {
       },
       body: JSON.stringify(requestBody),
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
         if (data.id) {
           setUser((prevUser) => ({
@@ -416,8 +438,8 @@ const deleteShelf = (shelfId) => {
       .finally(() => {
         setLoading(false);
       });
-  };
-  
+};
+
   
   //Fetch Books
   const fetchBooks = (searchQuery, filterType) => {
@@ -555,27 +577,30 @@ const deleteShelf = (shelfId) => {
       },
       body: JSON.stringify({ username, password }),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        //console.log('Server response:', data); 
-        if (data) {
-          console.log(data); 
-          setIsLoggedIn(true);
-          setUser(data); 
-          return true;
-        } else {
-          setError("Signup failed");
-          return false;
+    .then((response) => {
+        if (!response.ok) {
+          
+            return response.json().then((data) => {
+                throw new Error(data.error || "Signup failed");
+            });
         }
-      })
-      
-      .catch((error) => {
-        setError(error.message + "An error occurred. Please try again later.");
-      })
-      .finally(() => {
+        return response.json();
+    })
+    .then((data) => {
+     
+        setIsLoggedIn(true);
+        setUser(data);
+        return true;
+    })
+    .catch((error) => {
+        setError(error.message);  
+        return false;
+    })
+    .finally(() => {
         setLoading(false);
-      });
-  };
+    });
+};
+
 
   //logout
   const logout = () => {
@@ -629,7 +654,7 @@ const deleteShelf = (shelfId) => {
         setUser(null);
         setIsLoggedIn(false);
         setBooks([]);
-        console.log("Error checking session: " + error.message);
+        //console.log("Error checking session: " + error.message);
       });
   }, []);
 
@@ -646,6 +671,7 @@ const deleteShelf = (shelfId) => {
         user,
         signup,
         logout,
+        setLoading,
         createBookclub,
         createBookshelf,
         createBook,
@@ -657,7 +683,8 @@ const deleteShelf = (shelfId) => {
         deleteShelf,
         updateBookProgress,
         addBookToBookclub,
-        removeBookFromBookshelf
+        removeBookFromBookshelf,
+        removeBookFromBookclub
       }}
     >
       {children}

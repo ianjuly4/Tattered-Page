@@ -239,7 +239,11 @@ class Books(Resource):
             return book_dict_list, 200
         else:
             return {"message": "No Books Found"}, 404
-        
+    
+    from flask import make_response, request, session
+from models import Book, db
+
+class Books(Resource):
     def post(self):
         data = request.get_json()
 
@@ -247,39 +251,17 @@ class Books(Resource):
         if not user_id:
             return make_response({"error": "Unauthorized, Please Login to Continue"}, 401)
 
+        
         title = data.get("title")
         author = data.get("author")
         synopsis = data.get("synopsis")
         cover_image = data.get("cover_image")
-        progress = data.get("progress", 0)
-        published_date = data.get("published_date")
+        progress = data.get("progress", 0) 
         google_key = data.get("google_key")
 
+       
         if not title or not author or not synopsis or not cover_image or not google_key:
             return make_response({"error": "All book fields are required."}, 400)
-
-        if published_date:
-            try:
-            
-                formatted_date = datetime.strptime(published_date, "%Y-%d-%m").date()
-            except ValueError:
-            
-                try:
-                    parts = published_date.split("-")
-                    if len(parts) == 3:
-                        year, day, month = parts
-                       
-                        if int(day) > 12:
-                            corrected_date = f"{year}-{day}-{month}"
-                            formatted_date = datetime.strptime(corrected_date, "%Y-%d-%m").date()
-                        else:
-                            raise ValueError("Invalid date format")
-                    else:
-                        raise ValueError("Invalid date format")
-                except Exception:
-                    return make_response({"error": "Invalid date format for published_date. Please use YYYY-DD-MM format."}, 400)
-        else:
-            formatted_date = None
 
         new_book = Book(
             title=title,
@@ -287,19 +269,19 @@ class Books(Resource):
             synopsis=synopsis,
             cover_image=cover_image,
             progress=progress,
-            published_date=formatted_date,
             user_id=user_id,
             google_key=google_key
         )
 
+       
         db.session.add(new_book)
         db.session.commit()
 
+       
         return make_response(new_book.to_dict(), 201)
 
-api.add_resource(Books, "/books")
 
-       
+api.add_resource(Books, "/books")
 
 
 class UsersById(Resource):
