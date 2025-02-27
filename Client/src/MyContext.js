@@ -566,7 +566,7 @@ const deleteShelf = (shelfId) => {
         if (data.user && data.user.id) {
           setUser(data.user);
           setIsLoggedIn(true);
-          console.log("Login successful", data.user);
+          //console.log("Login successful", data.user);
           return true;
         } else if (data.error) {
          
@@ -666,7 +666,7 @@ const deleteShelf = (shelfId) => {
         return response.json();
       })
       .then((userData) => {
-        console.log(userData)
+        //console.log(userData)
         setUser(userData);
         setIsLoggedIn(true);
         

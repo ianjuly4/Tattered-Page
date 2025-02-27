@@ -19,8 +19,12 @@ function BookDetails() {
     setError(null);  
   }, [location]);
 
-  console.log(bookId)
-  console.log(user.books)
+  useEffect(() => {
+    if (!book) {
+      navigate("/books"); 
+    }
+  }, [book, navigate]);
+
   useEffect(() => {
     if (user && user.books && bookId) {
       const userBook = user.books.find((book) => book.google_key === bookId);
