@@ -16,11 +16,12 @@ function BookDetails() {
   const book = books.find((book) => book.id === bookId);
 
   useEffect(() => {
-    setError(null);  // Reset error when location changes (when user navigates)
+    setError(null);  
   }, [location]);
 
+  console.log(bookId)
+  console.log(user.books)
   useEffect(() => {
-    // If the user is logged in and tries to view a book they've added to their collection, navigate to the user's library.
     if (user && user.books && bookId) {
       const userBook = user.books.find((book) => book.google_key === bookId);
       if (userBook) {
@@ -29,7 +30,6 @@ function BookDetails() {
     }
   }, [user, bookId, navigate]);
 
-  // If no book is found, show loading message
   if (!book) {
     return (
       <div>
@@ -44,7 +44,7 @@ function BookDetails() {
   const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
 
   const handleAddtoLibrary = () => {
-    createBook(title, authors, description, coverImageUrl, publishedDate, bookId);
+    createBook(title, authors, description, coverImageUrl, bookId);
   };
 
   const backgroundStyle = {

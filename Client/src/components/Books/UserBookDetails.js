@@ -17,7 +17,7 @@ function UserBookDetails() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check if the user is logged in and set loading state
+  
   useEffect(() => {
     if (!user) {
       setIsLoading(true);
@@ -26,19 +26,19 @@ function UserBookDetails() {
     }
   }, [user]);
 
-  // If not logged in, redirect to bookshelves
+  
   useEffect(() => {
     if (!isLoggedIn) {
       navigate("/bookshelves");
     }
   }, [isLoggedIn, navigate]);
 
-  // Reset the error when the location changes
+ 
   useEffect(() => {
     setError(null);
   }, [location]);
 
-  // Set the book progress from the user's books
+  
   useEffect(() => {
     if (user && books) {
       const book = books.find((book) => book.id === Number(bookId));
@@ -48,14 +48,14 @@ function UserBookDetails() {
     }
   }, [books, bookId, user]);
 
-  // If loading or books are unavailable, show a loading message
+ 
   if (isLoading) {
     return <div>Loading....</div>;
   }
 
-  // Handle cases where books are not available or the book is not found
+ 
   if (!books || !Array.isArray(books)) {
-    return <div>Books not available.</div>;
+    return <div>Book not available.</div>;
   }
 
   const book = books.find((book) => book.id === Number(bookId));

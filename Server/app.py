@@ -239,11 +239,8 @@ class Books(Resource):
             return book_dict_list, 200
         else:
             return {"message": "No Books Found"}, 404
-    
-    from flask import make_response, request, session
-from models import Book, db
 
-class Books(Resource):
+
     def post(self):
         data = request.get_json()
 
