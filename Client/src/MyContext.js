@@ -339,33 +339,47 @@ const deleteShelf = (shelfId) => {
 
 
   //Delete/Delete Book function 
-  const deleteBook = (bookId) => {
-    setLoading(true);
-    setError(null);
+const deleteBook = (bookId) => {
+  setLoading(true);
+  setError(null);
 
-    fetch(`/books/${bookId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to delete book.");
-        }
-        setUser((prevUser) => ({
-          ...prevUser,
-          books: prevUser.books.filter((book) => book.id !== bookId),
-        }));
-        setError(error || "Book deleted successfully!");
-      })
-      .catch((error) => {
-        setError(error.message + "Error deleting book. Please try again.");
-      })
-      .finally(() => {
-        setLoading(false);
+  fetch(`/books/${bookId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to delete book.");
+      }
+
+     
+      setUser((prevUser) => {
+        
+        const updatedBooks = prevUser.books.filter((book) => book.id !== bookId);
+
+      
+        const updatedBookshelves = prevUser.bookshelves.map((shelf) => {
+          return {
+            ...shelf,
+            books: shelf.books.filter((book) => book.id !== bookId), 
+          };
+        });
+
+        return { ...prevUser, books: updatedBooks, bookshelves: updatedBookshelves };
       });
-  };
+
+      setError("Book deleted successfully!");
+    })
+    .catch((error) => {
+      setError(error.message + " Error deleting book. Please try again.");
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+};
+
 
   //update book progress
   const updateBookProgress = (bookId, progress) => {
