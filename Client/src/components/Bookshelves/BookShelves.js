@@ -51,9 +51,8 @@ function BookShelves() {
           </p>
           <p className="mt-4">Here’s what you can do:</p>
           <ul className="mt-4 list-disc pl-6">
-            <li>Organize Your Collection: Create shelves for your current reads, wish list, or books you’ve already devoured.</li>
-            <li>Get Personalized Recommendations: Based on your shelves and preferences, we’ll help you discover your next great read.</li>
-            <li>Share Your Reading Journey: Track your progress, add ratings, and share your thoughts with fellow readers.</li>
+          <li>Organize Your Collection: Create shelves for your current reads, wish list, or books you’ve already devoured.</li>
+          <li>Book Progess: Track your book progess.</li>
           </ul>
           <p className="mt-4">Ready to start building your perfect bookshelf? Dive in and make your library truly yours!</p>
           <div className="text-center mt-4">

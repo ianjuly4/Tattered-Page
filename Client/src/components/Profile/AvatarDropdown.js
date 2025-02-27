@@ -27,7 +27,7 @@ const AvatarDropdown = () => {
 
             {isOpen && (
                 <div className="absolute mt-2 w-auto bg-primary shadow-lg rounded-lg z-10">
-                    <ul className="flex space-x-4"> {/* Use flex and space-x-4 for horizontal layout */}
+                    <ul className="flex space-x-4">
                         {avatarOptions.map((avatar) => (
                             <li
                                 key={avatar.id}
