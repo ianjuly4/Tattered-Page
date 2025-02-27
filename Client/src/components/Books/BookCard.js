@@ -10,12 +10,12 @@ function BookCard({ book }) {
   const coverImageUrl = imageLinks?.thumbnail || defaultbookimage;
 
   return (
-    <div className="card bg-base-100 w-96 shadow-xl">
+    <div className="card bg-base-100 w-86 shadow-xl">
       <figure className="flex justify-center items-center p-6">
         <img
           src={coverImageUrl}
           alt={title}
-          className="max-w-full max-h-96 object-contain"
+          className="max-w-full max-h-86 object-contain"
         />
       </figure>
       <div className="card-body">

@@ -63,7 +63,6 @@ class BookclubsById(Resource):
         data = request.get_json()
 
         bookclub = Bookclub.query.filter(Bookclub.id == id).first()
-
         if not bookclub:
             return make_response({"error": "Bookclub not found."}, 404)
 
@@ -73,27 +72,23 @@ class BookclubsById(Resource):
         if not book:
             return make_response({"error": "Book not found."}, 404)
 
-        action = data.get("action")
-        
-
-        ACTIONS = {"add", "remove"}
-
-        if action not in ACTIONS:
-            return make_response({"error": "Invalid action. Must be 'add' or 'remove'."}, 400)
+        action = data.get("action")  
 
         if action == "add":
             if book in bookclub.books:
                 return make_response({"error": "This book is already in the bookclub."}, 400)
             bookclub.books.append(book)
             db.session.commit()
-            return make_response({"message": "Book added to bookclub.", "bookclub": bookclub.to_dict()}, 200)
+            return make_response(bookclub.to_dict(), 200)
 
         elif action == "remove":
             if book not in bookclub.books:
                 return make_response({"error": "This book is not in the bookclub."}, 400)
             bookclub.books.remove(book)
             db.session.commit()
-            return make_response({"message": "Book removed from bookclub.", "bookclub": bookclub.to_dict()}, 200)
+            return make_response(bookclub.to_dict(), 200)
+
+        return make_response({"error": "Invalid action. Must be 'add' or 'remove'."}, 400)
     
     def delete(self, id):
         bookclub = Bookclub.query.filter(Bookclub.id == id).first()

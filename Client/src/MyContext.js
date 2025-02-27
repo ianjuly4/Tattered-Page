@@ -94,6 +94,8 @@ function MyContextProvider({ children }) {
         setLoading(false);
       });
   };
+ 
+      
 
   //Update bookclub/Patch
   const addBookToBookclub = (clubId, bookId, action = "add") => {
@@ -114,32 +116,29 @@ function MyContextProvider({ children }) {
         action: action,
       }),
     })
-      .then((response) => response.json())
-      .then((clubData) => {
-        if (Array.isArray(clubData.books)) {
-          setUser((prevUser) => ({
-            ...prevUser,
-            bookclubs: prevUser.bookclubs.map((existingClub) =>
-              existingClub.id === clubId
-                ? {
-                    ...existingClub,
-                    books: clubData.books,
-                  }
-                : existingClub
-            ),
-          }));
-        } else {
-          setError("Unexpected response format.");
+    .then((response) => response.json())
+    .then((clubData) => {
+        if (clubData.books) {
+            setUser((prevUser) => ({
+                ...prevUser,
+                bookclubs: prevUser.bookclubs.map((existingClub) =>
+                    existingClub.id === clubId
+                        ? {
+                              ...existingClub,
+                              books: clubData.books,  
+                          }
+                        : existingClub
+                ),
+            }));
         }
-      })
-      .catch((error) => {
+    })
+    .catch((error) => {
         setError("Error updating bookclub: " + error.message);
-        console.error(error); 
-      })
-      .finally(() => {
+    })
+    .finally(() => {
         setLoading(false);
-      });
-  };
+    });
+};
   
   
   
@@ -339,46 +338,54 @@ const deleteShelf = (shelfId) => {
 
 
   //Delete/Delete Book function 
-const deleteBook = (bookId) => {
-  setLoading(true);
-  setError(null);
-
-  fetch(`/books/${bookId}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to delete book.");
-      }
-
-     
-      setUser((prevUser) => {
-        
-        const updatedBooks = prevUser.books.filter((book) => book.id !== bookId);
-
-      
-        const updatedBookshelves = prevUser.bookshelves.map((shelf) => {
-          return {
-            ...shelf,
-            books: shelf.books.filter((book) => book.id !== bookId), 
-          };
+  const deleteBook = (bookId) => {
+    setLoading(true);
+    setError(null);
+  
+    fetch(`/books/${bookId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete book.");
+        }
+  
+        setUser((prevUser) => {
+         
+          const updatedBooks = prevUser.books.filter((book) => book.id !== bookId);
+  
+          
+          const updatedBookshelves = prevUser.bookshelves.map((shelf) => {
+            return {
+              ...shelf,
+              books: shelf.books.filter((book) => book.id !== bookId), 
+            };
+          });
+  
+       
+          const updatedBookclubs = prevUser.bookclubs.map((club) => {
+            return {
+              ...club,
+              books: club.books.filter((book) => book.id !== bookId), 
+            };
+          });
+  
+          return { ...prevUser, books: updatedBooks, bookshelves: updatedBookshelves, bookclubs: updatedBookclubs };
         });
-
-        return { ...prevUser, books: updatedBooks, bookshelves: updatedBookshelves };
+  
+        setError("Book deleted successfully!");
+      })
+      .catch((error) => {
+        setError(error.message + " Error deleting book. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
-
-      setError("Book deleted successfully!");
-    })
-    .catch((error) => {
-      setError(error.message + " Error deleting book. Please try again.");
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-};
+  };
+  
 
 
   //update book progress
