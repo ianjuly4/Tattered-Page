@@ -316,29 +316,28 @@ const deleteShelf = (shelfId) => {
 
   //update book progress
   const updateBookProgress = (bookId, progress) => {
-    fetch(`/books/${bookId}`, {
+    return fetch(`/books/${bookId}`, {
       method: 'PATCH',
-      body: JSON.stringify({ bookProgress: progress }),
+      body: JSON.stringify({ progress: progress }),
       headers: { 'Content-Type': 'application/json' },
     })
       .then(response => response.json())
       .then(updatedBook => {
-        setUser((prevUser) => {
-          const updatedBooks = prevUser.books.map((book) =>
-            book.id === bookId
-              ? { ...book, progress: updatedBook.progress } 
-              : book
+        setUser(prevUser => {
+          const updatedBooks = prevUser.books.map(book =>
+            book.id === bookId ? { ...book, progress: updatedBook.progress } : book
           );
-          return {
-            ...prevUser, 
-            books: updatedBooks, 
-          };
+          return { ...prevUser, books: updatedBooks };
         });
+        return updatedBook;
       })
       .catch((error) => {
         console.error("Error updating progress:", error);
       });
   };
+  
+  
+  
 
 
   //Create Post Book 
@@ -347,22 +346,36 @@ const deleteShelf = (shelfId) => {
       setError("Missing required fields for book creation");
       return;
     }
-
+  
     const isValidDate = (dateString) => {
       const regex = /^\d{4}-\d{2}-\d{2}$/;
       return regex.test(dateString);
     };
-    const formattedDate = isValidDate(publishedDate) ? publishedDate : 'NA';
+  
+    const formatDate = (dateString) => {
+      const parts = dateString.split("-");
+      if (parts.length === 3) {
+        const [year, day, month] = parts;
+        // Try fixing incorrect date format (if month and day are swapped)
+        if (parseInt(day) > 12) {
+          return `${year}-${day.padStart(2, "0")}-${month.padStart(2, "0")}`;
+        }
+        return dateString; // return original date if it seems valid
+      }
+      return 'NA'; // if the date format is incorrect
+    };
+  
+    const formattedDate = isValidDate(publishedDate) ? publishedDate : formatDate(publishedDate);
     if (formattedDate === 'NA') {
       setError("Invalid date format. Please use YYYY-DD-MM.");
       return;
     }
-
+  
     const authorString = Array.isArray(authors) ? authors.join(", ") : authors;
-
+  
     setLoading(true);
     setError(null);
-
+  
     const requestBody = {
       title,
       author: authorString,
@@ -372,7 +385,7 @@ const deleteShelf = (shelfId) => {
       published_date: formattedDate,
       google_key: bookId
     };
-
+  
     fetch("/books", {
       method: "POST",
       headers: {
@@ -403,11 +416,7 @@ const deleteShelf = (shelfId) => {
       .finally(() => {
         setLoading(false);
       });
-};
-
-
-  
-  
+  };
   
   
   //Fetch Books

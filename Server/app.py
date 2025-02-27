@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, make_response, session, send_from_directory, jsonify
 from flask_restful import Api, Resource
 from config import app, db, bcrypt, migrate, api, os
-from models import User, BookShelf, Bookclub, Book, Chatlog
+from models import User, BookShelf, Bookclub, Book
 from datetime import datetime
 import ipdb
 
@@ -75,7 +75,7 @@ class BookclubsById(Resource):
 
         action = data.get("action")
         
-        # Constants for action types
+
         ACTIONS = {"add", "remove"}
 
         if action not in ACTIONS:
@@ -207,6 +207,19 @@ class BooksById(Resource):
             return make_response({"error":"Book not found"}, 404)
         return make_response(book.to_dict(), 200)
     
+    def patch(self, id):
+        data = request.get_json()
+        book = Book.query.filter(Book.id == id).first()
+        if not book:
+            return make_response({"message": "Book not found"}, 404)
+
+        for attr, value in data.items():
+            setattr(book, attr, value)
+
+        db.session.commit()
+        return make_response(book.to_dict(), 201)
+    
+
     def delete(self, id):
         book = Book.query.filter(Book.id == id).first()
         if not book:
@@ -245,17 +258,29 @@ class Books(Resource):
         if not title or not author or not synopsis or not cover_image or not google_key:
             return make_response({"error": "All book fields are required."}, 400)
 
-       
         if published_date:
             try:
-               
+            
                 formatted_date = datetime.strptime(published_date, "%Y-%d-%m").date()
             except ValueError:
-                return make_response({"error": "Invalid date format for published_date. Please use YYYY-DD-MM format."}, 400)
+            
+                try:
+                    parts = published_date.split("-")
+                    if len(parts) == 3:
+                        year, day, month = parts
+                       
+                        if int(day) > 12:
+                            corrected_date = f"{year}-{day}-{month}"
+                            formatted_date = datetime.strptime(corrected_date, "%Y-%d-%m").date()
+                        else:
+                            raise ValueError("Invalid date format")
+                    else:
+                        raise ValueError("Invalid date format")
+                except Exception:
+                    return make_response({"error": "Invalid date format for published_date. Please use YYYY-DD-MM format."}, 400)
         else:
             formatted_date = None
 
-      
         new_book = Book(
             title=title,
             author=author,

@@ -184,9 +184,6 @@ class Bookclub(db.Model, SerializerMixin):
     books = db.relationship('Book', secondary='bookclub_books', back_populates='bookclubs')
     users = db.relationship('User', secondary='bookclub_users', back_populates='bookclubs')
 
-    # One-to-One relationship with Chatlog
-    chatlog = db.relationship('Chatlog', uselist=False, back_populates='bookclub', cascade='all, delete-orphan')
-
     @validates('name')
     def validate_name(self, key, name):
         if not name:
@@ -199,32 +196,6 @@ class Bookclub(db.Model, SerializerMixin):
             raise ValueError("Description cannot be empty")
         return description
 
-
-class Chatlog(db.Model, SerializerMixin):
-    __tablename__ = "chatlogs"
-
-    serialize_rules = (
-        "-bookclub.chatlog", 
-        "-books.chatlogs",  
-        "-users.chatlogs",
-        
-    )
-
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-
-    bookclub_id = db.Column(db.Integer, db.ForeignKey('bookclubs.id'))
-    bookclub = db.relationship('Bookclub', back_populates='chatlog')
-
-    @validates('content')
-    def validate_content(self, key, content):
-        if not content:
-            raise ValueError("Content cannot be empty")
-        if len(content) < 1:
-            raise ValueError("Content must be at least 1 character long")
-        return content
 
 
 # BookClub-Users (many-to-many relationship between user and bookclub through the 'bookclub_users' table)

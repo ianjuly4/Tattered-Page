@@ -17,9 +17,6 @@ function UserBookDetails() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  
-  console.log(user)
-  
   useEffect(() => {
     if (!user) {
       setIsLoading(true);
@@ -38,6 +35,7 @@ function UserBookDetails() {
     setError(null);
   }, [location]);
 
+  // Set initial progress on book load
   useEffect(() => {
     if (user && books) {
       const book = books.find((book) => book.id === Number(bookId));
@@ -47,6 +45,7 @@ function UserBookDetails() {
     }
   }, [books, bookId, user]);
 
+  // If loading or no books are available, show loading message
   if (isLoading) {
     return <div>Loading....</div>;
   }
@@ -84,8 +83,15 @@ function UserBookDetails() {
     }
   };
 
+  // Update the progress in the context and trigger a re-render
   const handleProgressUpdate = () => {
-    updateBookProgress(bookId, bookProgress);
+    updateBookProgress(bookId, bookProgress)
+      .then((updatedBook) => {
+        // Book progress is updated in context, no need to set the state manually
+      })
+      .catch((error) => {
+        console.error("Error updating progress:", error);
+      });
   };
 
   return (
@@ -108,7 +114,8 @@ function UserBookDetails() {
             <img
               src={cover_image || defaultbookimage}
               alt={title}
-              className="w-full sm:w-48 md:w-64 lg:w-80 h-auto object-cover rounded-lg shadow-lg border-4 border-black"/>
+              className="w-full sm:w-48 md:w-64 lg:w-80 h-auto object-cover rounded-lg shadow-lg border-4 border-black"
+            />
           </figure>
 
           <div className="text-center mb-4">
@@ -143,7 +150,7 @@ function UserBookDetails() {
               ></div>
             </div>
 
-            {/* Input and Button */}
+            {/* Input and Button for updating progress */}
             <div className="flex items-center space-x-4">
               <input
                 type="number"
@@ -159,6 +166,7 @@ function UserBookDetails() {
               </button>
             </div>
           </div>
+
           {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
 
           {/* Bookshelves Section with Border */}

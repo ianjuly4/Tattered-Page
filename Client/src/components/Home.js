@@ -81,8 +81,8 @@ function Home() {
           <div className="text-center lg:text-left lg:w-1/2 px-4 py-8">
             <h1 className="text-5xl font-bold mb-6">Bookclub</h1>
             <p className="py-6">
-              Looking for your next great read? Or perhaps a cozy community to share your thoughts with? Bookclub is the perfect place for book lovers like you! Whether you're diving into a thrilling novel, or exploring thought-provoking nonfiction, we've got a club for everyone.
-            </p>
+            
+            </p>  Looking for your next great read? Or perhaps a cozy community to share your thoughts with? Bookclub is the perfect place for book lovers like you! Whether you're diving into a thrilling novel, or exploring thought-provoking nonfiction, we've got a club for everyone.
             <p className="mt-4">
               Here’s what you can expect:
             </p>

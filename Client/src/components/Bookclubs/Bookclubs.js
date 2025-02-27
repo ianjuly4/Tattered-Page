@@ -44,15 +44,13 @@ function Bookclubs() {
         <div className="text-center lg:text-center lg:w-1/2">
           <h1 className="text-5xl font-bold mb-6">Bookclub</h1>
           <p className="py-6">
-            Looking for your next great read? Or perhaps a cozy community to share your thoughts with? Bookclub is the perfect place for book lovers like you! Whether you're diving into a thrilling novel, exploring thought-provoking nonfiction, or sharing your latest book recommendations, we've got a club for everyone.
+          Looking for your next great read? Or perhaps a cozy community to share your thoughts with? Bookclub is the perfect place for book lovers like you! Whether you're diving into a thrilling novel, or exploring thought-provoking nonfiction, we've got a club for everyone.
           </p>
           <p className="mt-4">
             Here’s what you can expect:
           </p>
           <ul className="mt-4 list-disc pl-6">
-            <li>Join or Create Clubs: Find a Bookclub that matches your interests or create your own to gather like-minded readers!</li>
-            <li>Interactive Discussions: Engage in lively book discussions, share your thoughts, and get fresh perspectives from fellow members.</li>
-            <li>Read & Share: Track your reading progress, share reviews, and explore exciting new genres with fellow bibliophiles.</li>
+          <li>Create Clubs: Create your own to bookclubs with your favorite reads, similar books, or similar genres</li>
           </ul>
           <p className="mt-4">
             Start your reading journey today – your next favorite book is just a click away!
